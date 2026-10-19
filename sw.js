@@ -1,0 +1,65 @@
+// DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
+const VERSION='d38185b6f5';
+const CACHE='dddv-'+VERSION;
+const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+  './cars/4wd-back.png',
+  './cars/4wd-cockpit.png',
+  './cars/4wd-diag.png',
+  './cars/4wd-front.png',
+  './cars/4wd-side.png',
+  './cars/4wdw-back.png',
+  './cars/4wdw-diag.png',
+  './cars/4wdw-side.png',
+  './cars/86-back.png',
+  './cars/86-cockpit.png',
+  './cars/86-diag.png',
+  './cars/86-front.png',
+  './cars/86-side.png',
+  './cars/boss-back.png',
+  './cars/boss-cockpit.png',
+  './cars/boss-diag.png',
+  './cars/boss-front.png',
+  './cars/boss-side.png',
+  './cars/fr-back.png',
+  './cars/fr-cockpit.png',
+  './cars/fr-diag.png',
+  './cars/fr-front.png',
+  './cars/fr-side.png',
+  './cars/kei-back.png',
+  './cars/kei-cockpit.png',
+  './cars/kei-diag.png',
+  './cars/kei-front.png',
+  './cars/kei-side.png',
+  './cars/re-back.png',
+  './cars/re-cockpit.png',
+  './cars/re-diag.png',
+  './cars/re-front.png',
+  './cars/re-side.png',
+  './cars/train-back.png',
+  './cars/train-cockpit.png',
+  './cars/train-diag.png',
+  './cars/train-front.png',
+  './cars/train-side.png'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('dddv-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+// 音楽は途中から読む（Range）ので、丸ごと保存してから切り出して返す
+async function audio(req){
+  const c=await caches.open(CACHE),url=req.url.split('#')[0];
+  let full=await c.match(url);
+  if(!full){try{const r=await fetch(url);if(r.ok){await c.put(url,r.clone());full=r;}else return r;}catch(e){return fetch(req);}}
+  const range=req.headers.get('range');if(!range)return full;
+  const buf=await full.arrayBuffer(),m=/bytes=(\d*)-(\d*)/.exec(range),size=buf.byteLength;
+  const start=m&&m[1]?+m[1]:0,end=m&&m[2]?Math.min(+m[2],size-1):size-1;
+  return new Response(buf.slice(start,end+1),{status:206,headers:{'Content-Type':'audio/mpeg','Content-Range':`bytes ${start}-${end}/${size}`,'Content-Length':String(end-start+1),'Accept-Ranges':'bytes'}});
+}
+self.addEventListener('fetch',e=>{
+  const req=e.request;if(req.method!=='GET')return;
+  const u=new URL(req.url);
+  if(u.pathname.endsWith('.mp3')){e.respondWith(audio(req));return;}
+  // ゲーム本体は新しいものを優先（オフラインなら保存分）
+  if(req.mode==='navigate'||u.pathname.endsWith('/index.html')){
+    e.respondWith(fetch(req).then(r=>{const cp=r.clone();caches.open(CACHE).then(c=>c.put('./index.html',cp));return r;}).catch(()=>caches.match('./index.html')));return;}
+  // 画像・ライブラリ・フォントは保存分を優先
+  e.respondWith(caches.match(req).then(hit=>hit||fetch(req).then(r=>{if(r.ok||r.type==='opaque'){const cp=r.clone();caches.open(CACHE).then(c=>c.put(req,cp));}return r;})));
+});
