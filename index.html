@@ -243,7 +243,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -268,6 +268,11 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <div class="cup"><div class="cupHead"><b>夜の回収便</b><span id="colBest">BEST --</span></div>
       <p class="lede" style="font-size:12px">ネオン街の歩道にあるゴミ集積所（緑の光）で止まって回収しよう。止まっている間に回収ゲージがたまり、回収すると残り時間が8秒増える。時間切れになる前に、できるだけ多く回収してゴールへ。</p>
       <p class="lede" style="font-size:12px">どの乗り物でも遊べるけど、<b>ゴミ収集車</b>だと回収がとても速く、もらえるポイントも多い。通り過ぎたらブレーキでバックして戻れる。</p></div>
+    </section>
+    <section class="pane" id="pane-escape" role="tabpanel" hidden>
+      <div class="cup"><div class="cupHead"><b>深夜の逃走劇</b><span id="escBest">逃げ切り 0回</span></div>
+      <p class="lede" style="font-size:12px">後ろからパトカーが追ってくる。パトカーにくっつかれると捕獲ゲージがたまり、満タンで逮捕。スピードで振り切るか、一般車を盾にしてゴールまで逃げ切ろう。途中で増援も来る。</p>
+      <div class="courseList" id="escList"></div></div>
     </section>
     <section class="pane" id="pane-parts" role="tabpanel" hidden>
       <p class="lede" style="font-size:12px">パーツは全部の車で共通です。乗りかえても付いたままになります。</p>
@@ -855,6 +860,8 @@ const DRIVERS={
     pre:['……闇に、ついて来られるか。','デスドライブの意味を教えてやる。'],passed:['面白い。','その走り、悪くない。'],pass:['ここが限界だ。','夜に呑まれろ。'],win:'夜は、まだ深い。',lose:'……お前が、次の闇だ。'}
 };
 const pick=a=>a[Math.random()*a.length|0];
+const COP={name:'警察',car:'パトカー',col:0x3a7bff,bot:0x15161a,shape:'sedan',sprite:'police',type:'police',cop:true,fav:'',
+  pre:['そこの車、止まりなさい！','前の車、左に寄せて止まりなさい！'],passed:['逃がすな！','応援を要請する！'],pass:['確保ーっ！','前に回り込んだぞ！'],win:'確保！',lose:'…見失いました。'};
 function nameTag(text,col){
   const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');
   g.fillStyle='rgba(8,12,24,.72)';g.fillRect(0,8,256,48);g.fillStyle='#'+col.toString(16).padStart(6,'0');g.fillRect(0,8,8,48);
@@ -863,7 +870,7 @@ function nameTag(text,col){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));sp.scale.set(3.2,.8,1);sp.position.y=2.7;return sp;}
 let cpus=[];
 function makeCpu(def,skill,s0,lane,light){skill+=def.fav===(course&&course.id)?.025:0;
-  const m=makeCar({top:def.col,bot:def.bot,shape:def.shape,sprite:def.sprite},false);
+  const m=makeCar({top:def.col,bot:def.bot,shape:def.shape,sprite:def.sprite,type:def.type},false);
   if(mode==='cup')m.g.add(nameTag(def.name,def.col));
   if(light){const l=new THREE.SpotLight(0xfff0d0,1.4,60,.5,.6,1.4);l.position.set(0,.9,1.9);const t=new THREE.Object3D();t.position.set(0,-.6,12);m.g.add(l,t);l.target=t;}
   return {def,name:def.name,mesh:m,skill,s:s0,v:0,lat:lane,lane,x:0,y:0,z:0,yaw:0,drift:false,done:0};
@@ -960,18 +967,22 @@ function resetRace(){
     ps=slots(4);
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
+  } else if(mode==='escape'){
+    [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
+    ps={s:START_I+70,lat:0};
   } else {
     cpus.push(makeCpu(DRIVERS.yellow,DIFF[diff].scale,START_I+6,-1.6,true));
     ps={s:START_I-10,lat:1.6};
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
   if(spec.type==='train'){car.x=p.x;car.z=p.z;}
-  cpus.forEach(c=>{placeCpu(c);c.ahead=true;});
+  cpus.forEach(c=>{placeCpu(c);c.ahead=c.s>car.idx||!c.def.cop;});
+  if(mode==='escape'){game.bust=0;game.reinf=0;startCopSiren();}
   spawnTraffic();if(mode==='collect')spawnSpots();
   if(cpus.length){const c=pick(cpus);setTimeout(()=>say(c.def,pick(c.def.pre),3.2),500);}
 }
@@ -1018,7 +1029,7 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
-let mode=['battle','collect'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
+let mode=['battle','collect','escape'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
 const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
@@ -1107,16 +1118,25 @@ function renderGarage(){
   if(own&&c.wingAlt){const wb=document.createElement('button');wb.type='button';wb.className='buy ghosty';wb.textContent=wingOn(c.id)?'リアウイングを外す':'リアウイングを付ける';
     wb.addEventListener('click',()=>{store.set('touge_wing_'+c.id,wingOn(c.id)?'0':'1');if(selId===c.id)swapCar(c.id);renderGarage();});act.appendChild(wb);}
 }
+const ESC_COURSES=['wangan','c1','neon','down'];
+let escCourse=store.get('touge_esc_course')||'wangan';if(!ESC_COURSES.includes(escCourse))escCourse='wangan';
+function renderEsc(){const l=$('escList');l.innerHTML='';const st=sj('touge_esc',{});
+  ESC_COURSES.forEach(id=>{const c=courseOf(id),b=document.createElement('button');b.type='button';b.className='courseBtn'+(id===escCourse?' sel':'');
+    b.innerHTML='<b></b><small></small>';b.querySelector('b').textContent=c.name;b.querySelector('small').textContent=st[id]?'逃げ切り '+st[id]+'回':'まだ逃げ切っていない';
+    b.addEventListener('click',()=>{escCourse=id;store.set('touge_esc_course',id);loadCourse(id);renderEsc();syncStart();});l.appendChild(b);});
+  const tot=Object.values(st).reduce((a,b)=>a+b,0);$('escBest').textContent='逃げ切り 合計 '+tot+'回';}
 function syncStart(){
   const b=$('btnStart');
   if(mode==='cup'){const c=CUPS[cupIdx];const r=cupState&&cupState.race<c.courses.length?cupState.race:0;b.textContent=(c.name)+'　第'+(r+1)+'戦へ';}
+  else if(mode==='escape')b.textContent='逃走開始（'+courseOf(escCourse).name+'）';
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  ['gp','battle','garage','parts','collect'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  ['gp','battle','garage','parts','collect','escape'].forEach(k=>$('pane-'+k).hidden=k!==t);
   if(t==='gp'){mode='cup';store.set('touge_mode','cup');const id=CUPS[cupIdx].courses[cupState&&cupState.race<3?cupState.race:0];if(!course||course.id!==id)loadCourse(id);}
+  if(t==='escape'){mode='escape';store.set('touge_mode','escape');if(!course||course.id!==escCourse)loadCourse(escCourse);renderEsc();}
   if(t==='collect'){mode='collect';store.set('touge_mode','collect');if(!course||course.id!=='neon')loadCourse('neon');const b=sj('touge_col_best',null);$('colBest').textContent=b?'BEST '+b.n+'個回収':'BEST --';}
   if(t==='battle'){mode='battle';store.set('touge_mode','battle');if(!course||course.id!==battleCourse)loadCourse(battleCourse);renderCourses();}
   syncStart();
@@ -1127,10 +1147,11 @@ function startFromMenu(){
   $('title').hidden=true;$('snd').hidden=true;startAudio();startBgm();
   if(mode==='cup'){if(!cupState||cupState.race>=CUPS[cupIdx].courses.length)newCup();const id=CUPS[cupIdx].courses[cupState.race];if(course.id!==id)loadCourse(id);}
   else if(mode==='collect'){if(course.id!=='neon')loadCourse('neon');}
+  else if(mode==='escape'){if(course.id!==escCourse)loadCourse(escCourse);}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
-function toMenu(){if(car.siren)setSiren(false);$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -1248,7 +1269,10 @@ function fire(){
   else flash('ハズレ…');}
 function taiko(strong){if(!ac)return;const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(strong?95:80,t);o.frequency.exponentialRampToValueAtTime(42,t+.25);g.gain.setValueAtTime(strong?.55:.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+.32);}
 function kane(){if(!ac)return;const t=ac.currentTime;[1760,2640].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;const lp=ac.createBiquadFilter();lp.type='bandpass';lp.frequency.value=f;g.gain.setValueAtTime(i?.04:.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(lp);lp.connect(g);g.connect(fxOut());o.start(t);o.stop(t+.3);});}
-let sirenOsc=null,sirenG=null;
+let sirenOsc=null,sirenG=null,copSiren=null,copSirenG=null;
+function startCopSiren(){stopCopSiren();if(!ac)return;copSiren=ac.createOscillator();copSiren.type='sawtooth';const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=.5;lg.gain.value=250;lfo.connect(lg);lg.connect(copSiren.frequency);copSiren.frequency.value=860;
+  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;copSirenG=ac.createGain();copSirenG.gain.value=0;copSiren.connect(lp);lp.connect(copSirenG);copSirenG.connect(fxOut());copSiren.start();lfo.start();copSiren.lfo=lfo;}
+function stopCopSiren(){if(copSiren){try{copSiren.stop();copSiren.lfo.stop();}catch(e){}}copSiren=null;copSirenG=null;}
 function setSiren(on){car.siren=on;
   if(sirenOsc){try{sirenOsc.stop();}catch(e){}sirenOsc=null;}
   if(on&&ac){sirenOsc=ac.createOscillator();sirenOsc.type='sawtooth';const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=.55;lg.gain.value=260;lfo.connect(lg);lg.connect(sirenOsc.frequency);sirenOsc.frequency.value=900;
@@ -1413,6 +1437,11 @@ function stepCpu(c,dt,traffic){
         if(ds<4&&Math.abs(dl)<1.7&&o.v<c.v)tv=Math.max(tv0*.6,Math.min(tv,o.v+.3));else tv=tv0*1.04;
       }}
   }
+  if(c.def&&c.def.cop&&game.state==='race'){ // パトカー：プレイヤーを追いかけて真後ろ・横に寄せる
+    const pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz,gap=pp.d-c.s,psp=Math.hypot(car.vx,car.vz);
+    if(gap>80)tv=tv0*1.14;else if(gap>30)tv=tv0*1.05;
+    if(gap>-6&&gap<18){tl=plat+(gap<3?(c.lat>plat?1.9:-1.9):0);tv=Math.min(tv0*1.08,psp+(gap>3?1.8:-.3));passing=true;}
+    else if(gap<=-6)tv=Math.min(tv0,psp*.9);}
   tl=Math.max(-lim,Math.min(lim,tl));
   c.v+=Math.sign(tv-c.v)*Math.min(Math.abs(tv-c.v),(tv>c.v?6:10)*dt);
   c.s=Math.min(N-1.01,c.s+c.v*dt);
@@ -1526,7 +1555,7 @@ function frame(now){
             if(c.def&&radioCd<=0)say(c.def,pick(['うわっ、押された！','な、なんだその車は！','ゴミ収集車…だと…？']));else if(game.shoved%3===0)flash('どかした！ ×'+game.shoved);}
           return;}
         const pu=(R-d);car.x+=dx/d*pu;car.z+=dz/d*pu;if(vn<0){car.vx-=dx/d*vn*1.1;car.vz-=dz/d*vn*1.1;}
-        c.v*=.985;if(vn<-3&&!(c.cd>game.t)){c.cd=game.t+.8;game.hits++;damage(c.def?(-vn-2)*1.2:Math.min(14,(-vn-2)*.6));if(!c.def){c.v=Math.max(c.v,Math.hypot(car.vx,car.vz)*.6);}hitSound();game.shake=.5;endChain(false);}}});}
+        c.v*=.985;if(vn<-3&&!(c.cd>game.t)){c.cd=game.t+.8;game.hits++;damage(c.def?(-vn-2)*(c.def.cop?.35:1.2):Math.min(14,(-vn-2)*.6));if(!c.def){c.v=Math.max(c.v,Math.hypot(car.vx,car.vz)*.6);}hitSound();game.shake=.5;endChain(false);}}});}
   }
   if(racing){
     game.t+=dt;
@@ -1540,6 +1569,14 @@ function frame(now){
       else if(!c.ahead&&c.s>car.idx+3){c.ahead=true;if(radioCd<=0)say(c.def,pick(c.def.pass));}});
     cpus.forEach(c=>{if(!c.done&&c.s>=GOAL_I){c.done=game.t;if(mode==='battle'){rivalDone=game.t;flash('ライバルがゴールした！');}}});
     {const rk=rankNow();if(rk===1){if(game.leadSince==null)game.leadSince=game.t;}else{game.leadSince=null;game.wasBehind=true;}}
+    if(mode==='escape'&&game.state==='race'){
+      const psp=Math.hypot(car.vx,car.vz);let near=0,nd=1e9;
+      cpus.forEach(c=>{if(!c.def.cop)return;const d=Math.hypot(car.x-c.x,car.z-c.z);nd=Math.min(nd,d);if(d<5.5)near++;});
+      if(near)game.bust+=dt*near*(psp<8?.45:psp<16?.16:psp<24?.06:0);else game.bust=Math.max(0,game.bust-dt*.2);
+      game.copDist=nd;if(copSirenG)copSirenG.gain.setTargetAtTime(.09*Math.max(0,1-nd/140),ac.currentTime,.1);
+      if(game.reinf<2&&game.t>25+game.reinf*25&&car.idx>60){game.reinf++;const c=makeCpu(COP,.95,Math.max(2,car.idx-70),pick([-1.6,1.6]),false);placeCpu(c);c.ahead=false;cpus.push(c);flash('パトカーの応援が来た！');say(COP,'応援到着！包囲しろ！');}
+      if(game.bust>=1){game.bust=1;game.busted=true;flash('確保！');finish();}
+    }
     if(mode==='collect'&&game.state==='race'){
       game.left-=dt;const sp=Math.hypot(car.vx,car.vz);let near=null;
       for(const q of spots){if(!q.done&&Math.hypot(car.x-q.x,car.z-q.z)<5){near=q;break;}}
@@ -1635,6 +1672,9 @@ function frame(now){
     const ge=$('gap');
     if(mode==='cup'){const rk=rankNow();let nx=1e9;cpus.forEach(c=>{const d=c.s-car.idx;if(!c.done&&d>0)nx=Math.min(nx,d);});
       ge.textContent=(game.state==='count'?'スタート ':'')+rk+'位 / '+(cpus.length+1)+'台'+(nx<1e9&&game.state!=='count'?'　前まで '+Math.round(nx)+' m':'');ge.className=rk===1?'lead':'';}
+    else if(mode==='escape'){const b=game.bust||0,n=Math.ceil(b*8);
+      ge.textContent='ゴールまで '+Math.max(0,Math.round(GOAL_I-car.idx))+' m　追跡 '+cpus.filter(c=>c.def.cop).length+'台'+(game.copDist<200?'（'+Math.round(game.copDist)+' m）':'')+'　捕獲 '+'■'.repeat(n)+'□'.repeat(8-n);
+      ge.className=b>.5||game.copDist<12?'':'lead';}
     else if(mode==='collect'){let nx=null;for(const q of spots)if(!q.done&&q.i>=car.idx-6){nx=q;break;}
       ge.textContent=(game.cprog>0?'回収中 '+'■'.repeat(Math.ceil(game.cprog*8))+'□'.repeat(8-Math.ceil(game.cprog*8)):'残り '+Math.max(0,game.left).toFixed(1)+' 秒　回収 '+game.collected+'/'+spots.length+(nx?'　次まで '+Math.max(0,Math.round(nx.i-car.idx))+' m':'　ゴールへ！'));
       ge.className=game.left<10?'':'lead';}
@@ -1653,6 +1693,7 @@ function frame(now){
     engG.gain.setTargetAtTime(on&&spec.type!=='bike'&&spec.type!=='sled'?.28+r*.5:0,t,.08);
     sqG.gain.setTargetAtTime(on&&car.drifting&&info.sp>8?Math.min(.35,car.slip*.012):0,t,.06);}
 
+  {const ph=Math.floor(now/180)%2;cpus.forEach(c=>{const sl=c.mesh.g.userData.siren;if(sl)sl.forEach((l,k)=>l.visible=game.state!=='title'&&k===ph);});}
   if(pc.g.userData.siren){const on=car.siren&&game.state!=='title',ph=Math.floor(now/180)%2;pc.g.userData.siren.forEach((l,k)=>l.visible=on&&k===ph);}
   updateSprite(pc,pc.g.rotation.y,game.view===1&&game.state!=='title');
   if(tailCar){tailCar.g.visible=game.state!=='title';updateSprite(tailCar,tailCar.g.rotation.y,false);}
@@ -1666,16 +1707,28 @@ function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCo
 function addRows(rows){if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
 function addTotal(earned){{const b=soryaBonus();if(b){wallet+=b;earned+=b;}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent='+'+earned.toLocaleString()+' P';e.append(t1,t2);}
-function finish(){if(car.siren)setSiren(false);
+function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
   if(!game.retired){game.slowT=1.3;$('count').textContent='GOAL';}
-  if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else finishBattle();
+  if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
+}
+function finishEscape(){
+  const ok=!game.busted&&!game.retired,frac=Math.min(1,Math.max(0,(car.idx-START_I)/(GOAL_I-START_I)));
+  const pBase=ok?2500:Math.round(frac*1200),pDist=ok&&game.copDist<1e8?Math.round(Math.min(game.copDist,300)*6):0,pClean=ok&&game.bust<.05?1000:0,pShove=game.shoved*50;
+  const earned=Math.max(100,pBase+pDist+pClean+pShove-game.hits*20);wallet+=earned;
+  if(ok){const st=sj('touge_esc',{});st[course.id]=(st[course.id]||0)+1;store.set('touge_esc',JSON.stringify(st));}
+  $('resKick').textContent='逃走モード ／ '+course.name;
+  $('resHead').textContent=game.retired?'大破':game.busted?'逮捕':'逃げ切った！';$('resHead').className='res-big '+(ok?'win':'lose');
+  $('resSub').textContent=game.busted?'ゴールまであと '+Math.round(GOAL_I-car.idx)+' m のところで確保された。':game.retired?'車が大破して逃走失敗。':'パトカーを振り切ってゴール。最後のパトカーとの差は '+Math.round(Math.min(game.copDist,999))+' m。';
+  quote(COP,ok?COP.lose:COP.win);
+  addRows([[ok?'逃げ切りボーナス':'逃走距離 '+Math.round(frac*100)+'%',pBase],['パトカーとの差',pDist]].concat(pClean?[['ノータッチ逃走',pClean]]:[],pShove?[['どかした車 '+game.shoved+'台',pShove]]:[],[['接触 '+game.hits+'回',-game.hits*20]]));addTotal(earned);
+  $('btnRetry').textContent='もう一回';$('btnMenu').hidden=false;
 }
 function finishCollect(){
   const PKr=spec.type==='packer',per=PKr?250:150,n=game.collected,all=n===spots.length,goal=!game.timeUp&&!game.retired;
