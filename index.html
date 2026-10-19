@@ -963,7 +963,7 @@ function resetRace(){
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1483,7 +1483,7 @@ function frame(now){
   if(spec.type==='dashi'){const BEAT=.72,np=input.nitro&&!car.nPrev;car.nPrev=input.nitro;car.hop=Math.max(0,(car.hop||0)-dt*3);
     if(racing){const before=car.beatT||0;car.beatT=before+dt;if(car.beatT>=BEAT){car.beatT-=BEAT;taiko(car.combo>0);}
       if(np){const ph=car.beatT,d=Math.min(ph,BEAT-ph);
-        if(d<.15){car.combo=(car.combo||0)+1;const imp=1.1+Math.min(8,car.combo)*.14,sp0=Math.hypot(car.vx,car.vz);
+        if(d<.15){car.combo=(car.combo||0)+1;game.soryaN++;game.maxCombo=Math.max(game.maxCombo,car.combo);const imp=1.1+Math.min(8,car.combo)*.14,sp0=Math.hypot(car.vx,car.vz);
           if(sp0<23+Math.min(8,car.combo)*.4){car.vx+=Math.sin(car.yaw)*imp;car.vz+=Math.cos(car.yaw)*imp;}car.hop=1;flash('そーりゃ！'+(car.combo>1?' ×'+car.combo:''));kane();}
         else{car.combo=0;flash('リズムがずれた…');}}}
     car.nitro=(car.beatT||0)/BEAT;}
@@ -1647,9 +1647,11 @@ function frame(now){
 }
 
 function quote(d,t){const q=$('resQuote');q.style.setProperty('--rc',hex(d.col));q.querySelector('b').textContent=d.name;q.querySelector('span').textContent='「'+t+'」';q.hidden=false;}
-function addRows(rows){const e=$('earn');e.innerHTML='';
+// 山車：そーりゃの回数と最大コンボがポイントになる
+function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
+function addRows(rows){if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
-function addTotal(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent='+'+earned.toLocaleString()+' P';e.append(t1,t2);}
+function addTotal(earned){{const b=soryaBonus();if(b){wallet+=b;earned+=b;}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent='+'+earned.toLocaleString()+' P';e.append(t1,t2);}
 function finish(){
   game.state='done';endChain(true);$('drift').classList.remove('show');
   if(mode!=='collect'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
