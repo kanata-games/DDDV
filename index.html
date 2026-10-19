@@ -922,7 +922,7 @@ $('autoGas').checked=autoGas;
 let vProf=new Float32Array(0),latProf=new Float32Array(0);
 function buildProfiles(){
   vProf=new Float32Array(N);latProf=new Float32Array(N);
-  const A_LAT=10.5,VMAX=44;
+  const A_LAT=12,VMAX=44;
   const kS=new Float32Array(N);for(let i=0;i<N;i++){let m=0;for(let j=Math.max(0,i-6);j<=Math.min(N-1,i+6);j++)m=Math.max(m,Math.abs(P[j].k));kS[i]=m;}
   for(let i=0;i<N;i++)vProf[i]=Math.min(VMAX,kS[i]>0?Math.sqrt(A_LAT/kS[i]):VMAX);
   for(let i=N-2;i>=0;i--)vProf[i]=Math.min(vProf[i],Math.sqrt(vProf[i+1]**2+2*8.5));
@@ -1005,11 +1005,11 @@ const hex=n=>'#'+n.toString(16).padStart(6,'0');
 const sj=(k,d)=>{try{const v=JSON.parse(store.get(k));return v==null?d:v;}catch(e){return d;}};
 // ---- グランプリ ----
 const CUPS=[
-  {id:'D',name:'D級 グランプリ',courses:['lake','up','down'],drivers:['yellow','blue','silver','green'],skill:[.72,.75,.78,.81],prize:4000,pos:[1500,1000,700,450,300]},
-  {id:'C',name:'C級 グランプリ',courses:['tsuzura','lake','ridge'],drivers:['gen','silver','blue','yellow'],skill:[.8,.83,.86,.88],prize:8000,pos:[3000,2000,1400,900,600],req:'D'},
-  {id:'B',name:'B級 グランプリ',courses:['ridge','down','tsuzura'],drivers:['gen','silver','blue','kurenai'],skill:[.88,.91,.94,.97],prize:14000,pos:[4500,3000,2000,1300,800],req:'C'},
-  {id:'N',name:'ナイトシティ グランプリ',courses:['wangan','neon','c1'],drivers:['blue','kurenai','silver','yellow'],skill:[.78,.81,.84,.87],prize:10000,pos:[3500,2400,1600,1000,700],req:'D'},
-  {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[.97,1.0,1.03,1.07],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
+  {id:'D',name:'D級 グランプリ',courses:['lake','up','down'],drivers:['yellow','blue','silver','green'],skill:[.8,.83,.86,.88],prize:4000,pos:[1500,1000,700,450,300]},
+  {id:'C',name:'C級 グランプリ',courses:['tsuzura','lake','ridge'],drivers:['gen','silver','blue','yellow'],skill:[.87,.9,.92,.94],prize:8000,pos:[3000,2000,1400,900,600],req:'D'},
+  {id:'B',name:'B級 グランプリ',courses:['ridge','down','tsuzura'],drivers:['gen','silver','blue','kurenai'],skill:[.92,.95,.97,1.0],prize:14000,pos:[4500,3000,2000,1300,800],req:'C'},
+  {id:'N',name:'ナイトシティ グランプリ',courses:['wangan','neon','c1'],drivers:['blue','kurenai','silver','yellow'],skill:[.84,.87,.9,.92],prize:10000,pos:[3500,2400,1600,1000,700],req:'D'},
+  {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[1.0,1.02,1.05,1.08],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
 ];
 const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
@@ -1390,7 +1390,7 @@ function stepCpu(c,dt,traffic){
   if(c.liftT>0){c.liftT-=dt;c.v=Math.max(0,c.v-25*dt);}
   if(c.stunT>0){c.stunT-=dt;c.v=Math.max(0,c.v-20*dt);}
   const i=Math.min(N-1,Math.floor(c.s));
-  const tv0=vProf[Math.min(N-1,i+3)]*c.skill;let tv=tv0;
+  const tv0=vProf[Math.min(N-1,i+3)]*c.skill*(c.def&&mode==='cup'&&game.state==='race'&&c.s<car.idx-40?1.05:1);let tv=tv0;
   let tl=latProf[i]*.8+c.lane*.45;
   const lim=HALF-1.1;let passing=false;
   if(traffic){
