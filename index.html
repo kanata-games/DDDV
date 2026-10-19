@@ -765,6 +765,7 @@ SPR.taxi=sprSet('taxi',{back:[1.95*326/338,1.95],diag:[2*570/302,2],side:[4.5,4.
 SPR.nbox=sprSet('nbox',{back:[1.85*384/377,1.85],diag:[1.9*585/375,1.9],side:[3.4,3.4*317/568],front:[1.85*396/385,1.85]},{back:1.2,diag:1.2,side:.5,front:1.2},.48);
 SPR.tanto=sprSet('tanto',{back:[1.85*317/329,1.85],diag:[1.9*478/354,1.9],side:[3.4,3.4*330/576],front:[1.85*396/382,1.85]},{back:1.2,diag:1.2,side:.5,front:1.2},.5);
 SPR.alph=sprSet('alph',{back:[2.1*400/367,2.1],diag:[2.15*596/356,2.15],side:[4.4,4.4*319/587],front:[2.1*437/354,2.1]},{back:1.5,diag:1.5,side:.6,front:1.5},.5);
+SPR.noah=sprSet('noah',{back:[2.0*407/381,2.0],diag:[2.05*584/381,2.05],side:[4.2,4.2*350/594],front:[2.0*420/385,2.0]},{back:1.4,diag:1.4,side:.6,front:1.4},.5);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -790,10 +791,10 @@ function updateSprite(obj,yaw,hide){
   sp.plane.position.x=-(lx/L)*push;sp.plane.position.z=(lz/L)*push;
 }
 const CARS=[
-  {id:'86',dur:100,name:'白黒ハチロク',note:'軽くて素直。サイドで流しやすい最初の相棒。',price:0,top:0xf2f2ee,bot:0x15161a,pow:1,grip:1,drift:1,shape:'hatch',sprite:'86',img:'cars/86-diag.png'},
+  {id:'86',dur:100,name:'白黒パチロク',note:'軽くて素直。サイドで流しやすい最初の相棒。',price:0,top:0xf2f2ee,bot:0x15161a,pow:1,grip:1,drift:1,shape:'hatch',sprite:'86',img:'cars/86-diag.png'},
   {id:'kei',dur:130,name:'軽トラ',note:'遅いけど、とにかくよく滑る。荷台つき。',price:1500,top:0xe7e9e3,bot:0xd8dad4,pow:.8,grip:.9,drift:1.35,shape:'truck',sprite:'kei',img:'cars/kei-diag.png'},
   {id:'train',dur:220,name:'峠の電車',note:'線路の上を走る。カーブでサイドを引くと脱線して横に流れ、線路に戻れば再レール成功。',price:5000,top:0xd9dde3,bot:0x2f55c8,pow:1.15,grip:.75,drift:1.5,shape:'sedan',sprite:'train',img:'cars/train-diag.png',type:'train',len:18,halfW:1.45,cam:[13,7.5,-6,14],seat:[0,2.5,8.2]},
-  {id:'fr',dur:100,name:'銀のシルビア',note:'後ろが出やすいドリフト向き。長く流せる。',price:4000,top:0xc4c8cf,bot:0x9aa0a8,pow:1.1,grip:.97,drift:1.28,shape:'coupe',sprite:'fr',img:'cars/fr-diag.png'},
+  {id:'fr',dur:100,name:'銀のシルヴィー',note:'後ろが出やすいドリフト向き。長く流せる。',price:4000,top:0xc4c8cf,bot:0x9aa0a8,pow:1.1,grip:.97,drift:1.28,shape:'coupe',sprite:'fr',img:'cars/fr-diag.png'},
   {id:'re',dur:95,name:'赤いロータリー',note:'高回転でよく伸びる。ライバルと同じ血筋。',price:6500,top:0xd41420,bot:0x2a2a2a,pow:1.2,grip:1.05,drift:1.12,shape:'coupe',sprite:'re',img:'cars/re-diag.png'},
   {id:'4wd',dur:120,name:'青い4WDターボ',note:'立ち上がりが速く安定。ドリフトは苦手。リアウイングは付け外しできる。',price:9000,top:0x1f4fbf,bot:0x1a1d24,pow:1.32,grip:1.22,drift:.8,shape:'sedan',sprite:'4wd',wingAlt:'4wdw',img:'cars/4wd-diag.png'},
   {id:'packer',dur:260,name:'ゴミ収集車',note:'重くて遅いけど、一般車もライバルも押しのけて進む。ぶつかってもほとんど壊れない。ホーン（H）でメロディが流れる。',price:3500,top:0x1f5fd0,bot:0x22252b,pow:.85,grip:.85,drift:.85,shape:'truck',sprite:'packer',img:'cars/packer-diag.png',type:'packer',len:6.2,halfW:1.15,cam:[8.5,4.8,0,5,1.3],seat:[.45,2.05,1.9]},
@@ -802,11 +803,12 @@ const CARS=[
   {id:'tank',dur:420,armor:.2,name:'61式戦車',note:'遅いけど、止まったままその場で旋回できる。壁にぶつかってもほぼ無傷で、車を押しのける。Hで主砲を撃つと前の車がスピンして止まる。',price:15000,top:0x6b7a3a,bot:0x3a3f2a,pow:1.0,grip:1.0,drift:.5,shape:'sedan',sprite:'tank',img:'cars/tank-diag.png',type:'tank',len:6.2,halfW:1.35,vmax:.52,steerMul:1.1,cam:[9,5.2,0,4,1.2],seat:[0,2.3,1.2]},
   {id:'sled',dur:120,name:'ソリ',note:'アクセルがない。下り坂の勢いだけで滑る。平地や上りではアクセルで地面を蹴って少しだけ進める。速いと鉄のランナーから火花が出る。',price:500,top:0xd6262c,bot:0xc98a3a,pow:.3,grip:.75,drift:1.5,shape:'hatch',sprite:'sled',img:'cars/sled-diag.png',type:'sled',len:1.25,halfW:.35,steerMul:1.2,cam:[2.6,1.4,0,3,.2],seat:[0,.8,-.2]},
   {id:'dashi',dur:320,name:'山車（だんじり）',note:'太鼓のリズムに合わせてNを押すと「そーりゃ！」で前に出る。続けて合わせるほど勢いがつく。カーブは横滑りの「やりまわし」。大きいので車を押しのける。',price:6000,top:0xc98a3a,bot:0x1f2c5a,pow:.75,grip:.85,drift:1.4,shape:'truck',sprite:'dashi',img:'cars/dashi-diag.png',type:'dashi',len:6.5,halfW:1.4,vmax:.45,steerMul:1.05,cam:[9,5,0,5,1.6],seat:[0,4.2,1.5]},
-  {id:'police',dur:130,name:'パトカー',note:'クラウンのパトカー。Hでサイレンを鳴らすと赤色灯が回り、前の一般車が端に寄って道を譲る。ライバルはちょっと焦る。',price:7000,top:0xf2f2f2,bot:0x15161a,pow:1.18,grip:1.08,drift:.95,shape:'sedan',sprite:'police',img:'cars/police-diag.png',type:'police'},
-  {id:'taxi',dur:140,name:'タクシー',note:'JPN TAXI。走った距離に応じて運賃（初乗り500 P＋300mごとに100 P）がレース後のポイントに入る。首都高や街では一般車としても走っている。',price:3000,top:0x1c2a55,bot:0x15161a,pow:.95,grip:1.0,drift:.85,shape:'sedan',sprite:'taxi',img:'cars/taxi-diag.png',type:'taxi'},
-  {id:'nbox',dur:110,name:'N-BOX',note:'背の高い軽自動車。パワーは控えめだけど、小回りが利いて街中で強い。首都高や街では一般車としても走っている。',price:1200,top:0xf2f2f2,bot:0x2a2d33,pow:.8,grip:1.02,drift:.9,shape:'hatch',sprite:'nbox',img:'cars/nbox-diag.png',type:'nbox',steerMul:1.25,len:3.4,halfW:.75},
-  {id:'tanto',dur:110,name:'タント',note:'水色の背の高い軽。N-BOXのライバル。少しだけ曲がりやすく、少しだけ遅い。首都高や街では一般車としても走っている。',price:1100,top:0x9fd3ea,bot:0x2a2d33,pow:.78,grip:1.05,drift:.9,shape:'hatch',sprite:'tanto',img:'cars/tanto-diag.png',type:'nbox',steerMul:1.3,len:3.4,halfW:.75},
-  {id:'alph',dur:170,name:'残クレアルファード',note:'黒光りする高級ミニバン。頭金だけで乗れる残価設定クレジット。ただしレースのたびに月々の支払いが賞金から引かれ、車体の傷は査定で残債に上乗せされる。ホーンを鳴らすとオラオラ顔の圧で一般車が道をあける。重くてぶつかり合いに強い。',price:2500,top:0x0d0e11,bot:0x1a1b1f,pow:1.0,grip:.97,drift:.88,shape:'hatch',sprite:'alph',img:'cars/alph-diag.png',type:'alph',steerMul:.95,armor:.7,len:4.9,halfW:.95},
+  {id:'police',dur:130,name:'パトカー',note:'白黒セダンのパトカー。Hでサイレンを鳴らすと赤色灯が回り、前の一般車が端に寄って道を譲る。ライバルはちょっと焦る。',price:7000,top:0xf2f2f2,bot:0x15161a,pow:1.18,grip:1.08,drift:.95,shape:'sedan',sprite:'police',img:'cars/police-diag.png',type:'police'},
+  {id:'taxi',dur:140,name:'タクシー',note:'背の高い今どきのタクシー。走った距離に応じて運賃（初乗り500 P＋300mごとに100 P）がレース後のポイントに入る。首都高や街では一般車としても走っている。',price:3000,top:0x1c2a55,bot:0x15161a,pow:.95,grip:1.0,drift:.85,shape:'sedan',sprite:'taxi',img:'cars/taxi-diag.png',type:'taxi'},
+  {id:'nbox',dur:110,name:'M-BOKS',note:'背の高い軽自動車。パワーは控えめだけど、小回りが利いて街中で強い。首都高や街では一般車としても走っている。',price:1200,top:0xf2f2f2,bot:0x2a2d33,pow:.8,grip:1.02,drift:.9,shape:'hatch',sprite:'nbox',img:'cars/nbox-diag.png',type:'nbox',steerMul:1.25,len:3.4,halfW:.75},
+  {id:'tanto',dur:110,name:'タンタ',note:'水色の背の高い軽。M-BOKSのライバル。少しだけ曲がりやすく、少しだけ遅い。首都高や街では一般車としても走っている。',price:1100,top:0x9fd3ea,bot:0x2a2d33,pow:.78,grip:1.05,drift:.9,shape:'hatch',sprite:'tanto',img:'cars/tanto-diag.png',type:'nbox',steerMul:1.3,len:3.4,halfW:.75},
+  {id:'alph',dur:170,name:'残クレアルファーゾ',note:'黒光りする高級ミニバン。頭金だけで乗れる残価設定クレジット。ただしレースのたびに月々の支払いが賞金から引かれ、車体の傷は査定で残債に上乗せされる。ホーンを鳴らすとオラオラ顔の圧で一般車が道をあける。重くてぶつかり合いに強い。',price:2500,top:0x0d0e11,bot:0x1a1b1f,pow:1.0,grip:.97,drift:.88,shape:'hatch',sprite:'alph',img:'cars/alph-diag.png',type:'alph',steerMul:.95,armor:.7,len:4.9,halfW:.95},
+  {id:'noah',dur:150,name:'ファミリーのノワ',note:'銀色の箱型ミニバン。後ろには家族が乗っている。ぶつけずドリフトもしない安全運転でゴールすると「家族の笑顔ボーナス」（最大900 P）。ぶつけたり振り回したりすると後ろから文句が飛んでくる。素直で扱いやすい。',price:3000,top:0xc9ccd2,bot:0x2a2d33,pow:.92,grip:1.02,drift:.8,shape:'hatch',sprite:'noah',img:'cars/noah-diag.png',type:'noah',steerMul:1.0,len:4.7,halfW:.9},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -1167,7 +1169,8 @@ function toMenu(){if(car.siren)setSiren(false);stopCopSiren();$('result').hidden
 function accMul(){return (car.boost?1.7:1)*(car.draft?1.12:1);}
 function topMul(){return (car.boost?1.2:1)*(car.draft?1.06:1);}
 function hpPow(){const f=car.hp/spec.hpMax;return f<.5?.8+.4*f:1;}
-function damage(a){if(game.state!=='race'||a<=0)return;a*=spec.armor||1;car.hp=Math.max(0,car.hp-a);if(a>=12)flash('ダメージ −'+Math.round(a));if(car.hp<=0)wreck();}
+const FAMILY_LINES=['パパ運転こわい…','ちょっと！ 子どもが起きたでしょ！','ジュースこぼれた〜！','まだ着かないの〜？','おばあちゃん酔っちゃったって','いま絶対ぶつけたよね？'];
+function damage(a){if(game.state!=='race'||a<=0)return;if(spec.type==='noah'&&a>=4&&game.t-(game.famT||-9)>2.5){game.famT=game.t;say({name:'後部座席',col:0xffd27a},FAMILY_LINES[Math.floor(Math.random()*FAMILY_LINES.length)]);}a*=spec.armor||1;car.hp=Math.max(0,car.hp-a);if(a>=12)flash('ダメージ −'+Math.round(a));if(car.hp<=0)wreck();}
 function wreck(){
   if(game.retired)return;game.retired=true;game.state='done';game.shake=1;
   car.vx*=.2;car.vz*=.2;car.v=0;car.derail=false;
@@ -1465,7 +1468,7 @@ function lanesNow(){const n=HALF>=7?3:2;return n===3?[-HALF*2/3,0,HALF*2/3]:[-HA
 function spawnTraffic(){
   if(!course.traffic)return;const ln=lanesNow(),city=course.env==='city';
   for(let k=0;k<course.traffic;k++){const sh=pick(['sedan','hatch','sedan','truck']);
-    const rr=Math.random(),m=rr<.28?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.38?makeCar({top:0x0d0e11,bot:0x1a1b1f,shape:'hatch',sprite:'alph',len:4.9},false):rr<.6?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):rr<.88?makeCar({top:0x9fd3ea,bot:0x2a2d33,shape:'hatch',sprite:'tanto',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
+    const rr=Math.random(),m=rr<.28?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.38?makeCar({top:0x0d0e11,bot:0x1a1b1f,shape:'hatch',sprite:'alph',len:4.9},false):rr<.48?makeCar({top:0xc9ccd2,bot:0x2a2d33,shape:'hatch',sprite:'noah',len:4.7},false):rr<.64?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):rr<.88?makeCar({top:0x9fd3ea,bot:0x2a2d33,shape:'hatch',sprite:'tanto',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
     traffic.push({mesh:m,s:START_I+70+k*(N-220)/course.traffic+Math.random()*25,lat:pick(ln),v:city?8+Math.random()*4:12+Math.random()*7,x:0,y:0,z:0,yaw:0,cd:0});}
   traffic.forEach(t=>placeCpu(t));}
 function stepTraffic(dt){
@@ -1716,11 +1719,12 @@ function frame(now){
 function quote(d,t){const q=$('resQuote');q.style.setProperty('--rc',hex(d.col));q.querySelector('b').textContent=d.name;q.querySelector('span').textContent='「'+t+'」';q.hidden=false;}
 // 山車：そーりゃの回数と最大コンボがポイントになる
 function taxiFare(){if(spec.type!=='taxi')return 0;const d=Math.max(0,P[Math.min(N-1,car.idx)].d-(game.startD||0));return 500+Math.floor(d/300)*100;}
+function familyBonus(){if(spec.type!=='noah'||game.retired)return 0;return Math.max(0,900-game.hits*150-Math.min(450,Math.floor((game.dTotal||0)/40)));}
 function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
 function zanCalc(){if(spec.type!=='alph'||zan<=0){game.zanC=null;return null;}const lost=1-car.hp/spec.hpMax,sat=lost>.05?Math.round(lost*3000/100)*100:0;game.zanC={sat,pay:0};return game.zanC;}
-function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い',-Math.min(ZAN_PAY,zan+z.sat)]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
+function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い',-Math.min(ZAN_PAY,zan+z.sat)]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(spec.type==='noah')rows=rows.concat([['家族の笑顔（接触 '+game.hits+'回）',familyBonus()]]);if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
-function addTotal(earned){{const b=soryaBonus()+taxiFare();if(b){wallet+=b;earned+=b;}}{const z=game.zanC;if(z){zan+=z.sat;const want=Math.min(ZAN_PAY,zan),pay=Math.min(want,Math.max(0,wallet));wallet-=pay;earned-=pay;zan-=pay;store.set('touge_zan',zan);game.zanC=null;setTimeout(()=>flash(zan<=0?'完済！ このアルファードは本当にあなたのものになった':pay<want?'支払いが足りない… 延滞です（残債 '+zan.toLocaleString()+' P）':'残債 あと '+zan.toLocaleString()+' P'),1900);}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
+function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus();if(b){wallet+=b;earned+=b;}}{const z=game.zanC;if(z){zan+=z.sat;const want=Math.min(ZAN_PAY,zan),pay=Math.min(want,Math.max(0,wallet));wallet-=pay;earned-=pay;zan-=pay;store.set('touge_zan',zan);game.zanC=null;setTimeout(()=>flash(zan<=0?'完済！ このアルファーゾは本当にあなたのものになった':pay<want?'支払いが足りない… 延滞です（残債 '+zan.toLocaleString()+' P）':'残債 あと '+zan.toLocaleString()+' P'),1900);}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
 function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
   if(mode!=='collect'&&mode!=='escape'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
