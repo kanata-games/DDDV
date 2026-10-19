@@ -230,7 +230,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 <div class="hud" id="msg"></div>
 <div class="hud" id="radio" hidden><b id="radioName"></b><span id="radioText"></span></div>
 <div class="hud" id="total">ドリフトポイント<strong id="dtotal">0</strong></div>
-<div class="hud" id="dash"><div id="speed">0</div><div id="unit">km/h</div><div id="tach"></div><div id="gear">N</div><div id="draftTag" hidden>スリップストリーム</div><div id="nitroBox"><div class="dl">NITRO <span>N</span></div><div class="dbar"><i id="nitroBar"></i></div></div><div id="hpBox"><div class="dl">耐久 <span id="hpNum">100</span></div><div class="dbar"><i id="hpBar"></i></div></div><div id="derailBox" hidden><div class="dl">脱線ゲージ</div><div class="dbar"><i id="derailBar"></i></div></div></div>
+<div class="hud" id="dash"><div id="speed">0</div><div id="unit">km/h</div><div id="tach"></div><div id="gear">N</div><div id="draftTag" hidden>スリップストリーム</div><div id="nitroBox"><div class="dl"><b id="nitroLbl" style="font-weight:400">NITRO</b> <span>N</span></div><div class="dbar"><i id="nitroBar"></i></div></div><div id="hpBox"><div class="dl">耐久 <span id="hpNum">100</span></div><div class="dbar"><i id="hpBar"></i></div></div><div id="derailBox" hidden><div class="dl">脱線ゲージ</div><div class="dbar"><i id="derailBar"></i></div></div></div>
 
 <div id="touch">
   <div class="grp"><div class="tb big" data-k="left">◀</div><div class="tb big" data-k="right">▶</div></div>
@@ -741,6 +741,7 @@ SPR['4wdw']=Object.assign({},SPR['4wd'],{back:sprTex('cars/4wdw-back.png'),diag:
 SPR.boss=sprSet('boss',{back:[1.36*448/294,1.36],diag:[1.66*518/255,1.66],side:[4.55,4.55*178/538],front:[1.36*448/287,1.36]},{back:1.5,diag:1.5,side:.6,front:1.5},.475);
 SPR.packer=sprSet('packer',{back:[2.9*310/300,2.9],diag:[3.15*520/247,3.15],side:[6.2,6.2*226/520],front:[2.9*313/300,2.9]},{back:3.1,diag:2.6,side:.6,front:3.1},.4725);
 SPR.fork=sprSet('fork',{back:[2.2*194/320,2.2],diag:[2.25*406/320,2.25],side:[3.7,3.7*316/540],front:[2.2*210/320,2.2]},{back:1.6,diag:1.4,side:.5,front:1.6},.62);
+SPR.bike=sprSet('bike',{back:[1.15*182/320,1.15],diag:[1.15*403/320,1.15],side:[1.85,1.85*320/509],front:[1.15*182/320,1.15]},{back:.9,diag:.7,side:.3,front:.9},.66);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -760,6 +761,7 @@ function updateSprite(obj,yaw,hide){
   const wy=Math.atan2(dx,dz);sp.plane.rotation.set(0,wy-yaw,0);
   const L=Math.hypot(dx,dz)||1,push=sp.set.push[view];
   sp.plane.position.y=h/2+.02;
+  if(obj===pc&&spec.type==='bike')sp.plane.rotation.z=Math.max(-.45,Math.min(.45,car.yr*Math.hypot(car.vx,car.vz)*.03));
   // 板をカメラ側へ少し寄せて、車体の手前側の面に見せる
   sp.plane.position.x=-(lx/L)*push;sp.plane.position.z=(lz/L)*push;
 }
@@ -772,6 +774,7 @@ const CARS=[
   {id:'4wd',dur:120,name:'青い4WDターボ',note:'立ち上がりが速く安定。ドリフトは苦手。リアウイングは付け外しできる。',price:9000,top:0x1f4fbf,bot:0x1a1d24,pow:1.32,grip:1.22,drift:.8,shape:'sedan',sprite:'4wd',wingAlt:'4wdw',img:'cars/4wd-diag.png'},
   {id:'packer',dur:260,name:'ゴミ収集車',note:'重くて遅いけど、一般車もライバルも押しのけて進む。ぶつかってもほとんど壊れない。ホーン（H）でメロディが流れる。',price:3500,top:0x1f5fd0,bot:0x22252b,pow:.85,grip:.85,drift:.85,shape:'truck',sprite:'packer',img:'cars/packer-diag.png',type:'packer',len:6.2,halfW:1.15,cam:[10,3.8,0,6],seat:[.45,2.05,1.9]},
   {id:'fork',dur:150,name:'フォークリフト',note:'後輪で曲がるのでクルクル回る。前の車にぶつかるとフォークですくい上げて止める。最高速は低い。',price:2500,top:0xf2c200,bot:0x22252b,pow:.9,grip:.95,drift:1.45,shape:'truck',sprite:'fork',img:'cars/fork-diag.png',type:'fork',len:3.7,halfW:.85,vmax:.62,steerMul:1.9,cam:[7,2.8,0,5],seat:[0,1.75,-.2]},
+  {id:'bike',dur:180,name:'ママチャリ',note:'最高速は低いけど、細くて一般車の間をすり抜けられる。ニトロの代わりに立ちこぎ（ゲージは自然に回復）。ベルはH。',price:800,top:0xc9ccd2,bot:0x2a2d33,pow:.8,grip:1.05,drift:.7,shape:'hatch',sprite:'bike',img:'cars/bike-diag.png',type:'bike',len:1.9,halfW:.4,vmax:.45,steerMul:1.3,cam:[4.5,1.8,0,4],seat:[0,1.35,.1]},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -927,7 +930,7 @@ function resetRace(){
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  car.hp=spec.hpMax;car.nitro=.25;car.boost=false;car.draft=false;Object.assign(game,{shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1191,7 +1194,8 @@ function melody(){const t0=ac.currentTime;if(t0<melodyEnd)return;
   const N_=[[659.3,.2],[622.3,.2],[659.3,.2],[622.3,.2],[659.3,.2],[493.9,.2],[587.3,.2],[523.3,.2],[440,.55]];let t=t0;
   N_.forEach(([f,d])=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.02);g.gain.exponentialRampToValueAtTime(.01,t+d);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+d+.05);t+=d;});
   melodyEnd=t;}
-function horn(){if(!ac)return;if(spec.type==='packer'){melody();return;}if(spec.type==='fork'){[0,.32,.64].forEach(d=>setTimeout(()=>beep(1046,.18),d*1000));return;}const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.75);g.connect(fxOut());
+function horn(){if(!ac)return;if(spec.type==='packer'){melody();return;}if(spec.type==='bike'){[0,.16].forEach(d=>{const t=ac.currentTime+d;[2350,3520].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(i?.08:.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+.65);});});return;}
+  if(spec.type==='fork'){[0,.32,.64].forEach(d=>setTimeout(()=>beep(1046,.18),d*1000));return;}const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.75);g.connect(fxOut());
   const hi=spec.type==='train';[hi?330:440,hi?415:554].forEach(f=>{const o=ac.createOscillator();o.type='square';o.frequency.value=f;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;o.connect(lp);lp.connect(g);o.start(t);o.stop(t+.8);});}
 function hitSound(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.setValueAtTime(140,ac.currentTime);o.frequency.exponentialRampToValueAtTime(40,ac.currentTime+.2);g.gain.setValueAtTime(.5,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.25);o.connect(g);g.connect(fxOut());o.start();o.stop(ac.currentTime+.3);}
 function boom(){if(!ac)return;const t=ac.currentTime;
@@ -1422,7 +1426,8 @@ function frame(now){
   }
   const racing=game.state==='race';
   {const was=car.boost;car.boost=racing&&input.nitro&&car.nitro>0.02&&!car.derail;
-   if(car.boost){car.nitro=Math.max(0,car.nitro-dt*.4);if(!was){flash('NITRO!');whoosh();}}
+   if(car.boost){car.nitro=Math.max(0,car.nitro-dt*.4);if(!was){if(spec.type==='bike')flash('立ちこぎ！');else{flash('NITRO!');whoosh();}}}
+   else if(spec.type==='bike'&&racing)car.nitro=Math.min(1,car.nitro+dt*.09);
    car.draft=false;
    if(racing&&!car.derail){const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz;
      for(const c of cpus.concat(traffic)){const ds=c.s-p.d;if(ds>4&&ds<20&&Math.abs(c.lat-lat)<1.9){car.draft=true;break;}}
@@ -1529,7 +1534,7 @@ function frame(now){
     if(railJ>25){railJ-=25;joint(v);}
   }
   drawSpeed(Math.max(0,info.vf)+(car.boost?18:0),dt);
-  {const on=car.boost&&game.state!=='title',hl=(spec.len||4.2)/2+.3,fx=-Math.sin(car.yaw),fz=-Math.cos(car.yaw),rx=-Math.cos(car.yaw),rz=Math.sin(car.yaw);
+  {const on=car.boost&&game.state!=='title'&&spec.type!=='bike',hl=(spec.len||4.2)/2+.3,fx=-Math.sin(car.yaw),fz=-Math.cos(car.yaw),rx=-Math.cos(car.yaw),rz=Math.sin(car.yaw);
    flames.forEach((f,k)=>{f.visible=on;if(!on)return;const sd=k?-.45:.45,j=.8+Math.random()*.5;f.position.set(car.x+fx*hl+rx*sd,car.y+.45,car.z+fz*hl+rz*sd);f.scale.set(.9*j,.9*j,1);});}
   if(game.shake>.01){camera.position.x+=(Math.random()-.5)*game.shake*.3;camera.position.y+=(Math.random()-.5)*game.shake*.3;}
   const moon=scene.userData.moon;moon.position.copy(camera.position).add(moon.userData.off);
@@ -1557,7 +1562,7 @@ function frame(now){
   if(ac&&eng){const on=game.state!=='title',t=ac.currentTime,r=car.rpm;
     const f=46+r*150;eng.frequency.setTargetAtTime(f,t,.04);eng.e3.frequency.setTargetAtTime(f,t,.04);eng.e2.frequency.setTargetAtTime(f*.5,t,.04);
     eng.lp.frequency.setTargetAtTime(260+r*r*1500*((input.gas||autoGas)?1:.55),t,.06);
-    engG.gain.setTargetAtTime(on?.28+r*.5:0,t,.08);
+    engG.gain.setTargetAtTime(on&&spec.type!=='bike'?.28+r*.5:0,t,.08);
     sqG.gain.setTargetAtTime(on&&car.drifting&&info.sp>8?Math.min(.35,car.slip*.012):0,t,.06);}
 
   updateSprite(pc,pc.g.rotation.y,game.view===1&&game.state!=='title');
