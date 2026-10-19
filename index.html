@@ -20,7 +20,7 @@
 :root{
   --night:#070b16; --ink:#e9ecf5; --dim:#8d97b3;
   --sodium:#ffae42; --sodium-soft:rgba(255,174,66,.18);
-  --moon:#9fb6ff; --tail:#ff3b3b; --panel:rgba(8,12,24,.72);
+  --moon:#9fb6ff; --nitro:#58c8ff; --tail:#ff3b3b; --panel:rgba(8,12,24,.72);
   --f-disp:"Dela Gothic One","Hiragino Kaku Gothic StdN","Yu Gothic",sans-serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
   --f-num:"Chakra Petch","Consolas",monospace;
@@ -47,7 +47,10 @@ body{touch-action:none;user-select:none;-webkit-user-select:none}
 #tach i{width:9px;height:14px;background:rgba(255,255,255,.08);border-radius:1px}
 #tach i.on{background:var(--sodium)} #tach i.on.red{background:var(--tail)}
 #gear{font-size:18px;color:var(--ink);margin-top:4px}
-#derailBox,#hpBox{margin-top:8px;width:140px;margin-left:auto}
+#derailBox,#hpBox,#nitroBox{margin-top:8px;width:140px;margin-left:auto}
+#nitroBox .dl{font-family:var(--f-num);font-size:11px;color:var(--dim);letter-spacing:.16em}#nitroBox .dl span{border:1px solid rgba(233,236,245,.3);border-radius:3px;padding:0 4px;margin-left:4px;color:var(--ink)}
+#nitroBar{background:var(--nitro)!important}#nitroBar.full{box-shadow:0 0 10px var(--nitro)}
+#draftTag{display:inline-block;margin-top:6px;font-family:var(--f-body);font-weight:700;font-size:12px;color:var(--night);background:var(--nitro);padding:2px 8px;border-radius:3px}
 #hpBox .dl{font-family:var(--f-body);font-size:11px;color:var(--dim);letter-spacing:.1em}
 #hpBox .dl span{font-family:var(--f-num);color:var(--ink)}
 #hpBar{background:var(--moon)!important}#hpBar.warn{background:var(--sodium)!important}#hpBar.hot{background:var(--tail)!important;animation:hpblink .5s steps(2) infinite}
@@ -65,6 +68,10 @@ body{touch-action:none;user-select:none;-webkit-user-select:none}
 #total{bottom:calc(16px + env(safe-area-inset-bottom,0px));left:max(16px,env(safe-area-inset-left,0px));font-size:13px;color:var(--dim)}
 #total strong{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
 #count{top:38%;left:50%;transform:translate(-50%,-50%);font-family:var(--f-disp);font-size:clamp(60px,16vw,130px);color:var(--ink);text-shadow:0 0 30px rgba(159,182,255,.7)}
+#radio{left:max(16px,env(safe-area-inset-left,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:min(420px,70vw);background:var(--panel);border-left:4px solid var(--rc,var(--sodium));padding:8px 12px;border-radius:0 4px 4px 0;font-family:var(--f-body);display:flex;flex-direction:column;gap:2px}
+#radio b{font-size:12px;color:var(--rc,var(--sodium));letter-spacing:.06em}
+#radio span{font-size:15px;font-weight:700}
+body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 #msg{top:58%;left:50%;transform:translateX(-50%);font-family:var(--f-body);font-weight:700;font-size:16px;background:var(--panel);padding:6px 14px;border-radius:4px;opacity:0;transition:opacity .3s;white-space:nowrap}
 #msg.show{opacity:1}
 #btnView{position:fixed;z-index:3;top:calc(140px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));font-family:var(--f-body);font-weight:700;font-size:12px;color:var(--ink);background:var(--panel);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:6px 10px;cursor:pointer}
@@ -95,6 +102,12 @@ body{touch-action:none;user-select:none;-webkit-user-select:none}
 .pane{display:flex;flex-direction:column;gap:12px}
 .cup{background:var(--panel);border:1px solid rgba(159,182,255,.15);border-radius:5px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .cup.locked{opacity:.55}
+.cup.sel{border-color:var(--sodium)}
+.rivals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
+.rivals div{display:grid;grid-template-columns:8px 1fr;gap:0 8px;align-items:center;min-width:0}
+.rivals i{grid-row:span 2;width:8px;height:100%;border-radius:2px}
+.rivals b{font-size:13px}.rivals small{font-size:11px;color:var(--dim);min-width:0}
+@media (max-width:520px){.rivals{grid-template-columns:1fr}}
 .cupHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .cupHead b{font-family:var(--f-disp);font-weight:400;font-size:20px}
 .cupHead span{font-size:12px;color:var(--dim)}
@@ -118,6 +131,8 @@ body{touch-action:none;user-select:none;-webkit-user-select:none}
 .part .nm{font-family:var(--f-disp);font-size:16px}
 .part p{margin:2px 0 0;font-size:12px;color:var(--dim)}
 .pips{display:flex;gap:4px;margin-top:6px}.pips i{width:22px;height:6px;border-radius:2px;background:rgba(255,255,255,.12)}.pips i.on{background:var(--sodium)}
+#resQuote{margin:0;display:flex;flex-direction:column;gap:2px;border-left:4px solid var(--rc,var(--sodium));padding:6px 12px;background:var(--panel)}
+#resQuote b{font-size:12px;color:var(--rc,var(--sodium))}#resQuote span{font-weight:700}
 #standings{display:flex;flex-direction:column;gap:10px}
 @media (max-width:520px){.courseList,.races{grid-template-columns:1fr}}
 .gHead{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;letter-spacing:.2em;color:var(--dim)}
@@ -181,6 +196,7 @@ h1 em{font-style:normal;color:var(--sodium);text-shadow:0 0 26px rgba(255,174,66
 #touch .tb.on{background:var(--sodium-soft);border-color:var(--sodium)}
 #touch .tb.big{width:78px;height:78px;font-size:22px}
 body.is-touch #touch{display:flex}
+@media (max-width:700px){#touch .tb{width:56px;height:56px;font-size:12px}#touch .tb.big{width:66px;height:66px}#touch .grp{gap:6px}}
 body.is-touch #dash{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 @media (max-width:520px){#speed{font-size:48px}#mini{width:96px;height:96px}#btnView{top:calc(116px + env(safe-area-inset-top,0px))}}
@@ -212,12 +228,13 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 <div class="hud" id="drift"><b>DRIFT</b><span id="dpts">0</span></div>
 <div class="hud" id="count"></div>
 <div class="hud" id="msg"></div>
+<div class="hud" id="radio" hidden><b id="radioName"></b><span id="radioText"></span></div>
 <div class="hud" id="total">ドリフトポイント<strong id="dtotal">0</strong></div>
-<div class="hud" id="dash"><div id="speed">0</div><div id="unit">km/h</div><div id="tach"></div><div id="gear">N</div><div id="hpBox"><div class="dl">耐久 <span id="hpNum">100</span></div><div class="dbar"><i id="hpBar"></i></div></div><div id="derailBox" hidden><div class="dl">脱線ゲージ</div><div class="dbar"><i id="derailBar"></i></div></div></div>
+<div class="hud" id="dash"><div id="speed">0</div><div id="unit">km/h</div><div id="tach"></div><div id="gear">N</div><div id="draftTag" hidden>スリップストリーム</div><div id="nitroBox"><div class="dl">NITRO <span>N</span></div><div class="dbar"><i id="nitroBar"></i></div></div><div id="hpBox"><div class="dl">耐久 <span id="hpNum">100</span></div><div class="dbar"><i id="hpBar"></i></div></div><div id="derailBox" hidden><div class="dl">脱線ゲージ</div><div class="dbar"><i id="derailBar"></i></div></div></div>
 
 <div id="touch">
   <div class="grp"><div class="tb big" data-k="left">◀</div><div class="tb big" data-k="right">▶</div></div>
-  <div class="grp"><div class="tb" data-k="hand">サイド</div><div class="tb" data-k="brake">ブレーキ</div><div class="tb big" data-k="gas">アクセル</div></div>
+  <div class="grp"><div class="tb" data-k="nitro">ニトロ</div><div class="tb" data-k="hand">サイド</div><div class="tb" data-k="brake">ブレーキ</div><div class="tb big" data-k="gas">アクセル</div></div>
 </div>
 
 <div class="ov" id="title">
@@ -254,7 +271,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     <button class="go" id="btnStart" type="button">グランプリへ</button>
     <ul class="keys">
       <li><kbd>↑</kbd><kbd>W</kbd>アクセル　<kbd>↓</kbd><kbd>S</kbd>ブレーキ　<kbd>←</kbd><kbd>→</kbd>ハンドル</li>
-      <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン</li>
+      <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>N</kbd>ニトロ　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン</li>
     </ul>
     <div class="opts">画質
       <div class="seg" id="qSeg"><button type="button" data-q="0">軽い</button><button type="button" data-q="1">標準</button><button type="button" data-q="2">きれい</button></div>
@@ -269,6 +286,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     <div class="kicker" id="resKick">GOAL</div>
     <div class="res-big" id="resHead">勝利</div>
     <p class="lede" id="resSub"></p>
+    <p class="quote" id="resQuote" hidden><b></b><span></span></p>
     <div class="spec">
       <div><small>タイム</small><b id="rTime">0:00.00</b></div>
       <div><small>ドリフト</small><b id="rDrift">0</b></div>
@@ -304,20 +322,30 @@ const DOWN_SEGS=[
   ['C',30,95,.05],['S',60,.06],['C',85,-30,.05],['S',160,.03]
 ];
 const LAKE_SEGS=[['S',160,.01],['C',120,45,.01],['C',90,-60,.015],['S',120,.01],['C',60,80,.02],['S',80,.01],['C',150,-40,0],['C',45,-70,.02],['S',140,.01],['C',75,95,.015],['C',110,-50,.01],['S',100,0],['C',38,110,.02],['S',90,.01],['C',90,-75,.01],['C',130,30,0],['S',200,.01],['C',55,-80,.015],['S',120,.01]];
+// 4つ目以降の値に'T'があればトンネル
+const TSUZURA_SEGS=[['S',120,.05],['C',60,40,.06],['S',70,.07],
+ ['C',21,176,.05],['S',75,.09],['C',21,-176,.05],['S',75,.09],['C',21,176,.05],['S',75,.09],['C',21,-176,.05],['S',60,.08],
+ ['C',70,-45,.06],['S',90,.07],['C',40,-20,.06],['S',60,.07],
+ ['C',20,178,.05],['S',80,.09],['C',20,-178,.05],['S',80,.09],['C',20,178,.05],['S',70,.08],
+ ['C',90,-35,.05],['S',160,.04]];
+const RIDGE_SEGS=[['S',200,.02],['C',140,35,.02],['S',160,.03,'T'],['C',110,-30,.03,'T'],['S',80,.03,'T'],['C',90,-55,.03],['S',170,.02],['C',60,85,.03],['S',100,.03],
+ ['C',220,-30,.02],['S',150,.02,'T'],['C',160,25,.02,'T'],['S',90,.02,'T'],['C',45,-110,.03],['S',120,.02],['C',80,65,.02],['C',100,-40,.02],['S',180,.02]];
 // コース一覧（区間の並びだけで道・景色・CPUの走り方まで自動で作られる）
 const COURSES=[
   {id:'lake',name:'湖畔ハイウェイ',sub:'湖沿いの高速コーナーが続く',segs:LAKE_SEGS,y0:60,water:true,lampStep:55},
   {id:'up',name:'月見峠 上り',sub:'登り坂でパワーが試される',from:'down',reverse:true,lampStep:72},
-  {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72}
+  {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72},
+  {id:'tsuzura',name:'つづら折り峠',sub:'ヘアピンが7つ続く急な下り',segs:TSUZURA_SEGS,y0:300,lampStep:60},
+  {id:'ridge',name:'稜線トンネルロード',sub:'長いトンネルを抜ける高速コース',segs:RIDGE_SEGS,y0:140,lampStep:70}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
 function genPts(segs,y0){
   const pts=[];let x=0,y=y0,z=0,h=0,dist=0;
   pts.push({x,y,z,h,k:0,d:0});
-  for(const s of segs){
-    if(s[0]==='S'){for(let i=0;i<s[1];i++){x+=Math.sin(h);z+=Math.cos(h);y-=s[2];dist+=1;pts.push({x,y,z,h,k:0,d:dist});}}
+  for(const s of segs){const T=s[0]==='S'?s[3]==='T':s[4]==='T';
+    if(s[0]==='S'){for(let i=0;i<s[1];i++){x+=Math.sin(h);z+=Math.cos(h);y-=s[2];dist+=1;pts.push({x,y,z,h,k:0,d:dist,T});}}
     else{const R=s[1],ang=s[2]*Math.PI/180,n=Math.round(Math.abs(ang)*R),k=Math.sign(ang)/R,dh=ang/n;
-      for(let i=0;i<n;i++){h+=dh/2;x+=Math.sin(h);z+=Math.cos(h);h+=dh/2;y-=s[3];dist+=1;pts.push({x,y,z,h,k,d:dist});}}
+      for(let i=0;i<n;i++){h+=dh/2;x+=Math.sin(h);z+=Math.cos(h);h+=dh/2;y-=s[3];dist+=1;pts.push({x,y,z,h,k,d:dist,T});}}
   }
   for(let pass=0;pass<3;pass++){const ys=pts.map(p=>p.y);for(let i=2;i<pts.length-2;i++)pts[i].y=(ys[i-2]+ys[i-1]+ys[i]+ys[i+1]+ys[i+2])/5;}
   return pts;
@@ -325,7 +353,7 @@ function genPts(segs,y0){
 function buildTrack(def){
   let pts,segs;
   if(def.reverse){const b=courseOf(def.from);segs=b.segs;const base=genPts(b.segs,b.y0),L=base.length-1;
-    pts=base.reverse().map((p,i)=>({x:p.x,y:p.y,z:p.z,h:p.h+Math.PI,k:-p.k,d:i}));}
+    pts=base.reverse().map((p,i)=>({x:p.x,y:p.y,z:p.z,h:p.h+Math.PI,k:-p.k,d:i,T:p.T}));}
   else{segs=def.segs;pts=genPts(def.segs,def.y0);}
   for(const p of pts){p.rx=-Math.cos(p.h);p.rz=Math.sin(p.h);} // car-right vector
   return {pts,hairpins:segs.filter(s=>s[0]==='C'&&Math.abs(s[2])>150).length};
@@ -459,7 +487,7 @@ function buildScenery(){
    while(n<cnt&&tries<cnt*6){tries++;
      const i=(Math.random()*N)|0,s=Math.random()<(course.water?.75:.45)?-1:1,w=width[s][i];if(w<5)continue;
      const oo=(s<0?6:3)+Math.random()*(w-(s<0?6:3)),p=P[i],off=oo+HALF,x=p.x+p.rx*s*off,z=p.z+p.rz*s*off;
-     if(nearRoad(x,z,HALF+3.5,-1,-1))continue;
+     if(nearRoad(x,z,HALF+3.5,-1,-1)||p.T||P[Math.min(N-1,i+8)].T||P[Math.max(0,i-8)].T)continue;
      if(course.water&&s>0&&oo>9)continue; // 湖側は水際まで
      const sc=.7+Math.random()*.9;o.position.set(x,p.y+sideH(s,oo)-.2,z);o.rotation.y=Math.random()*6;o.scale.set(sc,sc*(.8+Math.random()*.6),sc);o.updateMatrix();
      cone.setMatrixAt(n,o.matrix);trunk.setMatrixAt(n,o.matrix);n++;}
@@ -472,13 +500,14 @@ function buildScenery(){
    const poolM=new THREE.MeshBasicMaterial({map:poolT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,polygonOffset:true,polygonOffsetFactor:-2});
    const haloM=new THREE.SpriteMaterial({map:haloT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
    const poolG=new THREE.PlaneGeometry(14,14),o=new THREE.Object3D();
-   for(let k=0;k<cnt;k++){const p=P[k*step+30];if(!p)break;const off=HALF+1.4,bx=p.x-p.rx*off,bz=p.z-p.rz*off;
+   for(let k=0;k<cnt;k++){const p=P[k*step+30];if(!p)break;if(p.T){o.position.set(0,-9999,0);o.updateMatrix();pole.setMatrixAt(k,o.matrix);arm.setMatrixAt(k,o.matrix);head.setMatrixAt(k,o.matrix);continue;}const off=HALF+1.4,bx=p.x-p.rx*off,bz=p.z-p.rz*off;
      o.position.set(bx,p.y+.6,bz);o.rotation.set(0,p.h,0);o.scale.set(1,1,1);o.updateMatrix();pole.setMatrixAt(k,o.matrix);
      const ax=bx+p.rx*1.1,az=bz+p.rz*1.1;o.position.set(ax,p.y+7.5,az);o.rotation.y=p.h+Math.PI/2;o.updateMatrix();arm.setMatrixAt(k,o.matrix);
      const hx=bx+p.rx*2.2,hz=bz+p.rz*2.2;o.position.set(hx,p.y+7.4,hz);o.updateMatrix();head.setMatrixAt(k,o.matrix);
      const pool=new THREE.Mesh(poolG,poolM);pool.rotation.x=-Math.PI/2;pool.position.set(hx,p.y+.04,hz);G.add(pool);
      const halo=new THREE.Sprite(haloM);halo.scale.set(4,4,1);halo.position.set(hx,p.y+7.2,hz);G.add(halo);}
    G.add(pole,arm,head);}
+  buildTunnels();
   gate(START_I,'START',false);gate(GOAL_I,'GOAL',true);
   buildRails();
 }
@@ -489,6 +518,33 @@ function buildScenery(){
   const sp=[];for(let i=0;i<1400;i++){const t=Math.random()*Math.PI*2,u=Math.random()*.9+.08,r=1100;sp.push(Math.cos(t)*Math.sqrt(1-u*u)*r,u*r,Math.sin(t)*Math.sqrt(1-u*u)*r);}
   const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));
   const stars=new THREE.Points(sg,new THREE.PointsMaterial({color:0xcfd8ff,size:1.6,sizeAttenuation:false,fog:false}));scene.add(stars);scene.userData.stars=stars;
+}
+// トンネル：かまぼこ形の壁と天井、オレンジのトンネル照明
+const tunWallT=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#6e6a62';g.fillRect(0,0,w,h);for(let i=0;i<2200;i++){const v=80+Math.random()*50|0;g.fillStyle=`rgba(${v},${v-4},${v-10},.45)`;g.fillRect(Math.random()*w,Math.random()*h,2,2);}g.fillStyle='rgba(30,28,24,.5)';for(let y=0;y<h;y+=32)g.fillRect(0,y,w,2);},true);
+function buildTunnels(){
+  if(!P.some(p=>p.T))return;
+  const G=trackGroup,W=HALF+.9,H=6.4,wallM=new THREE.MeshLambertMaterial({map:tunWallT,side:THREE.DoubleSide});
+  const lightIdx=[];let i=0;
+  while(i<N){if(!P[i].T){i++;continue;}let j=i;while(j<N&&P[j].T)j++;
+    const rows=[];
+    for(let k=Math.max(0,i-1);k<=Math.min(N-1,j);k+=STEP){const p=P[k],v=p.d/5,pt=(a,b)=>[p.x+p.rx*a,p.y+b,p.z+p.rz*a];
+      const ring=[[-W,-.4],[-W,H*.62],[-W*.72,H*.9],[-W*.3,H],[W*.3,H],[W*.72,H*.9],[W,H*.62],[W,-.4]];
+      rows.push(ring.map(([a,b],u)=>{const q=pt(a,b);return [q[0],q[1],q[2],u/2,v];}));}
+    G.add(new THREE.Mesh(ribbon(rows,{}),wallM));
+    // 入口と出口のコンクリート枠
+    [i,j-1].forEach(k=>{const p=P[k],fr=new THREE.Group(),cm=new THREE.MeshLambertMaterial({color:0x9a968c});
+      const top=new THREE.Mesh(new THREE.BoxGeometry(W*2+2,2.2,.8),cm);top.position.y=H+.7;fr.add(top);
+      [-1,1].forEach(sd=>{const pl=new THREE.Mesh(new THREE.BoxGeometry(1.2,H+1,.8),cm);pl.position.set(sd*(W+.5),H/2,0);fr.add(pl);});
+      fr.position.set(p.x,p.y,p.z);fr.rotation.y=p.h;G.add(fr);});
+    for(let k=i+5;k<j-2;k+=10)lightIdx.push(k);
+    i=j;}
+  const n=lightIdx.length*2,lm=new THREE.InstancedMesh(new THREE.BoxGeometry(.25,.14,1.4),new THREE.MeshBasicMaterial({color:0xffb24a}),n);
+  const pm=new THREE.InstancedMesh(new THREE.PlaneGeometry(6,9).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:poolT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,polygonOffset:true,polygonOffsetFactor:-2}),lightIdx.length*2);
+  const o=new THREE.Object3D();let c=0;
+  lightIdx.forEach(k=>{const p=P[k];[-1,1].forEach(sd=>{
+    o.position.set(p.x+p.rx*sd*W*.8,p.y+H*.8,p.z+p.rz*sd*W*.8);o.rotation.set(0,p.h,0);o.updateMatrix();lm.setMatrixAt(c,o.matrix);
+    o.position.set(p.x+p.rx*sd*2,p.y+.05,p.z+p.rz*sd*2);o.updateMatrix();pm.setMatrixAt(c,o.matrix);c++;});});
+  G.add(lm,pm);
 }
 // start / goal gates
 function gate(i,label,checker){
@@ -512,7 +568,7 @@ function buildRails(){
   railGroup.add(new THREE.Mesh(ribbon(bal,{}),new THREE.MeshLambertMaterial({color:0x4a4a48,polygonOffset:true,polygonOffsetFactor:-1})));
   {const step=30,n=Math.floor(N/step),pm=new THREE.MeshLambertMaterial({color:0x7d858e});
    const pole=new THREE.InstancedMesh(new THREE.BoxGeometry(.28,6.2,.28).translate(0,3.1,0),pm,n),arm=new THREE.InstancedMesh(new THREE.BoxGeometry(4.4,.14,.14),pm,n),o2=new THREE.Object3D();
-   for(let k=0;k<n;k++){const p=P[k*step+5];if(!p)break;const bx=p.x-p.rx*3.9,bz=p.z-p.rz*3.9;
+   for(let k=0;k<n;k++){const p=P[k*step+5];if(!p)break;if(p.T){o2.position.set(0,-9999,0);o2.updateMatrix();pole.setMatrixAt(k,o2.matrix);arm.setMatrixAt(k,o2.matrix);continue;}const bx=p.x-p.rx*3.9,bz=p.z-p.rz*3.9;
      o2.position.set(bx,p.y,bz);o2.rotation.set(0,p.h,0);o2.updateMatrix();pole.setMatrixAt(k,o2.matrix);
      o2.position.set(p.x-p.rx*1.75,p.y+6,p.z-p.rz*1.75);o2.updateMatrix();arm.setMatrixAt(k,o2.matrix);}
    railGroup.add(pole,arm);
@@ -644,13 +700,25 @@ function tintTex(file,src,range,shift,mul){mul=mul||1;
 function tintSet(base,file,src,range,shift,mul){const b=SPR[base],o=Object.assign({},b);['back','diag','side','front'].forEach(v=>o[v]=tintTex('cars/'+file+'-'+v+'.png',src,range,shift,mul));return o;}
 SPR.reY=tintSet('re','re',0,28,48);            // 黄色いロータリー
 SPR['4wdG']=tintSet('4wd','4wd',222,40,-75,.62);   // みどりの4WD
-// CPUの車（ドライバー名と車のイラスト）
-const CPU_DEFS=[
-  {name:'イエロー',car:'黄色いロータリー',col:0xf3c613,bot:0x2a2a2a,shape:'coupe',sprite:'reY'},
-  {name:'ブルーサンダー',car:'青い4WDターボ',col:0x2a6fe0,bot:0x1a1d24,shape:'sedan',sprite:'4wdw'},
-  {name:'シルバーフォックス',car:'銀のシルビア',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr'},
-  {name:'みどりの風',car:'緑の4WDターボ',col:0x3fb26a,bot:0x1d2a22,shape:'sedan',sprite:'4wdG'}
-];
+// ライバル：車・得意コース・セリフ
+const DRIVERS={
+  yellow:{name:'イエロー',car:'黄色いロータリー',col:0xf3c613,bot:0x2a2a2a,shape:'coupe',sprite:'reY',fav:'down',
+    pre:['今夜も峠はオレのもんだ。','後ろ、ちゃんとついて来いよ。','ロータリーの回転、聞かせてやる。'],
+    passed:['ちっ、やるじゃねえか！','まだ終わってねえぞ！'],pass:['甘いぜ！','お先に！'],win:'峠はオレの庭だ。',lose:'…次は負けねえ。'},
+  blue:{name:'ブルーサンダー',car:'青い4WDターボ',col:0x2a6fe0,bot:0x1a1d24,shape:'sedan',sprite:'4wdw',fav:'lake',
+    pre:['4WDの立ち上がり、見せてやるよ。','直線で並んだら、もう終わりだ。'],passed:['な、コーナーで!?','計算外だ…！'],pass:['直線ならこっちのもんだ！','ブースト全開！'],win:'計算どおり。',lose:'データが足りなかったか…'},
+  silver:{name:'シルバーフォックス',car:'銀のシルビア',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr',fav:'tsuzura',
+    pre:['ヘアピンは横向きで抜けるもんだ。','狐はね、ずる賢いのさ。'],passed:['…ほう。','いい角度で入るじゃないか。'],pass:['インががら空きだよ。','お見事、とは言わないよ。'],win:'流し方がちがうのさ。',lose:'今日は譲ってあげる。'},
+  green:{name:'みどりの風',car:'緑の4WDターボ',col:0x3fb26a,bot:0x1d2a22,shape:'sedan',sprite:'4wdG',fav:'up',
+    pre:['風になります！','がんばりまーす！'],passed:['わわっ、速い！','す、すごい…！'],pass:['すみません、通りまーす！','風になりました！'],win:'やったー！',lose:'楽しかったです！'},
+  gen:{name:'源さん',car:'軽トラ',col:0xe7e9e3,bot:0xd8dad4,shape:'truck',sprite:'kei',fav:'ridge',
+    pre:['配達の途中なんでな、手短に頼むよ。','この峠は毎朝走っとる。'],passed:['若いのは元気じゃのう。','おお、こわいこわい。'],pass:['ほれ、どいたどいた。','軽トラなめたらいかんぞ。'],win:'積み荷は無事じゃ。',lose:'荷物が重かったわい。'},
+  kurenai:{name:'紅',car:'赤いロータリー',col:0xd41420,bot:0x2a2a2a,shape:'coupe',sprite:'re',fav:'ridge',
+    pre:['イエローなんかと一緒にしないで。','わたしの前は走らせない。'],passed:['……！','やるわね。'],pass:['遅い。','見えてるわよ。'],win:'当然でしょ。',lose:'覚えておくわ。'},
+  veil:{name:'ヴェイル',car:'黒いモンスター',col:0x9b7bff,bot:0x17181c,shape:'coupe',sprite:'boss',fav:'tsuzura',
+    pre:['……闇に、ついて来られるか。','デスドライブの意味を教えてやる。'],passed:['面白い。','その走り、悪くない。'],pass:['ここが限界だ。','夜に呑まれろ。'],win:'夜は、まだ深い。',lose:'……お前が、次の闇だ。'}
+};
+const pick=a=>a[Math.random()*a.length|0];
 function nameTag(text,col){
   const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');
   g.fillStyle='rgba(8,12,24,.72)';g.fillRect(0,8,256,48);g.fillStyle='#'+col.toString(16).padStart(6,'0');g.fillRect(0,8,8,48);
@@ -658,7 +726,7 @@ function nameTag(text,col){
   const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));sp.scale.set(3.2,.8,1);sp.position.y=2.7;return sp;}
 let cpus=[];
-function makeCpu(def,skill,s0,lane,light){
+function makeCpu(def,skill,s0,lane,light){skill+=def.fav===(course&&course.id)?.025:0;
   const m=makeCar({top:def.col,bot:def.bot,shape:def.shape,sprite:def.sprite},false);
   if(mode==='cup')m.g.add(nameTag(def.name,def.col));
   if(light){const l=new THREE.SpotLight(0xfff0d0,1.4,60,.5,.6,1.4);l.position.set(0,.9,1.9);const t=new THREE.Object3D();t.position.set(0,-.6,12);m.g.add(l,t);l.target=t;}
@@ -685,6 +753,8 @@ const smokeT=glowTex('rgba(210,215,225,.5)');const smokes=[];
 for(let i=0;i<70;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:smokeT,transparent:true,depthWrite:false,opacity:0}));s.visible=false;scene.add(s);smokes.push({s,life:0});}
 let smokeI=0;
 function puff(x,y,z,vx,vz){const p=smokes[smokeI];smokeI=(smokeI+1)%smokes.length;p.s.position.set(x,y+.3,z);p.vx=vx*.2;p.vz=vz*.2;p.life=1;p.s.visible=true;}
+// ニトロの炎
+const flameT=glowTex('rgba(90,190,255,1)');const flames=[0,1].map(()=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:flameT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.visible=false;scene.add(s);return s;});
 // sparks
 const sparkT=glowTex('rgba(255,190,90,1)');const sparks=[];
 for(let i=0;i<40;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:sparkT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(.35,.35,1);s.visible=false;scene.add(s);sparks.push({s,life:0,v:new THREE.Vector3()});}
@@ -695,7 +765,7 @@ function spark(x,y,z){for(let k=0;k<8;k++){const p=sparks[sparkI];sparkI=(sparkI
 const car={x:0,y:0,z:0,yaw:0,vx:0,vz:0,yr:0,steer:0,idx:0,drifting:false,slip:0,lastSkid:0,rpm:0,gear:1,s:0,v:0,derail:false,derailT:0,gauge:0};
 const demo={s:0,lat:0,lane:0,v:0,x:0,y:0,z:0,yaw:0,skill:.9};
 let game={state:'title',t:0,count:0,dTotal:0,dChain:0,chainT:0,hits:0,view:0,stuck:0,shake:0};
-const input={left:0,right:0,gas:0,brake:0,hand:0};
+const input={left:0,right:0,gas:0,brake:0,hand:0,nitro:0};
 let autoGas=store.get('touge_auto')==null?isTouch:store.get('touge_auto')==='1';
 $('autoGas').checked=autoGas;
 
@@ -733,25 +803,26 @@ function resetRace(){
   let ps;
   if(mode==='cup'){
     const cp=CUPS[cupIdx];
-    CPU_DEFS.forEach((d,k)=>{const sl=slots(k);cpus.push(makeCpu(d,cp.skill[k],sl.s,sl.lat,false));});
+    cupDrivers().forEach((d,k)=>{const sl=slots(k);cpus.push(makeCpu(d,cp.skill[k],sl.s,sl.lat,false));});
     ps=slots(4);
   } else {
-    cpus.push(makeCpu(CPU_DEFS[0],DIFF[diff].scale,START_I+6,-1.6,true));
+    cpus.push(makeCpu(DRIVERS.yellow,DIFF[diff].scale,START_I+6,-1.6,true));
     ps={s:START_I-10,lat:1.6};
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  car.hp=spec.hpMax;Object.assign(game,{retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  car.hp=spec.hpMax;car.nitro=.25;car.boost=false;car.draft=false;Object.assign(game,{slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
   if(spec.type==='train'){car.x=p.x;car.z=p.z;}
-  cpus.forEach(c=>placeCpu(c));
+  cpus.forEach(c=>{placeCpu(c);c.ahead=true;});
+  {const c=pick(cpus);setTimeout(()=>say(c.def,pick(c.def.pre),3.2),500);}
 }
 let rivalDone=0;
 
 /* ================= INPUT ================= */
-const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',Space:'hand',ShiftLeft:'hand'};
+const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',Space:'hand',ShiftLeft:'hand',KeyN:'nitro',KeyX:'nitro'};
 addEventListener('keydown',e=>{const k=keymap[e.code];if(k){input[k]=1;e.preventDefault();}
   if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();});
 addEventListener('keyup',e=>{const k=keymap[e.code];if(k)input[k]=0;});
@@ -778,32 +849,47 @@ const hex=n=>'#'+n.toString(16).padStart(6,'0');
 const sj=(k,d)=>{try{const v=JSON.parse(store.get(k));return v==null?d:v;}catch(e){return d;}};
 // ---- グランプリ ----
 const CUPS=[
-  {id:'D',name:'D級 グランプリ',courses:['lake','up','down'],skill:[.72,.75,.78,.81],prize:4000,pos:[1500,1000,700,450,300]},
-  {id:'C',name:'C級 グランプリ',locked:true}
+  {id:'D',name:'D級 グランプリ',courses:['lake','up','down'],drivers:['yellow','blue','silver','green'],skill:[.72,.75,.78,.81],prize:4000,pos:[1500,1000,700,450,300]},
+  {id:'C',name:'C級 グランプリ',courses:['tsuzura','lake','ridge'],drivers:['gen','silver','blue','yellow'],skill:[.8,.83,.86,.88],prize:8000,pos:[3000,2000,1400,900,600],req:'D'},
+  {id:'B',name:'B級 グランプリ',courses:['ridge','down','tsuzura'],drivers:['gen','silver','blue','kurenai'],skill:[.88,.91,.94,.97],prize:14000,pos:[4500,3000,2000,1300,800],req:'C'},
+  {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[.97,1.0,1.03,1.07],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
 ];
 const RACE_PTS=[10,6,4,2,1];
-let mode=store.get('touge_mode')==='battle'?'battle':'cup',cupIdx=0,tab=mode==='battle'?'battle':'gp';
-let cupState=sj('touge_cup',null),cleared=sj('touge_cleared',[]);
+let cleared=sj('touge_cleared',[]);
+const cupOpen=c=>!c.req||cleared.includes(c.req);
+let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
+let mode=store.get('touge_mode')==='battle'?'battle':'cup',tab=mode==='battle'?'battle':'gp';
+let cupIdx=+(store.get('touge_cupIdx')||0);if(!CUPS[cupIdx]||!cupOpen(CUPS[cupIdx]))cupIdx=0;
+let cupState=cupStates[CUPS[cupIdx].id]||null;
+const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
+function selectCup(i){cupIdx=i;store.set('touge_cupIdx',i);cupState=cupStates[CUPS[i].id]||null;const id=CUPS[i].courses[cupState&&cupState.race<3?cupState.race:0];if(course.id!==id)loadCourse(id);}
 let battleCourse=store.get('touge_course')||'down';if(!COURSES.some(c=>c.id===battleCourse))battleCourse='down';
-function saveCup(){store.set('touge_cup',JSON.stringify(cupState));}
-function newCup(){cupState={race:0,pts:{you:0},hist:[]};CPU_DEFS.forEach(d=>cupState.pts[d.name]=0);saveCup();}
-function standingsRows(){const r=[{n:'あなた',p:cupState.pts.you,you:1}];CPU_DEFS.forEach(d=>r.push({n:d.name,p:cupState.pts[d.name]||0}));return r.sort((a,b)=>b.p-a.p||(b.you||0)-(a.you||0));}
+function saveCup(){cupStates[CUPS[cupIdx].id]=cupState;store.set('touge_cups',JSON.stringify(cupStates));}
+function newCup(){cupState={race:0,pts:{you:0},hist:[]};cupDrivers().forEach(d=>cupState.pts[d.name]=0);saveCup();}
+function standingsRows(){const r=[{n:'あなた',p:cupState.pts.you,you:1}];cupDrivers().forEach(d=>r.push({n:d.name,p:cupState.pts[d.name]||0}));return r.sort((a,b)=>b.p-a.p||(b.you||0)-(a.you||0));}
 function tblHTML(rows,cols){const e=document.createElement('div');e.className='tbl';
   cols.forEach(c=>{const h=document.createElement('span');h.className='h'+(c.num?' num':'');h.textContent=c.h;e.appendChild(h);});
   rows.forEach((r,k)=>cols.forEach(c=>{const x=document.createElement('span');x.className=(c.num?'num ':'')+(r.you?'you':'');x.textContent=c.f(r,k);e.appendChild(x);}));return e;}
 function renderCup(){
   const box=$('cupBox');box.innerHTML='';
-  CUPS.forEach((c,ci)=>{const d=document.createElement('div');d.className='cup'+(c.locked?' locked':'');
+  CUPS.forEach((c,ci)=>{const open=cupOpen(c),sel=ci===cupIdx,stt=cupStates[c.id]||null;
+    const d=document.createElement('div');d.className='cup'+(open?'':' locked')+(sel?' sel':'');
     const head=document.createElement('div');head.className='cupHead';head.innerHTML='<b></b><span></span>';head.querySelector('b').textContent=c.name;
     const st=head.querySelector('span');
-    if(c.locked){st.textContent='準備中';d.appendChild(head);box.appendChild(d);return;}
-    const done=cleared.includes(c.id);st.textContent=done?'優勝済み':'優勝賞金 '+c.prize.toLocaleString()+' P';if(done)st.className='done';
+    if(!open){st.textContent=CUPS.find(x=>x.id===c.req).name+'で優勝すると開放';d.appendChild(head);box.appendChild(d);return;}
+    const done=cleared.includes(c.id);st.textContent=done?'優勝済み'+(c.title?'（称号「'+c.title+'」）':''):'優勝賞金 '+c.prize.toLocaleString()+' P';if(done)st.className='done';
     d.appendChild(head);
+    if(!sel){const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';p.textContent=c.courses.map(id=>courseOf(id).name).join(' → ')+'　／ ライバル：'+c.drivers.map(k=>DRIVERS[k].name).join('・');d.appendChild(p);
+      const b=document.createElement('button');b.type='button';b.className='ghost';b.textContent='この大会に出る'+(stt&&stt.race>0&&stt.race<3?'（第'+(stt.race+1)+'戦から）':'');
+      b.addEventListener('click',()=>{selectCup(ci);renderCup();syncStart();});d.appendChild(b);box.appendChild(d);return;}
     const races=document.createElement('div');races.className='races';
     c.courses.forEach((id,k)=>{const r=document.createElement('div');const nowR=cupState?cupState.race:0;r.className=k<nowR?'past':k===nowR?'now':'';
       r.innerHTML='<small></small><span></span>';r.querySelector('small').textContent='第'+(k+1)+'戦'+(cupState&&k<nowR?'　'+(cupState.hist[k]||'')+'位':'');r.querySelector('span').textContent=courseOf(id).name;races.appendChild(r);});
     d.appendChild(races);
-    if(cupState&&cupState.race>0){d.appendChild(tblHTML(standingsRows(),[{h:'',f:(r,k)=>(k+1)+'.'},{h:'途中経過',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));}
+    const rv=document.createElement('div');rv.className='rivals';
+    cupDrivers().forEach(dr=>{const e=document.createElement('div');e.innerHTML='<i></i><b></b><small></small>';e.querySelector('i').style.background=hex(dr.col);e.querySelector('b').textContent=dr.name;e.querySelector('small').textContent=dr.car+'　得意：'+courseOf(dr.fav).name;rv.appendChild(e);});
+    d.appendChild(rv);
+    if(cupState&&cupState.race>0&&cupState.race<3){d.appendChild(tblHTML(standingsRows(),[{h:'',f:(r,k)=>(k+1)+'.'},{h:'途中経過',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));}
     const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';
     p.textContent='CPU 4台と3レース。順位ごとに 10・6・4・2・1 ポイント。合計で1位なら優勝。レースごとに順位に応じた賞金も入ります。';
     d.appendChild(p);
@@ -885,6 +971,8 @@ function toMenu(){$('result').hidden=true;game.state='title';clearCpus();demo.s=
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
+function accMul(){return (car.boost?1.7:1)*(car.draft?1.12:1);}
+function topMul(){return (car.boost?1.2:1)*(car.draft?1.06:1);}
 function hpPow(){const f=car.hp/spec.hpMax;return f<.5?.8+.4*f:1;}
 function damage(a){if(game.state!=='race'||a<=0)return;car.hp=Math.max(0,car.hp-a);if(a>=12)flash('ダメージ −'+Math.round(a));if(car.hp<=0)wreck();}
 function wreck(){
@@ -895,6 +983,8 @@ function wreck(){
   boom();flash('大破！ リタイア');setTimeout(finish,1600);
 }
 function recover(){const p=P[car.idx];Object.assign(car,{x:p.x,y:p.y,z:p.z,yaw:p.h,vx:Math.sin(p.h)*4,vz:Math.cos(p.h)*4,yr:0,drifting:false,derail:false,s:p.d,v:4,gauge:0});endChain(false);flash('コースに復帰');}
+let radioT=0,radioCd=0;
+function say(d,t,dur){if(!d||!t)return;const r=$('radio');r.style.setProperty('--rc',hex(d.col));$('radioName').textContent=d.name;$('radioText').textContent='「'+t+'」';r.hidden=false;radioT=dur||2.8;radioCd=3.5;}
 let msgT=0;function flash(t){$('msg').textContent=t;$('msg').classList.add('show');msgT=1.6;}
 
 /* ================= AUDIO ================= */
@@ -984,6 +1074,8 @@ function hitSound(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain(
 function boom(){if(!ac)return;const t=ac.currentTime;
   const src=ac.createBufferSource();src.buffer=ac.createBuffer(1,ac.sampleRate*1.2,ac.sampleRate);const d=src.buffer.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.5);
   const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(1800,t);lp.frequency.exponentialRampToValueAtTime(120,t+1);const g=ac.createGain();g.gain.value=.9;src.connect(lp);lp.connect(g);g.connect(fxOut());src.start(t);}
+function whoosh(){if(!ac)return;const t=ac.currentTime,src=ac.createBufferSource(),b=ac.createBuffer(1,ac.sampleRate*.9,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/d.length);
+  src.buffer=b;const bp=ac.createBiquadFilter();bp.type='bandpass';bp.Q.value=2;bp.frequency.setValueAtTime(400,t);bp.frequency.exponentialRampToValueAtTime(2600,t+.8);const g=ac.createGain();g.gain.value=.55;src.connect(bp);bp.connect(g);g.connect(fxOut());src.start(t);}
 function beep(f,len){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.setValueAtTime(.22,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+len);o.connect(g);g.connect(fxOut());o.start();o.stop(ac.currentTime+len);}
 
 /* ================= PHYSICS ================= */
@@ -1006,7 +1098,7 @@ function stepCar(dt,racing){
   const brake=racing?input.brake:1, hand=racing?input.hand:0;
   // 前後
   const grade=(P[Math.max(0,car.idx-1)].y-P[Math.min(N-1,car.idx+1)].y)/2;
-  if(gas)vf+=gas*8.6*spec.pow*hpPow()*Math.max(0,1-vf/(48*Math.sqrt(spec.pow)))*dt;
+  {const gg=car.boost?1:gas;if(gg)vf+=gg*8.6*spec.pow*hpPow()*accMul()*Math.max(0,1-vf/(48*Math.sqrt(spec.pow)*topMul()))*dt;}
   if(brake){if(vf>0)vf=Math.max(0,vf-15*dt);else vf=Math.max(-6,vf-5*dt);}
   if(hand)vf-=Math.sign(vf)*Math.min(Math.abs(vf),3.5*dt);
   vf+=grade*9.8*.55*dt;
@@ -1082,7 +1174,7 @@ function stepVehicle(dt,racing){
     const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz,dy=Math.abs(((car.yaw-p.h+Math.PI*3)%(Math.PI*2))-Math.PI);
     if(((Math.abs(lat)<1.1&&dy<.3&&!input.hand)||r.sp<4)&&car.derailT>.6){
       const good=r.sp>=4;car.derail=false;car.drifting=false;car.s=p.d;car.v=Math.max(0,r.vf);
-      if(good&&racing){game.dChain+=500;game.chainT=.6;flash('再レール成功！ +500');beep(880,.15);setTimeout(()=>beep(1320,.2),120);}
+      if(good&&racing){game.dChain+=500;car.nitro=Math.min(1,car.nitro+.3);game.chainT=.6;flash('再レール成功！ +500');beep(880,.15);setTimeout(()=>beep(1320,.2),120);}
     }
     return r;
   }
@@ -1090,7 +1182,7 @@ function stepVehicle(dt,racing){
   const i=Math.max(0,Math.min(N-2,Math.floor(car.s)));
   const grade=(P[Math.max(0,i-1)].y-P[Math.min(N-1,i+1)].y)/2;
   let v=car.v;
-  if(gas)v+=gas*6.4*spec.pow*hpPow()*Math.max(0,1-v/46)*dt;
+  {const gg=car.boost?1:gas;if(gg)v+=gg*6.4*spec.pow*hpPow()*accMul()*Math.max(0,1-v/(46*topMul()))*dt;}
   if(brake)v=Math.max(0,v-11*dt);
   v+=grade*9.8*.6*dt;v-=(0.0008*v*v+.15)*dt;v=Math.max(0,v);
   const safe=railSafe(i);
@@ -1176,6 +1268,7 @@ const camPos=new THREE.Vector3(),camLook=new THREE.Vector3();let camInit=false;
 function frame(now){
   requestAnimationFrame(frame);
   let dt=Math.min(.05,(now-last)/1000);last=now;
+  if(game.slowT>0){game.slowT-=dt;dt*=.3;if(game.slowT<=0)$('count').textContent='';}
   if(game.state==='title'){ // メニューの裏で選んだ車がコースを走る
     stepCpu(demo,dt,false);if(demo.s>N-50){demo.s=START_I;demo.v=0;}
     car.x=demo.x;car.z=demo.z;car.idx=Math.floor(demo.s);
@@ -1187,6 +1280,13 @@ function frame(now){
     if(game.count<=0){game.state='race';$('count').textContent='GO';beep(1040,.5);setTimeout(()=>{if($('count').textContent==='GO')$('count').textContent='';},700);}
   }
   const racing=game.state==='race';
+  {const was=car.boost;car.boost=racing&&input.nitro&&car.nitro>0.02&&!car.derail;
+   if(car.boost){car.nitro=Math.max(0,car.nitro-dt*.4);if(!was){flash('NITRO!');whoosh();}}
+   car.draft=false;
+   if(racing&&!car.derail){const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz;
+     for(const c of cpus){const ds=c.s-p.d;if(ds>4&&ds<20&&Math.abs(c.lat-lat)<1.9){car.draft=true;break;}}
+     if(car.draft)car.nitro=Math.min(1,car.nitro+dt*.07);}
+   $('draftTag').hidden=!car.draft;const nb=$('nitroBar');nb.style.width=Math.round(car.nitro*100)+'%';nb.className=car.nitro>=.999?'full':'';}
   let info={vf:0,vr:0,sp:0};
   if(game.state!=='title'){
     acc+=dt;const h=1/120;
@@ -1199,11 +1299,15 @@ function frame(now){
   if(racing){
     game.t+=dt;
     // drift scoring
-    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=car.slip*info.sp*dt*.45;game.chainT=.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
+    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=car.slip*info.sp*dt*.45;car.nitro=Math.min(1,car.nitro+car.slip*info.sp*dt*.45/1500);game.chainT=.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
     else if(game.chainT>0){game.chainT-=dt;if(game.chainT<=0){endChain(true);$('drift').classList.remove('show');}}
     if(info.sp<1.5)game.stuck+=dt;else game.stuck=0;if(game.stuck>3.5){recover();game.stuck=0;}
     if(mode==='battle'&&!game.passed&&cpus[0]&&car.idx>cpus[0].s+4&&game.t>2){game.passed=true;flash('追い抜いた！ +500 P');beep(990,.2);}
+    cpus.forEach(c=>{if(c.done)return;
+      if(c.ahead&&car.idx>c.s+3){c.ahead=false;if(radioCd<=0)say(c.def,pick(c.def.passed));}
+      else if(!c.ahead&&c.s>car.idx+3){c.ahead=true;if(radioCd<=0)say(c.def,pick(c.def.pass));}});
     cpus.forEach(c=>{if(!c.done&&c.s>=GOAL_I){c.done=game.t;if(mode==='battle'){rivalDone=game.t;flash('ライバルがゴールした！');}}});
+    {const rk=rankNow();if(rk===1){if(game.leadSince==null)game.leadSince=game.t;}else{game.leadSince=null;game.wasBehind=true;}}
     if(car.idx>=GOAL_I)finish();
   }
   // 耐久が減ると車から煙
@@ -1254,7 +1358,7 @@ function frame(now){
     if(camera.position.y<car.y+1.2)camera.position.y=car.y+1.2;
     const la=spec.cam?spec.cam[3]||4:4;camLook.set(car.x+Math.sin(cy)*la,car.y+(spec.cam?1.8:1.0),car.z+Math.cos(cy)*la);
     camera.lookAt(camLook);wheelRig.visible=false;
-    if(cockpitOn){cockpitOn=false;$('cockpit').hidden=true;}const fb=spec.type==='train'?Math.min(20,info.sp*.5):Math.min(12,info.sp*.24);camFov+=(68+fb-camFov)*Math.min(1,dt*2);setCam(false,camFov);
+    if(cockpitOn){cockpitOn=false;$('cockpit').hidden=true;}const fb=(spec.type==='train'?Math.min(20,info.sp*.5):Math.min(12,info.sp*.24))+(car.boost?10:0);camFov+=(68+fb-camFov)*Math.min(1,dt*2);setCam(false,camFov);
   } else {
     const cs=Math.cos(car.yaw),sn=Math.sin(car.yaw);
     const st=spec.seat||[.36,1.12,-.25],lx=st[0]; // 右ハンドル
@@ -1271,7 +1375,9 @@ function frame(now){
     const v=Math.max(0,info.vf);railJ+=v*dt;camera.position.y+=Math.sin(now*.045)*Math.min(.05,v*.0015);
     if(railJ>25){railJ-=25;joint(v);}
   }
-  drawSpeed(Math.max(0,info.vf),dt);
+  drawSpeed(Math.max(0,info.vf)+(car.boost?18:0),dt);
+  {const on=car.boost&&game.state!=='title',hl=(spec.len||4.2)/2+.3,fx=-Math.sin(car.yaw),fz=-Math.cos(car.yaw),rx=-Math.cos(car.yaw),rz=Math.sin(car.yaw);
+   flames.forEach((f,k)=>{f.visible=on;if(!on)return;const sd=k?-.45:.45,j=.8+Math.random()*.5;f.position.set(car.x+fx*hl+rx*sd,car.y+.45,car.z+fz*hl+rz*sd);f.scale.set(.9*j,.9*j,1);});}
   if(game.shake>.01){camera.position.x+=(Math.random()-.5)*game.shake*.3;camera.position.y+=(Math.random()-.5)*game.shake*.3;}
   const moon=scene.userData.moon;moon.position.copy(camera.position).add(moon.userData.off);
   scene.userData.stars.position.copy(camera.position);
@@ -1293,6 +1399,7 @@ function frame(now){
     drawMini();
   }
   if(msgT>0){msgT-=dt;if(msgT<=0)$('msg').classList.remove('show');}
+  if(radioT>0){radioT-=dt;if(radioT<=0)$('radio').hidden=true;}if(radioCd>0)radioCd-=dt;
   // audio
   if(ac&&eng){const on=game.state!=='title',t=ac.currentTime,r=car.rpm;
     const f=46+r*150;eng.frequency.setTargetAtTime(f,t,.04);eng.e3.frequency.setTargetAtTime(f,t,.04);eng.e2.frequency.setTargetAtTime(f*.5,t,.04);
@@ -1306,6 +1413,7 @@ function frame(now){
   renderer.render(scene,camera);
 }
 
+function quote(d,t){const q=$('resQuote');q.style.setProperty('--rc',hex(d.col));q.querySelector('b').textContent=d.name;q.querySelector('span').textContent='「'+t+'」';q.hidden=false;}
 function addRows(rows){const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
 function addTotal(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent='+'+earned.toLocaleString()+' P';e.append(t1,t2);}
@@ -1314,26 +1422,29 @@ function finish(){
   if(!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
-  $('standings').innerHTML='';
+  $('standings').innerHTML='';$('resQuote').hidden=true;
+  if(!game.retired){game.slowT=1.3;$('count').textContent='GOAL';}
   if(mode==='cup')finishCup();else finishBattle();
   store.set('touge_p',wallet);
-  setTimeout(()=>{$('result').hidden=false;},900);
+  setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
 }
 function finishBattle(){
   const win=!rivalDone&&!game.retired,d=DIFF[diff];
   const pBase=game.retired?300:win?2000:600,pDrift=Math.round(game.dTotal*.25),pTime=game.retired?0:Math.max(0,Math.round((170-game.t)*15)),pHit=game.hits*40,pPass=game.passed?500:0;
-  const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass-pHit)*d.mult));
+  const comeback=win&&game.leadSince!=null&&game.t-game.leadSince<10,pRev=comeback?600:0;if(comeback)setTimeout(()=>flash('大逆転！'),300);
+  const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass+pRev-pHit)*d.mult));
   wallet+=earned;
   $('resKick').textContent='峠バトル ／ '+course.name;
   $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');
   $('resSub').textContent=game.retired?'壁にぶつけすぎて車が大破した。耐久はパーツの「ボディ補強」で上げられる。':win?'黄色いロータリーを峠で抜き去った。今夜の'+course.name+'はあなたのものだ。':'ライバルに '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。ヘアピンはサイドで鼻先を早めに入れると縮まる。';
-  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]]);addTotal(earned);
+  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev],['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]]);addTotal(earned);
+  quote(DRIVERS.yellow,win?DRIVERS.yellow.lose:DRIVERS.yellow.win);
   $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;
 }
 function finishCup(){
-  const cup=CUPS[cupIdx];
+  const cup=CUPS[cupIdx];let c2;
   // まだ走っているCPUは、今の速さから到着タイムを見積もる
-  const order=cpus.map(c=>({n:c.name,t:c.done||game.t+(GOAL_I-c.s)/Math.max(c.v,8),est:!c.done}));
+  const order=cpus.map(c=>({d:c.def,n:c.name,t:c.done||game.t+(GOAL_I-c.s)/Math.max(c.v,8),est:!c.done}));
   order.push({n:'あなた',t:game.retired?1e9:game.t,you:1,ret:game.retired});
   order.sort((a,b)=>a.t-b.t);
   const pos=order.findIndex(o=>o.you)+1;
@@ -1341,19 +1452,23 @@ function finishCup(){
   cupState.hist.push(pos);cupState.race++;
   const final=cupState.race>=cup.courses.length,table=standingsRows(),champ=final&&table[0].you;
   const pPrize=cup.pos[pos-1],pDrift=Math.round(game.dTotal*.25),pHit=game.hits*40,pCup=champ?cup.prize:0;
-  const earned=Math.max(200,pPrize+pDrift-pHit)+pCup;
+  const gapNext=pos===1&&order[1]?order[1].t-game.t:9,comeback=pos===1&&game.wasBehind&&game.leadSince!=null&&game.t-game.leadSince<10,photo=pos===1&&gapNext<.4;
+  const pRev=comeback?Math.round(cup.pos[0]*.4):0,pPhoto=photo?Math.round(cup.pos[0]*.2):0;
+  const earned=Math.max(200,pPrize+pDrift-pHit)+pCup+pRev+pPhoto;
+  if(comeback)setTimeout(()=>flash('大逆転！'),300);else if(photo)setTimeout(()=>flash('写真判定…わずか '+gapNext.toFixed(2)+' 秒差！'),300);
   wallet+=earned;
   if(champ&&!cleared.includes(cup.id)){cleared.push(cup.id);store.set('touge_cleared',JSON.stringify(cleared));}
   saveCup();
   $('resKick').textContent=cup.name+'　第'+cupState.race+'戦 ／ '+course.name;
   $('resHead').textContent=final?(champ?'優勝！':'総合 '+(table.findIndex(r=>r.you)+1)+'位'):(game.retired?'リタイア':pos+'位');
   $('resHead').className='res-big '+((final?champ:pos===1)?'win':pos>=4?'lose':'');
-  $('resSub').textContent=final?(champ?cup.name+'を制した。優勝賞金 '+cup.prize.toLocaleString()+' P を獲得。':'あと一歩。パーツを強化して、もう一度挑戦しよう。'):
+  $('resSub').textContent=final?(champ?cup.name+'を制した。優勝賞金 '+cup.prize.toLocaleString()+' P を獲得。'+(c2=CUPS[cupIdx+1],c2&&!c2.locked?c2.name+'が開放された。':'')+(cup.title?'称号「'+cup.title+'」を手に入れた。':''):'あと一歩。パーツを強化して、もう一度挑戦しよう。'):
     'このレースは '+pos+'位で '+RACE_PTS[pos-1]+' ポイント。次は '+courseOf(cup.courses[cupState.race]).name+'。';
   const st=$('standings');
   st.appendChild(tblHTML(order,[{h:'',f:(r,k)=>(k+1)+'.'},{h:'このレース',f:r=>r.n},{h:'',f:r=>r.ret?'リタイア':fmt(r.t)+(r.est?'*':'')},{h:'pt',num:1,f:(r,k)=>'+'+RACE_PTS[k]}]));
   st.appendChild(tblHTML(table,[{h:'',f:(r,k)=>(k+1)+'.'},{h:final?'最終結果':'合計',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));
-  addRows([[pos+'位の賞金',pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
+  addRows([[pos+'位の賞金',pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(pRev?[['大逆転ボーナス',pRev]]:[],pPhoto?[['僅差ボーナス',pPhoto]]:[],champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
+  {const top=order.find(o=>!o.you);if(top)quote(top.d,pos===1?top.d.lose:(order[0].you?top.d.lose:(order[0].d||top.d).win));if(pos!==1&&order[0].d)quote(order[0].d,order[0].d.win);}
   if(final){$('btnRetry').textContent='メニューへ';$('btnMenu').hidden=true;}
   else{$('btnRetry').textContent='次のレースへ（'+courseOf(cup.courses[cupState.race]).name+'）';$('btnMenu').hidden=false;}
 }
