@@ -763,6 +763,7 @@ SPR.dashi=sprSet('dashi',{back:[4*362/330,4],diag:[4.1*427/330,4.1],side:[6.5,6.
 SPR.police=sprSet('police',{back:[1.75*485/383,1.75],diag:[1.8*553/281,1.8],side:[4.9,4.9*217/580],front:[1.75*492/373,1.75]},{back:1.5,diag:1.5,side:.6,front:1.5},.47);
 SPR.taxi=sprSet('taxi',{back:[1.95*326/338,1.95],diag:[2*570/302,2],side:[4.5,4.5*252/583],front:[1.95*382/325,1.95]},{back:1.4,diag:1.4,side:.6,front:1.4},.47);
 SPR.nbox=sprSet('nbox',{back:[1.85*384/377,1.85],diag:[1.9*585/375,1.9],side:[3.4,3.4*317/568],front:[1.85*396/385,1.85]},{back:1.2,diag:1.2,side:.5,front:1.2},.48);
+SPR.tanto=sprSet('tanto',{back:[1.85*317/329,1.85],diag:[1.9*478/354,1.9],side:[3.4,3.4*330/576],front:[1.85*396/382,1.85]},{back:1.2,diag:1.2,side:.5,front:1.2},.5);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -803,6 +804,7 @@ const CARS=[
   {id:'police',dur:130,name:'パトカー',note:'クラウンのパトカー。Hでサイレンを鳴らすと赤色灯が回り、前の一般車が端に寄って道を譲る。ライバルはちょっと焦る。',price:7000,top:0xf2f2f2,bot:0x15161a,pow:1.18,grip:1.08,drift:.95,shape:'sedan',sprite:'police',img:'cars/police-diag.png',type:'police'},
   {id:'taxi',dur:140,name:'タクシー',note:'JPN TAXI。走った距離に応じて運賃（初乗り500 P＋300mごとに100 P）がレース後のポイントに入る。首都高や街では一般車としても走っている。',price:3000,top:0x1c2a55,bot:0x15161a,pow:.95,grip:1.0,drift:.85,shape:'sedan',sprite:'taxi',img:'cars/taxi-diag.png',type:'taxi'},
   {id:'nbox',dur:110,name:'N-BOX',note:'背の高い軽自動車。パワーは控えめだけど、小回りが利いて街中で強い。首都高や街では一般車としても走っている。',price:1200,top:0xf2f2f2,bot:0x2a2d33,pow:.8,grip:1.02,drift:.9,shape:'hatch',sprite:'nbox',img:'cars/nbox-diag.png',type:'nbox',steerMul:1.25,len:3.4,halfW:.75},
+  {id:'tanto',dur:110,name:'タント',note:'水色の背の高い軽。N-BOXのライバル。少しだけ曲がりやすく、少しだけ遅い。首都高や街では一般車としても走っている。',price:1100,top:0x9fd3ea,bot:0x2a2d33,pow:.78,grip:1.05,drift:.9,shape:'hatch',sprite:'tanto',img:'cars/tanto-diag.png',type:'nbox',steerMul:1.3,len:3.4,halfW:.75},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -1183,7 +1185,8 @@ const TRACKS=[
   {f:'bgm/anpan-beat.mp3',t:'Anpan Beat'},
   {f:'bgm/ki-no-ki.mp3',t:'Ki no Ki – ELECTRIC'},
   {f:'bgm/stone-to-mountain.mp3',t:'From Stone to Mountain'},
-  {f:'bgm/alps-10000-feet.mp3',t:'ALPS 10,000 FEET - CLIMB TO THE SKY MIX'}
+  {f:'bgm/alps-10000-feet.mp3',t:'ALPS 10,000 FEET - CLIMB TO THE SKY MIX'},
+  {f:'bgm/joy-overdrive.mp3',t:'歓喜超速 — JOY OVERDRIVE'}
 ];
 const vol=Object.assign({bgm:70,eng:40,fx:60},(()=>{try{return JSON.parse(store.get('touge_vol')||'{}')}catch(e){return{}}})());
 let bgmMode=store.get('touge_bgm')||'shuffle',viaGraph=false; // 'shuffle' | 'off' | '0'..'5'
@@ -1458,7 +1461,7 @@ function lanesNow(){const n=HALF>=7?3:2;return n===3?[-HALF*2/3,0,HALF*2/3]:[-HA
 function spawnTraffic(){
   if(!course.traffic)return;const ln=lanesNow(),city=course.env==='city';
   for(let k=0;k<course.traffic;k++){const sh=pick(['sedan','hatch','sedan','truck']);
-    const rr=Math.random(),m=rr<.35?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.7?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
+    const rr=Math.random(),m=rr<.32?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.6?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):rr<.88?makeCar({top:0x9fd3ea,bot:0x2a2d33,shape:'hatch',sprite:'tanto',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
     traffic.push({mesh:m,s:START_I+70+k*(N-220)/course.traffic+Math.random()*25,lat:pick(ln),v:city?8+Math.random()*4:12+Math.random()*7,x:0,y:0,z:0,yaw:0,cd:0});}
   traffic.forEach(t=>placeCpu(t));}
 function stepTraffic(dt){
