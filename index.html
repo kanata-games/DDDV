@@ -273,6 +273,9 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <li><kbd>↑</kbd><kbd>W</kbd>アクセル　<kbd>↓</kbd><kbd>S</kbd>ブレーキ　<kbd>←</kbd><kbd>→</kbd>ハンドル</li>
       <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>N</kbd>ニトロ　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン</li>
     </ul>
+    <div class="opts">視点の距離
+      <div class="seg" id="camSeg"><button type="button" data-c="0">近い</button><button type="button" data-c="1">ふつう</button><button type="button" data-c="2">遠い</button></div>
+    </div>
     <div class="opts">画質
       <div class="seg" id="qSeg"><button type="button" data-q="0">軽い</button><button type="button" data-q="1">標準</button><button type="button" data-q="2">きれい</button></div>
       <span id="autoWrap">　<label><input type="checkbox" id="autoGas"> オートアクセル</label></span>
@@ -772,9 +775,9 @@ const CARS=[
   {id:'fr',dur:100,name:'銀のシルビア',note:'後ろが出やすいドリフト向き。長く流せる。',price:4000,top:0xc4c8cf,bot:0x9aa0a8,pow:1.1,grip:.97,drift:1.28,shape:'coupe',sprite:'fr',img:'cars/fr-diag.png'},
   {id:'re',dur:95,name:'赤いロータリー',note:'高回転でよく伸びる。ライバルと同じ血筋。',price:6500,top:0xd41420,bot:0x2a2a2a,pow:1.2,grip:1.05,drift:1.12,shape:'coupe',sprite:'re',img:'cars/re-diag.png'},
   {id:'4wd',dur:120,name:'青い4WDターボ',note:'立ち上がりが速く安定。ドリフトは苦手。リアウイングは付け外しできる。',price:9000,top:0x1f4fbf,bot:0x1a1d24,pow:1.32,grip:1.22,drift:.8,shape:'sedan',sprite:'4wd',wingAlt:'4wdw',img:'cars/4wd-diag.png'},
-  {id:'packer',dur:260,name:'ゴミ収集車',note:'重くて遅いけど、一般車もライバルも押しのけて進む。ぶつかってもほとんど壊れない。ホーン（H）でメロディが流れる。',price:3500,top:0x1f5fd0,bot:0x22252b,pow:.85,grip:.85,drift:.85,shape:'truck',sprite:'packer',img:'cars/packer-diag.png',type:'packer',len:6.2,halfW:1.15,cam:[10,3.8,0,6],seat:[.45,2.05,1.9]},
-  {id:'fork',dur:150,name:'フォークリフト',note:'後輪で曲がるのでクルクル回る。前の車にぶつかるとフォークですくい上げて止める。最高速は低い。',price:2500,top:0xf2c200,bot:0x22252b,pow:.9,grip:.95,drift:1.45,shape:'truck',sprite:'fork',img:'cars/fork-diag.png',type:'fork',len:3.7,halfW:.85,vmax:.62,steerMul:1.9,cam:[7,2.8,0,5],seat:[0,1.75,-.2]},
-  {id:'bike',dur:180,name:'ママチャリ',note:'最高速は低いけど、細くて一般車の間をすり抜けられる。ニトロの代わりに立ちこぎ（ゲージは自然に回復）。ベルはH。',price:800,top:0xc9ccd2,bot:0x2a2d33,pow:.8,grip:1.05,drift:.7,shape:'hatch',sprite:'bike',img:'cars/bike-diag.png',type:'bike',len:1.9,halfW:.4,vmax:.45,steerMul:1.3,cam:[4.5,1.8,0,4],seat:[0,1.35,.1]},
+  {id:'packer',dur:260,name:'ゴミ収集車',note:'重くて遅いけど、一般車もライバルも押しのけて進む。ぶつかってもほとんど壊れない。ホーン（H）でメロディが流れる。',price:3500,top:0x1f5fd0,bot:0x22252b,pow:.85,grip:.85,drift:.85,shape:'truck',sprite:'packer',img:'cars/packer-diag.png',type:'packer',len:6.2,halfW:1.15,cam:[8,3.2,0,6,1.8],seat:[.45,2.05,1.9]},
+  {id:'fork',dur:150,name:'フォークリフト',note:'後輪で曲がるのでクルクル回る。前の車にぶつかるとフォークですくい上げて止める。最高速は低い。',price:2500,top:0xf2c200,bot:0x22252b,pow:.9,grip:.95,drift:1.45,shape:'truck',sprite:'fork',img:'cars/fork-diag.png',type:'fork',len:3.7,halfW:.85,vmax:.62,steerMul:1.9,cam:[4.8,2.2,0,4.5,1.1],seat:[0,1.75,-.2]},
+  {id:'bike',dur:180,name:'ママチャリ',note:'最高速は低いけど、細くて一般車の間をすり抜けられる。ニトロの代わりに立ちこぎ（ゲージは自然に回復）。ベルはH。',price:800,top:0xc9ccd2,bot:0x2a2d33,pow:.8,grip:1.05,drift:.7,shape:'hatch',sprite:'bike',img:'cars/bike-diag.png',type:'bike',len:1.9,halfW:.4,vmax:.45,steerMul:1.3,cam:[2.9,1.3,0,3.5,.7],seat:[0,1.35,.1]},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -964,6 +967,9 @@ let diff=+(store.get('touge_diff')??1);if(!DIFF[diff])diff=1;
 function syncDiff(){document.querySelectorAll('#dSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===diff));}
 document.querySelectorAll('#dSeg button').forEach(b=>b.addEventListener('click',()=>{diff=+b.dataset.d;store.set('touge_diff',diff);syncDiff();}));
 syncDiff();
+const CAMD=[.78,1,1.3];let camDist=+(store.get('touge_camd')??1);if(!CAMD[camDist])camDist=1;
+function syncCam(){document.querySelectorAll('#camSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.c===camDist));}
+document.querySelectorAll('#camSeg button').forEach(b=>b.addEventListener('click',()=>{camDist=+b.dataset.c;store.set('touge_camd',camDist);syncCam();}));syncCam();
 let focusId=selId;
 const hex=n=>'#'+n.toString(16).padStart(6,'0');
 const sj=(k,d)=>{try{const v=JSON.parse(store.get(k));return v==null?d:v;}catch(e){return d;}};
@@ -1509,14 +1515,14 @@ function frame(now){
     camera.position.lerp(camPos,Math.min(1,dt*2));camera.lookAt(camLook);wheelRig.visible=false;
   } else if(game.view===0){
     const vy=info.sp>4?Math.atan2(car.vx,car.vz):car.yaw;const cy=car.yaw+((vy-car.yaw+Math.PI*3)%(Math.PI*2)-Math.PI)*.35;
-    const cd=spec.cam?spec.cam[0]:6.2,ch=spec.cam?spec.cam[1]:2.3,cl=spec.cam?spec.cam[2]||0:0;
+    const cm=CAMD[camDist],cd=(spec.cam?spec.cam[0]:5)*cm,ch=(spec.cam?spec.cam[1]:1.9)*(.6+.4*cm),cl=spec.cam?spec.cam[2]||0:0;
     camPos.set(car.x-Math.sin(cy)*cd-Math.cos(cy)*cl,car.y+ch,car.z-Math.cos(cy)*cd+Math.sin(cy)*cl);
     if(!camInit){camera.position.copy(camPos);camInit=true;}
     camera.position.lerp(camPos,Math.min(1,dt*4.2));
     if(camera.position.y<car.y+1.2)camera.position.y=car.y+1.2;
-    const la=spec.cam?spec.cam[3]||4:4;camLook.set(car.x+Math.sin(cy)*la,car.y+(spec.cam?1.8:1.0),car.z+Math.cos(cy)*la);
+    const la=spec.cam?spec.cam[3]||4:4;camLook.set(car.x+Math.sin(cy)*la,car.y+(spec.cam?(spec.cam[4]!=null?spec.cam[4]:1.8):1.0),car.z+Math.cos(cy)*la);
     camera.lookAt(camLook);wheelRig.visible=false;
-    if(cockpitOn){cockpitOn=false;$('cockpit').hidden=true;}const fb=(spec.type==='train'?Math.min(20,info.sp*.5):Math.min(12,info.sp*.24))+(car.boost?10:0);camFov+=(68+fb-camFov)*Math.min(1,dt*2);setCam(false,camFov);
+    if(cockpitOn){cockpitOn=false;$('cockpit').hidden=true;}const fb=(spec.type==='train'?Math.min(20,info.sp*.5):Math.min(12,info.sp*.24))+(car.boost?10:0);camFov+=(64+fb*.85-camFov)*Math.min(1,dt*2);setCam(false,camFov);
   } else {
     const cs=Math.cos(car.yaw),sn=Math.sin(car.yaw);
     const st=spec.seat||[.36,1.12,-.25],lx=st[0]; // 右ハンドル
