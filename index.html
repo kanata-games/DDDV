@@ -739,6 +739,7 @@ SPR.re=sprSet('re',{back:[1.3*580/367,1.3],diag:[1.62*589/315,1.62],side:[4.4,4.
 SPR['4wd']=sprSet('4wd',{back:[1.45*433/300,1.45],diag:[1.75*520/251,1.75],side:[4.6,4.6*181/520],front:[1.45*438/300,1.45]},{back:1.5,diag:1.5,side:.6,front:1.5},.48);
 SPR['4wdw']=Object.assign({},SPR['4wd'],{back:sprTex('cars/4wdw-back.png'),diag:sprTex('cars/4wdw-diag.png'),side:sprTex('cars/4wdw-side.png'),size:Object.assign({},SPR['4wd'].size,{side:[4.62,4.62*181/523]})});
 SPR.boss=sprSet('boss',{back:[1.36*448/294,1.36],diag:[1.66*518/255,1.66],side:[4.55,4.55*178/538],front:[1.36*448/287,1.36]},{back:1.5,diag:1.5,side:.6,front:1.5},.475);
+SPR.packer=sprSet('packer',{back:[2.9*310/300,2.9],diag:[3.15*520/247,3.15],side:[6.2,6.2*226/520],front:[2.9*313/300,2.9]},{back:3.1,diag:2.6,side:.6,front:3.1},.4725);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -768,6 +769,7 @@ const CARS=[
   {id:'fr',dur:100,name:'銀のシルビア',note:'後ろが出やすいドリフト向き。長く流せる。',price:4000,top:0xc4c8cf,bot:0x9aa0a8,pow:1.1,grip:.97,drift:1.28,shape:'coupe',sprite:'fr',img:'cars/fr-diag.png'},
   {id:'re',dur:95,name:'赤いロータリー',note:'高回転でよく伸びる。ライバルと同じ血筋。',price:6500,top:0xd41420,bot:0x2a2a2a,pow:1.2,grip:1.05,drift:1.12,shape:'coupe',sprite:'re',img:'cars/re-diag.png'},
   {id:'4wd',dur:120,name:'青い4WDターボ',note:'立ち上がりが速く安定。ドリフトは苦手。リアウイングは付け外しできる。',price:9000,top:0x1f4fbf,bot:0x1a1d24,pow:1.32,grip:1.22,drift:.8,shape:'sedan',sprite:'4wd',wingAlt:'4wdw',img:'cars/4wd-diag.png'},
+  {id:'packer',dur:260,name:'ゴミ収集車',note:'重くて遅いけど、一般車もライバルも押しのけて進む。ぶつかってもほとんど壊れない。ホーン（H）でメロディが流れる。',price:3500,top:0x1f5fd0,bot:0x22252b,pow:.85,grip:.85,drift:.85,shape:'truck',sprite:'packer',img:'cars/packer-diag.png',type:'packer',len:6.2,halfW:1.15,cam:[10,3.8,0,6],seat:[.45,2.05,1.9]},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -923,7 +925,7 @@ function resetRace(){
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  car.hp=spec.hpMax;car.nitro=.25;car.boost=false;car.draft=false;Object.assign(game,{slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  car.hp=spec.hpMax;car.nitro=.25;car.boost=false;car.draft=false;Object.assign(game,{shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1182,7 +1184,12 @@ let noiseBuf=null;
 function joint(v){if(!ac)return;if(!noiseBuf){noiseBuf=ac.createBuffer(1,ac.sampleRate*.08,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);}
   const gap=Math.max(.05,Math.min(.25,2.6/Math.max(v,1)));
   [0,gap,1.1,1.1+gap].forEach((o,k)=>{if(k>1&&v<3)return;const t=ac.currentTime+o*(k>1?Math.min(1,18/Math.max(v,1)):1);const src=ac.createBufferSource();src.buffer=noiseBuf;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=380;const g=ac.createGain();g.gain.value=.55;src.connect(lp);lp.connect(g);g.connect(fxOut());src.start(t);});}
-function horn(){if(!ac)return;const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.75);g.connect(fxOut());
+let melodyEnd=0;
+function melody(){const t0=ac.currentTime;if(t0<melodyEnd)return;
+  const N_=[[659.3,.2],[622.3,.2],[659.3,.2],[622.3,.2],[659.3,.2],[493.9,.2],[587.3,.2],[523.3,.2],[440,.55]];let t=t0;
+  N_.forEach(([f,d])=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.02);g.gain.exponentialRampToValueAtTime(.01,t+d);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+d+.05);t+=d;});
+  melodyEnd=t;}
+function horn(){if(!ac)return;if(spec.type==='packer'){melody();return;}const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.75);g.connect(fxOut());
   const hi=spec.type==='train';[hi?330:440,hi?415:554].forEach(f=>{const o=ac.createOscillator();o.type='square';o.frequency.value=f;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;o.connect(lp);lp.connect(g);o.start(t);o.stop(t+.8);});}
 function hitSound(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.setValueAtTime(140,ac.currentTime);o.frequency.exponentialRampToValueAtTime(40,ac.currentTime+.2);g.gain.setValueAtTime(.5,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.25);o.connect(g);g.connect(fxOut());o.start();o.stop(ac.currentTime+.3);}
 function boom(){if(!ac)return;const t=ac.currentTime;
@@ -1421,9 +1428,17 @@ function frame(now){
     acc+=dt;const h=1/120;
     while(acc>=h){info=stepVehicle(h,racing);if(racing||game.state==='done'){cpus.forEach(c=>stepCpu(c,h,true));stepTraffic(h);}acc-=h;}
     // 車どうしの接触
+    {const PK=spec.type==='packer',R=PK?3.3:2.3,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
     cpus.concat(traffic).forEach(c=>{const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz);
-      if(d<2.3&&d>0.01){const pu=(2.3-d);car.x+=dx/d*pu;car.z+=dz/d*pu;const cvx=Math.sin(c.yaw)*c.v,cvz=Math.cos(c.yaw)*c.v,vn=((car.vx-cvx)*dx+(car.vz-cvz)*dz)/d;if(vn<0){car.vx-=dx/d*vn*1.1;car.vz-=dz/d*vn*1.1;}
-        c.v*=.985;if(vn<-3&&!(c.cd>game.t)){c.cd=game.t+.8;game.hits++;damage(c.def?(-vn-2)*1.2:Math.min(14,(-vn-2)*.6));if(!c.def){c.v=Math.max(c.v,Math.hypot(car.vx,car.vz)*.6);}hitSound();game.shake=.5;endChain(false);}}});
+      if(d<R&&d>0.01){const cvx=Math.sin(c.yaw)*c.v,cvz=Math.cos(c.yaw)*c.v,vn=((car.vx-cvx)*dx+(car.vz-cvz)*dz)/d;
+        if(PK){ // ゴミ収集車：相手を横へ押しのける
+          const sd=c.lat>=plat?1:-1;c.lat=Math.max(-HALF+1,Math.min(HALF-1,c.lat+sd*(R-d)*.9));c.v=Math.min(c.v,Math.max(4,Math.hypot(car.vx,car.vz)*.55));
+          car.vx*=.995;car.vz*=.995;
+          if(vn<-2&&!(c.cd>game.t)){c.cd=game.t+1.2;game.shoved++;hitSound();game.shake=.25;damage(Math.min(6,(-vn-2)*.25));
+            if(c.def&&radioCd<=0)say(c.def,pick(['うわっ、押された！','な、なんだその車は！','ゴミ収集車…だと…？']));else if(game.shoved%3===0)flash('どかした！ ×'+game.shoved);}
+          return;}
+        const pu=(R-d);car.x+=dx/d*pu;car.z+=dz/d*pu;if(vn<0){car.vx-=dx/d*vn*1.1;car.vz-=dz/d*vn*1.1;}
+        c.v*=.985;if(vn<-3&&!(c.cd>game.t)){c.cd=game.t+.8;game.hits++;damage(c.def?(-vn-2)*1.2:Math.min(14,(-vn-2)*.6));if(!c.def){c.v=Math.max(c.v,Math.hypot(car.vx,car.vz)*.6);}hitSound();game.shake=.5;endChain(false);}}});}
   }
   if(racing){
     game.t+=dt;
@@ -1562,12 +1577,12 @@ function finishBattle(){
   const win=!rivalDone&&!game.retired,d=DIFF[diff];
   const pBase=game.retired?300:win?2000:600,pDrift=Math.round(game.dTotal*.25),pTime=game.retired?0:Math.max(0,Math.round((170-game.t)*15)),pHit=game.hits*40,pPass=game.passed?500:0;
   const comeback=win&&game.leadSince!=null&&game.t-game.leadSince<10,pRev=comeback?600:0;if(comeback)setTimeout(()=>flash('大逆転！'),300);
-  const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass+pRev-pHit)*d.mult));
+  const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass+pRev+game.shoved*50-pHit)*d.mult));
   wallet+=earned;
   $('resKick').textContent='峠バトル ／ '+course.name;
   $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');
   $('resSub').textContent=game.retired?'壁にぶつけすぎて車が大破した。耐久はパーツの「ボディ補強」で上げられる。':win?'黄色いロータリーを峠で抜き去った。今夜の'+course.name+'はあなたのものだ。':'ライバルに '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。ヘアピンはサイドで鼻先を早めに入れると縮まる。';
-  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev],['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]]);addTotal(earned);
+  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev]].concat(game.shoved?[['どかした車 '+game.shoved+'台',game.shoved*50]]:[],[['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]]));addTotal(earned);
   quote(DRIVERS.yellow,win?DRIVERS.yellow.lose:DRIVERS.yellow.win);
   $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;
 }
@@ -1584,7 +1599,7 @@ function finishCup(){
   const pPrize=cup.pos[pos-1],pDrift=Math.round(game.dTotal*.25),pHit=game.hits*40,pCup=champ?cup.prize:0;
   const gapNext=pos===1&&order[1]?order[1].t-game.t:9,comeback=pos===1&&game.wasBehind&&game.leadSince!=null&&game.t-game.leadSince<10,photo=pos===1&&gapNext<.4;
   const pRev=comeback?Math.round(cup.pos[0]*.4):0,pPhoto=photo?Math.round(cup.pos[0]*.2):0;
-  const earned=Math.max(200,pPrize+pDrift-pHit)+pCup+pRev+pPhoto;
+  const earned=Math.max(200,pPrize+pDrift-pHit)+pCup+pRev+pPhoto+game.shoved*50;
   if(comeback)setTimeout(()=>flash('大逆転！'),300);else if(photo)setTimeout(()=>flash('写真判定…わずか '+gapNext.toFixed(2)+' 秒差！'),300);
   wallet+=earned;
   if(champ&&!cleared.includes(cup.id)){cleared.push(cup.id);store.set('touge_cleared',JSON.stringify(cleared));}
@@ -1597,7 +1612,7 @@ function finishCup(){
   const st=$('standings');
   st.appendChild(tblHTML(order,[{h:'',f:(r,k)=>(k+1)+'.'},{h:'このレース',f:r=>r.n},{h:'',f:r=>r.ret?'リタイア':fmt(r.t)+(r.est?'*':'')},{h:'pt',num:1,f:(r,k)=>'+'+RACE_PTS[k]}]));
   st.appendChild(tblHTML(table,[{h:'',f:(r,k)=>(k+1)+'.'},{h:final?'最終結果':'合計',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));
-  addRows([[pos+'位の賞金',pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(pRev?[['大逆転ボーナス',pRev]]:[],pPhoto?[['僅差ボーナス',pPhoto]]:[],champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
+  addRows([[pos+'位の賞金',pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(game.shoved?[['どかした車 '+game.shoved+'台',game.shoved*50]]:[],pRev?[['大逆転ボーナス',pRev]]:[],pPhoto?[['僅差ボーナス',pPhoto]]:[],champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
   {const top=order.find(o=>!o.you);if(top)quote(top.d,pos===1?top.d.lose:(order[0].you?top.d.lose:(order[0].d||top.d).win));if(pos!==1&&order[0].d)quote(order[0].d,order[0].d.win);}
   if(final){$('btnRetry').textContent='メニューへ';$('btnMenu').hidden=true;}
   else{$('btnRetry').textContent='次のレースへ（'+courseOf(cup.courses[cupState.race]).name+'）';$('btnMenu').hidden=false;}
