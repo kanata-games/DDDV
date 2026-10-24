@@ -1152,10 +1152,14 @@ Object.assign(DRIVERS,{
   danjiri:{name:'若頭',car:'山車（だんじり）',col:0x8a5a2b,bot:0x3a2a1c,shape:'truck',sprite:'dashi',type:'dashi',fav:'tsuzura',pre:['そーりゃ！ そーりゃ！','やりまわし、見せたるで！'],passed:['なんやて!?'],pass:['どいたどいたー！'],win:'今年の祭りはワシらの勝ちや！',lose:'来年は負けへんで…！'},
   hearseman:{name:'葬儀社の黒田',car:'宮型霊柩車',col:0x111214,bot:0xc8a030,shape:'sedan',sprite:'hearse',type:'hearse',fav:'down',pre:['…お静かに願います。','本日はお日柄も…いえ。'],passed:['…お見事です。'],pass:['失礼いたします。'],win:'滞りなく。',lose:'…ご愁傷さまでした、私の。'},
   cartboy:{name:'カートの少年',car:'ショッピングカート',col:0xb8bcc4,bot:0x1f4fd8,shape:'hatch',sprite:'cart',type:'cart',fav:'tsuzura',pre:['お母さんに怒られる前に帰る！','下りなら負けないもん！'],passed:['ずるい〜！'],pass:['いっけー！'],win:'やったー！ アイス買ってもらう！',lose:'うぅ…カートかえしてくる…'}});
+Object.assign(DRIVERS,{
+  bayside:{name:'ベイサイドの迅',car:'スカイランGT-R',col:0x1f4fd8,bot:0x1a1d24,shape:'coupe',sprite:'gtr',type:'gtr',fav:'wangan',pre:['湾岸の直線で、ブーストが歌うのを聞かせてやる。','この時間の首都高は、俺のサーキットだ。'],passed:['…ブーストが乗る前に、か。'],pass:['全開だ。','直線なら誰にも負けない。'],win:'首都高の夜は、まだ俺のものだ。',lose:'いい踏みっぷりだった。'},
+  redbolt:{name:'赤い稲妻',car:'ランナーエボIX',col:0xd8141c,bot:0x1a1d24,shape:'sedan',sprite:'evo',type:'evo',fav:'c1',pre:['C1のコーナー、全部立ち上がりで刺す。','4WDの本気、見せてやるよ。'],passed:['くっ、コーナーで!?'],pass:['立ち上がりはもらった！','AYC、いい仕事するぜ。'],win:'コーナーの数だけ、俺が速い。',lose:'…直線で負けたか。'},
+  shiroi:{name:'白い流し屋',car:'チェイザー ツアラーV',col:0xf2f2f0,bot:0x1a1d24,shape:'sedan',sprite:'jzx',type:'jzx',fav:'neon',pre:['おじさんセダンだと思った？','街の交差点、全部横向きで抜けるよ。'],passed:['おっと、グリップ派か。'],pass:['ほら、横から失礼。'],win:'セダンでも速いでしょ。',lose:'いいライン、盗ませてもらうよ。'}});
 Object.assign(DRIVERS,{shii:FRIEND_RIVALS.shii,umi:FRIEND_RIVALS.umi,astarte:FRIEND_RIVALS.astarte,sensei:SENSEI});
-const BATTLE_RIVALS=[['yellow','イエロー',0],['shii','紫瑞',-.04],['umi','海音',-.02],['astarte','アスターテ',.01]];
+const BATTLE_RIVALS=[['yellow','イエロー',0],['bayside','迅（GT-R）',.02],['redbolt','稲妻（エボ）',.02],['shiroi','流し屋（チェイザー）',0],['shii','紫瑞',-.04],['umi','海音',-.02],['astarte','アスターテ',.01]];
 let battleRival=store.get('touge_brival')||'yellow';if(!BATTLE_RIVALS.some(r=>r[0]===battleRival))battleRival='yellow';
-function battleDef(){return battleRival==='yellow'?DRIVERS.yellow:FRIEND_RIVALS[battleRival];}
+function battleDef(){return FRIEND_RIVALS[battleRival]||DRIVERS[battleRival]||DRIVERS.yellow;}
 function battleSkill(){const r=BATTLE_RIVALS.find(x=>x[0]===battleRival);return DIFF[diff].scale+(r?r[2]:0);}
 const COP={name:'警察',car:'パトカー',col:0x3a7bff,bot:0x15161a,shape:'sedan',sprite:'police',type:'police',cop:true,fav:'',
   pre:['そこの車、止まりなさい！','前の車、左に寄せて止まりなさい！'],passed:['逃がすな！','応援を要請する！'],pass:['確保ーっ！','前に回り込んだぞ！'],win:'確保！',lose:'…見失いました。'};
@@ -1349,7 +1353,7 @@ const CUPS=[
   {id:'D',name:'D級 グランプリ',courses:['lake','up','down'],drivers:['yellow','blue','silver','green'],skill:[.8,.83,.86,.88],prize:4000,pos:[1500,1000,700,450,300]},
   {id:'C',name:'C級 グランプリ',courses:['tsuzura','lake','ridge'],drivers:['gen','silver','blue','yellow'],skill:[.87,.9,.92,.94],prize:8000,pos:[3000,2000,1400,900,600],req:'D'},
   {id:'B',name:'B級 グランプリ',courses:['ridge','down','tsuzura'],drivers:['gen','silver','blue','kurenai'],skill:[.92,.95,.97,1.0],prize:14000,pos:[4500,3000,2000,1300,800],req:'C'},
-  {id:'N',name:'ナイトシティ グランプリ',courses:['wangan','neon','c1'],drivers:['blue','kurenai','silver','yellow'],skill:[.84,.87,.9,.92],prize:10000,pos:[3500,2400,1600,1000,700],req:'D'},
+  {id:'N',name:'ナイトシティ グランプリ',courses:['wangan','neon','c1'],drivers:['shiroi','kurenai','redbolt','bayside'],skill:[.84,.87,.9,.93],prize:10000,pos:[3500,2400,1600,1000,700],req:'D'},
   {id:'W',name:'はたらく車 グランプリ',courses:['neon','c1','lake'],drivers:['packer','fireman','medic','mixerman'],skill:[.8,.83,.86,.89],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'work',catName:'はたらく車'},
   {id:'X',name:'ネタ車 グランプリ',courses:['down','tsuzura','lake'],drivers:['cartboy','danjiri','hearseman','tanker'],skill:[.78,.82,.86,.9],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'neta',catName:'ネタ車'},
   {id:'F',name:'月夜の友達 グランプリ',courses:['ridge','lake','tsuzura'],drivers:['shii','umi','astarte','sensei'],skill:[.92,.95,1.0,1.06],prize:20000,pos:[6000,4000,2600,1600,900],req:'C',cat:'friend',catName:'友達の車',title:'月夜の走り仲間'},
@@ -2298,6 +2302,9 @@ const FREE_RIVALS=[
  {name:'シルバーの亡霊',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr',tier:1,pre:['首都高のコーナーは、流して抜けるもんだ。','……見ない顔だな。'],passed:['…ほう。'],pass:['インが甘い。'],win:'まだまだだね。',lose:'今夜は譲るよ。'},
  {name:'白黒の流星',col:0xf2f2f2,bot:0x15161a,shape:'coupe',sprite:'86',tier:1,pre:['軽さは正義。','このハチロク…じゃなかった、パチロクをなめるなよ。'],passed:['重さの差か…！'],pass:['コーナーで刺す！'],win:'軽さの勝ちだ。',lose:'パワーが欲しい…'},
  {name:'紅',col:0xd41420,bot:0x2a2a2a,shape:'coupe',sprite:'re',tier:2,pre:['首都高で、わたしの前を走る気？','ロータリーは高回転で鳴くのよ。'],passed:['……！'],pass:['遅い。'],win:'当然でしょ。',lose:'…覚えておくわ。'},
+ {name:'ベイサイドの迅',col:0x1f4fd8,bot:0x1a1d24,shape:'coupe',sprite:'gtr',tier:2,pre:['湾岸の直線で、ブーストが歌うのを聞かせてやる。','見ない顔だな。…ついて来れるか？'],passed:['…やるな。'],pass:['全開だ。'],win:'首都高の夜は、まだ俺のものだ。',lose:'いい踏みっぷりだった。'},
+ {name:'赤い稲妻',col:0xd8141c,bot:0x1a1d24,shape:'sedan',sprite:'evo',tier:1,pre:['コーナーで勝負だ！'],passed:['くっ…！'],pass:['立ち上がりはもらった！'],win:'コーナーの数だけ、俺が速い。',lose:'…直線で負けたか。'},
+ {name:'白い流し屋',col:0xf2f2f0,bot:0x1a1d24,shape:'sedan',sprite:'jzx',tier:0,pre:['おじさんセダンだと思った？'],passed:['おっと。'],pass:['横から失礼。'],win:'セダンでも速いでしょ。',lose:'いいライン、盗ませてもらうよ。'},
  Object.assign({tier:-1},FRIEND_RIVALS.shii,{pre:['首都高でもわらわは負けんのじゃ！','夜の首都高も、祠でかっ飛ばすのじゃ〜！']}),
  Object.assign({tier:0},FRIEND_RIVALS.umi,{pre:['首都高の夜景、きれいですね…！ 勝負しましょう！','海の上の道、旅してるみたいです！']}),
  Object.assign({tier:1},FRIEND_RIVALS.astarte,{pre:['首都高の灯りは、星みたいね。','追いつけるかしら？']}),
