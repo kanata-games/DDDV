@@ -216,6 +216,9 @@ body.is-touch #touch{display:flex}
 body.is-touch #dash{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 @media (max-width:520px){#speed{font-size:48px}#mini{width:96px;height:96px}#btnView{top:calc(116px + env(safe-area-inset-top,0px))}}
+#btnQuit{position:fixed;z-index:3;top:calc(140px + env(safe-area-inset-top,0px));right:calc(max(16px,env(safe-area-inset-right,0px)) + 92px);font-family:var(--f-body);font-weight:700;font-size:12px;color:var(--ink);background:var(--panel);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:6px 10px;cursor:pointer}
+#btnQuit.arm{background:#a3262b;border-color:#ff6a6a}
+@media (max-width:520px){#btnQuit{top:calc(116px + env(safe-area-inset-top,0px))}}
 #btnPA{position:fixed;z-index:3;top:calc(176px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));font-family:var(--f-body);font-weight:700;font-size:12px;color:var(--night);background:var(--sodium);border:0;border-radius:4px;padding:6px 10px;cursor:pointer}
 @media (max-width:520px){#btnPA{top:calc(152px + env(safe-area-inset-top,0px))}}
 #spBox{top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;gap:14px;background:var(--panel);padding:6px 12px;border-radius:4px;font-family:var(--f-body);font-size:12px}
@@ -257,6 +260,7 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
 <canvas class="hud" id="mini" width="240" height="240"></canvas>
 <button id="btnView" type="button">視点：後方</button>
 <button id="btnPA" type="button" hidden>PAに入る</button>
+<button id="btnQuit" type="button" hidden>メニューへ</button>
 <div class="hud" id="spBox" hidden><div class="spr"><b>YOU</b><i><u id="spMe"></u></i></div><div class="spr"><b id="spName">RIVAL</b><i><u id="spRiv"></u></i></div></div>
 <button id="btnSnd" type="button">♪ 音量</button>
 <div id="snd" hidden>
@@ -352,7 +356,7 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
     <button class="go" id="btnStart" type="button">グランプリへ</button>
     <ul class="keys">
       <li><kbd>↑</kbd><kbd>W</kbd>アクセル　<kbd>↓</kbd><kbd>S</kbd>ブレーキ　<kbd>←</kbd><kbd>→</kbd>ハンドル</li>
-      <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>N</kbd>ニトロ　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン</li>
+      <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>N</kbd>ニトロ　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン　<kbd>Esc</kbd>メニューへ</li>
     </ul>
     <div class="opts">視点の距離
       <div class="seg" id="camSeg"><button type="button" data-c="3">すぐ後ろ</button><button type="button" data-c="0">近い</button><button type="button" data-c="1">ふつう</button><button type="button" data-c="2">遠い</button></div>
@@ -1264,7 +1268,7 @@ function resetRace(){
   if(spec.type==='ita'||spec.type==='umicar')setTimeout(()=>umi(['今夜はどこまで行けるかな？ 旅のはじまりです！','わあ、夜景がきれい…！ 行きましょう！','安全運転で…いえ、全力でいきます！'],true),1800);
   if(spec.type==='hokora')setTimeout(()=>shii(['祠、発進なのじゃ〜！','わらわの運転、とくと見るがよいのじゃ！','安全運転…は約束できんのじゃ♪','今宵もかっ飛ばすのじゃ〜！'],true),1800);
   game.kyo=spec.type==='kyoshu'||mode==='school'?{score:100,cd:0,aux:0,wallT:0,chat:8,stops:(mode==='school'&&course.stopI||[]).map(o=>({i:o.i,t:o.t,done:false,stopped:false}))}:null;if(mode==='school')setTimeout(()=>say(KYO,schoolGreet(),3.5),700);if(!$('kyoPt')){$('kyo').innerHTML='教習 <b id="kyoPt">100</b>点　制限 <span id="kyoLim">50</span> km/h';}$('kyo').hidden=!game.kyo&&spec.type!=='amb'&&spec.type!=='demae';$('meter').hidden=spec.type!=='taxi';game.fareShown=0;
-  game.fb=mode==='free'?{phase:'cruise',next:10,rival:null,me:100,riv:100,wins:0,lost:0,earn:0,enc:0,log:[]}:null;$('spBox').hidden=true;$('btnPA').hidden=mode!=='free';
+  game.fb=mode==='free'?{phase:'cruise',next:10,rival:null,me:100,riv:100,wins:0,lost:0,earn:0,enc:0,log:[]}:null;$('spBox').hidden=true;$('btnPA').hidden=mode!=='free';$('btnQuit').hidden=false;
   if(cpus.length){const c=pick(cpus);const hl=spec.type==='hearse'&&!c.def.cop?pick(['…縁起でもねえな。','なんで霊柩車が峠に来てんだよ…','後ろにつかれたくねえ…']):pick(c.def.pre);setTimeout(()=>say(c.def,hl,3.2),500);}
 }
 let rivalDone=0;
@@ -1272,7 +1276,7 @@ let rivalDone=0;
 /* ================= INPUT ================= */
 const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',Space:'hand',ShiftLeft:'hand',KeyN:'nitro',KeyX:'nitro'};
 addEventListener('keydown',e=>{const k=keymap[e.code];if(k){input[k]=1;e.preventDefault();}
-  if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();if(e.code==='KeyP'&&mode==='free'&&game.state==='race')enterPA();});
+  if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();if(e.code==='KeyP'&&mode==='free'&&game.state==='race')enterPA();if(e.code==='Escape')quitRace();});
 addEventListener('keyup',e=>{const k=keymap[e.code];if(k)input[k]=0;});
 document.querySelectorAll('#touch .tb').forEach(el=>{
   const k=el.dataset.k,on=e=>{e.preventDefault();if(k==='horn'){startAudio();horn();}input[k]=1;el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){}},off=e=>{input[k]=0;el.classList.remove('on');};
@@ -1295,6 +1299,9 @@ $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
   if(mode==='cup'){if(cupState&&cupState.race<CUPS[cupIdx].courses.length){loadCourse(CUPS[cupIdx].courses[cupState.race]);resetRace();}else toMenu();}
   else{if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}resetRace();}});
 $('btnMenu').addEventListener('click',toMenu);
+let quitArm=0;function quitRace(){if(game.state==='title'||!$('result').hidden)return;const b=$('btnQuit');if(Date.now()-quitArm<2500){quitArm=0;b.classList.remove('arm');b.textContent='メニューへ';game.state='done';toMenu();return;}
+  quitArm=Date.now();b.classList.add('arm');b.textContent='もう一度押すと戻る';flash('もう一度押すとメニューへ（今回の結果は残りません）');setTimeout(()=>{if(Date.now()-quitArm>=2400){b.classList.remove('arm');b.textContent='メニューへ';}},2500);}
+$('btnQuit').addEventListener('click',quitRace);
 $('senseiBtn').addEventListener('click',()=>{senseiMatch=true;mode='battle';$('title').hidden=true;$('snd').hidden=true;startAudio();startBgm();loadCourse('down');resetRace();});
 $('btnPA').addEventListener('click',()=>{if(mode==='free'&&game.state==='race')enterPA();});
 const DIFF=[{scale:.84,mult:.7},{scale:.9,mult:1},{scale:1.0,mult:1.6}];
@@ -1477,7 +1484,7 @@ function startFromMenu(){
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
-function toMenu(){$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -2220,7 +2227,7 @@ function finish(){if(car.siren)setSiren(false);stopCopSiren();
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
-  $('btnPA').hidden=true;$('spBox').hidden=true;
+  $('btnPA').hidden=true;$('btnQuit').hidden=true;$('spBox').hidden=true;
   if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
   if(mode==='free')finishFree();else if(mode==='densha')finishDen();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
