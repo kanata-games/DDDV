@@ -1527,7 +1527,7 @@ function stepVehicle(dt,racing){
   }
   return {vf:v,vr:0,sp:v};
 }
-function placeCpu(c){const a=sampleAt(c.s);c.x=a.x+a.rx*c.lat;c.z=a.z+a.rz*c.lat;c.y=a.y;const k=P[a.i].k;c.yaw=a.h+Math.max(-.5,Math.min(.5,k*c.v*c.v*.012));c.drift=Math.abs(k)>0.015&&c.v>12;}
+function placeCpu(c){const a=sampleAt(c.s);c.x=a.x+a.rx*c.lat;c.z=a.z+a.rz*c.lat;c.y=a.y;const k=P[a.i].k;c.yaw=a.h+Math.max(-.5,Math.min(.5,k*c.v*c.v*.012));if(c.wob>0){c.wob=Math.max(0,c.wob-.012);c.yaw+=Math.sin(performance.now()*.02)*c.wob*.6;}c.drift=Math.abs(k)>0.015&&c.v>12;}
 // CPU：速度表に沿って走り、前がふさがっていたら横にずれて抜きにいく
 function liftH(c){if(!(c.liftT>0))return 0;const up=Math.min(1,(1.8-c.liftT)/.35),dn=Math.min(1,c.liftT/.35);return 1.3*Math.min(up,dn);}
 function stepCpu(c,dt,traffic){
@@ -1666,7 +1666,9 @@ function frame(now){
           if(vn<-2&&!(c.cd>game.t)){c.cd=game.t+1.2;game.shoved++;hitSound();game.shake=.25;damage(Math.min(6,(-vn-2)*.25));
             if(c.def&&radioCd<=0)say(c.def,pick(['うわっ、押された！','な、なんだその車は！','ゴミ収集車…だと…？']));else if(game.shoved%3===0)flash('どかした！ ×'+game.shoved);}
           return;}
-        const pu=(R-d);car.x+=dx/d*pu;car.z+=dz/d*pu;if(vn<0){car.vx-=dx/d*vn*1.1;car.vz-=dz/d*vn*1.1;}
+        const pu=(R-d),heavy=c.def?.5:.6;car.x+=dx/d*pu*heavy;car.z+=dz/d*pu*heavy;if(vn<0){car.vx-=dx/d*vn*(c.def?.8:1.1);car.vz-=dz/d*vn*(c.def?.8:1.1);}
+        {const lim=HALF-1,ln=(dx*pp.rx+dz*pp.rz)/d,fw=(dx*Math.sin(pp.h)+dz*Math.cos(pp.h))/d,psp=Math.max(0,car.vx*Math.sin(pp.h)+car.vz*Math.cos(pp.h));
+         c.lat=Math.max(-lim,Math.min(lim,c.lat-ln*pu*(1-heavy)));if(c.def){if(fw>.45)c.v=Math.min(c.v,psp*.97);else if(fw<-.45&&psp>c.v)c.v+=(psp-c.v)*.35;c.wob=Math.min(.5,(c.wob||0)+Math.min(.3,Math.abs(vn)*.04));}}
         c.v*=.985;if(vn<-3&&!(c.cd>game.t)){c.cd=game.t+.8;game.hits++;damage(c.def?(-vn-2)*(c.def.cop?.35:1.2):Math.min(14,(-vn-2)*.6));if(!c.def){c.v=Math.max(c.v,Math.hypot(car.vx,car.vz)*.6);}hitSound();game.shake=.5;endChain(false);}}});}
   }
   if(racing){
