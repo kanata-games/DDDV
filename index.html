@@ -807,14 +807,18 @@ const CARS=[
   {id:'taxi',dur:140,name:'タクシー',note:'背の高い今どきのタクシー。走った距離に応じて運賃（初乗り500 P＋300mごとに100 P）がレース後のポイントに入る。首都高や街では一般車としても走っている。',price:3000,top:0x1c2a55,bot:0x15161a,pow:.95,grip:1.0,drift:.85,shape:'sedan',sprite:'taxi',img:'cars/taxi-diag.png',type:'taxi'},
   {id:'nbox',dur:110,name:'M-BOKS',note:'背の高い軽自動車。パワーは控えめだけど、小回りが利いて街中で強い。首都高や街では一般車としても走っている。',price:1200,top:0xf2f2f2,bot:0x2a2d33,pow:.8,grip:1.02,drift:.9,shape:'hatch',sprite:'nbox',img:'cars/nbox-diag.png',type:'nbox',steerMul:1.25,len:3.4,halfW:.75},
   {id:'tanto',dur:110,name:'タンタ',note:'水色の背の高い軽。M-BOKSのライバル。少しだけ曲がりやすく、少しだけ遅い。首都高や街では一般車としても走っている。',price:1100,top:0x9fd3ea,bot:0x2a2d33,pow:.78,grip:1.05,drift:.9,shape:'hatch',sprite:'tanto',img:'cars/tanto-diag.png',type:'nbox',steerMul:1.3,len:3.4,halfW:.75},
-  {id:'alph',dur:170,name:'残クレアルファーゾ',note:'黒光りする高級ミニバン。頭金だけで乗れる残価設定クレジット。ただしレースのたびに月々の支払いが賞金から引かれ、車体の傷は査定で残債に上乗せされる。ホーンを鳴らすとオラオラ顔の圧で一般車が道をあける。重くてぶつかり合いに強い。',price:2500,top:0x0d0e11,bot:0x1a1b1f,pow:1.0,grip:.97,drift:.88,shape:'hatch',sprite:'alph',img:'cars/alph-diag.png',type:'alph',steerMul:.95,armor:.7,len:4.9,halfW:.95},
+  {id:'alph',dur:170,name:'残クレアルファーゾ',note:'黒光りする高級ミニバン。この車だけは残クレ専用で、頭金だけで乗れる。ただしレースのたびに月々の支払いが賞金から引かれ、車体の傷は査定で残債に上乗せされる。ホーンを鳴らすとオラオラ顔の圧で一般車が道をあける。重くてぶつかり合いに強い。',price:2500,top:0x0d0e11,bot:0x1a1b1f,pow:1.0,grip:.97,drift:.88,shape:'hatch',sprite:'alph',img:'cars/alph-diag.png',type:'alph',zanOnly:true,zanDebt:15000,zanPay:700,steerMul:.95,armor:.7,len:4.9,halfW:.95},
   {id:'noah',dur:150,name:'ファミリーのノワ',note:'銀色の箱型ミニバン。後ろには家族が乗っている。ぶつけずドリフトもしない安全運転でゴールすると「家族の笑顔ボーナス」（最大900 P）。ぶつけたり振り回したりすると後ろから文句が飛んでくる。素直で扱いやすい。',price:3000,top:0xc9ccd2,bot:0x2a2d33,pow:.92,grip:1.02,drift:.8,shape:'hatch',sprite:'noah',img:'cars/noah-diag.png',type:'noah',steerMul:1.0,len:4.7,halfW:.9},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
 let owned=(()=>{try{const o=JSON.parse(store.get('touge_own')||'["86"]');return Array.isArray(o)?o:['86']}catch(e){return['86']}})();
 if(!owned.includes('86'))owned.push('86');
-let zan=Math.max(0,+(store.get('touge_zan')||0)||0);const ZAN_TOTAL=15000,ZAN_PAY=700;
+let zanM=(()=>{try{const o=JSON.parse(store.get('touge_zanm')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
+{const old=Math.max(0,+(store.get('touge_zan')||0)||0);if(old>0&&!zanM.alph){zanM.alph={d:old,p:700};store.set('touge_zanm',JSON.stringify(zanM));}store.set('touge_zan','0');}
+function zanSave(){store.set('touge_zanm',JSON.stringify(zanM));}
+function zanTerms(c){if(c.zanOnly)return{down:c.price,debt:c.zanDebt,pay:c.zanPay};const down=Math.ceil(c.price*.2/100)*100,debt=Math.round((c.price-down)*1.25/100)*100;return{down,debt,pay:Math.max(200,Math.round(debt/10/100)*100)};}
+function zanList(){return Object.keys(zanM).filter(k=>zanM[k]&&zanM[k].d>0);}
 let selId=store.get('touge_car')||'86';if(!owned.includes(selId))selId='86';
 // パーツ（全車共通。乗りかえても付いたまま）
 const PARTS={
@@ -1116,16 +1120,21 @@ function renderGarage(){
   const c=CARS.find(x=>x.id===focusId),info=$('carInfo');
   const own=owned.includes(c.id);
   info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div>';
-  info.querySelector('.nm').textContent=c.name;info.querySelector('p').textContent=c.note+(c.id==='alph'?(own?(zan>0?'　【残債 '+zan.toLocaleString()+' P／月々 '+ZAN_PAY.toLocaleString()+' P】':'　【完済済み — もう誰にも返さなくていい】'):'　【頭金 '+c.price.toLocaleString()+' P＋残債 '+ZAN_TOTAL.toLocaleString()+' P】'):'');
+  info.querySelector('.nm').textContent=c.name;{const L=zanM[c.id];info.querySelector('p').textContent=c.note+(own&&L&&L.d>0?'　【残クレ返済中：残債 '+L.d.toLocaleString()+' P／毎レース '+L.p.toLocaleString()+' P】':own&&L?'　【完済済み — 本当にあなたの車】':'');}
   const bars=info.querySelector('.bars');
   [['パワー',c.pow/1.5],['グリップ',c.grip/1.3],['ドリフト',c.drift/1.35],['耐久',(c.dur||100)/220]].forEach(([l,v])=>{const sp=document.createElement('span');sp.textContent=l;const bar=document.createElement('span');bar.className='bar';bar.innerHTML='<i></i>';bar.firstChild.style.width=Math.round(v*100)+'%';bars.append(sp,bar);});
   const act=info.querySelector('.act'),btn=document.createElement('button');btn.type='button';btn.className='buy';
   if(own){btn.textContent=c.id===selId?'この車で走る':'乗りかえる';btn.classList.add('ghosty');btn.disabled=c.id===selId;
     btn.addEventListener('click',()=>{swapCar(c.id);renderGarage();});}
-  else if(wallet>=c.price){btn.textContent=c.price.toLocaleString()+' P で買う';
-    btn.addEventListener('click',()=>{wallet-=c.price;owned.push(c.id);if(c.id==='alph'){zan=ZAN_TOTAL;store.set('touge_zan',zan);setTimeout(()=>flash('残クレ契約成立！ 残債 '+ZAN_TOTAL.toLocaleString()+' P'),50);}store.set('touge_p',wallet);store.set('touge_own',JSON.stringify(owned));swapCar(c.id);renderAll();});}
-  else{btn.textContent='あと '+(c.price-wallet).toLocaleString()+' P';btn.disabled=true;}
-  act.appendChild(btn);
+  else if(!c.zanOnly&&wallet>=c.price){btn.textContent=c.price.toLocaleString()+' P で買う';
+    btn.addEventListener('click',()=>{wallet-=c.price;owned.push(c.id);store.set('touge_p',wallet);store.set('touge_own',JSON.stringify(owned));swapCar(c.id);renderAll();});}
+  else if(!c.zanOnly){btn.textContent='あと '+(c.price-wallet).toLocaleString()+' P';btn.disabled=true;}
+  if(!(c.zanOnly&&!own))act.appendChild(btn);
+  if(!own&&c.price>0){const T=zanTerms(c),zb=document.createElement('button');zb.type='button';zb.className='buy'+(c.zanOnly?'':' ghosty');
+    zb.textContent=wallet>=T.down?'残クレで買う（頭金 '+T.down.toLocaleString()+' P＋残債 '+T.debt.toLocaleString()+' P・毎レース '+T.pay.toLocaleString()+' P）':'残クレ 頭金まであと '+(T.down-wallet).toLocaleString()+' P';zb.disabled=wallet<T.down;
+    zb.addEventListener('click',()=>{wallet-=T.down;owned.push(c.id);zanM[c.id]={d:T.debt,p:T.pay};zanSave();store.set('touge_p',wallet);store.set('touge_own',JSON.stringify(owned));swapCar(c.id);renderAll();setTimeout(()=>flash('残クレ契約成立！ 残債 '+T.debt.toLocaleString()+' P'),50);});act.appendChild(zb);}
+  {const L=zanM[c.id];if(own&&L&&L.d>0){const pb=document.createElement('button');pb.type='button';pb.className='buy ghosty';pb.textContent=wallet>=L.d?'残債を一括返済（'+L.d.toLocaleString()+' P）':'一括返済まであと '+(L.d-wallet).toLocaleString()+' P';pb.disabled=wallet<L.d;
+    pb.addEventListener('click',()=>{wallet-=L.d;L.d=0;zanSave();store.set('touge_p',wallet);renderAll();flash('完済！ '+c.name+'は本当にあなたのものになった');});act.appendChild(pb);}}
   if(own&&c.wingAlt){const wb=document.createElement('button');wb.type='button';wb.className='buy ghosty';wb.textContent=wingOn(c.id)?'リアウイングを外す':'リアウイングを付ける';
     wb.addEventListener('click',()=>{store.set('touge_wing_'+c.id,wingOn(c.id)?'0':'1');if(selId===c.id)swapCar(c.id);renderGarage();});act.appendChild(wb);}
 }
@@ -1721,10 +1730,12 @@ function quote(d,t){const q=$('resQuote');q.style.setProperty('--rc',hex(d.col))
 function taxiFare(){if(spec.type!=='taxi')return 0;const d=Math.max(0,P[Math.min(N-1,car.idx)].d-(game.startD||0));return 500+Math.floor(d/300)*100;}
 function familyBonus(){if(spec.type!=='noah'||game.retired)return 0;return Math.max(0,900-game.hits*150-Math.min(450,Math.floor((game.dTotal||0)/40)));}
 function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
-function zanCalc(){if(spec.type!=='alph'||zan<=0){game.zanC=null;return null;}const lost=1-car.hp/spec.hpMax,sat=lost>.05?Math.round(lost*3000/100)*100:0;game.zanC={sat,pay:0};return game.zanC;}
-function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い',-Math.min(ZAN_PAY,zan+z.sat)]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(spec.type==='noah')rows=rows.concat([['家族の笑顔（接触 '+game.hits+'回）',familyBonus()]]);if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
+function zanCalc(){const ids=zanList();if(!ids.length){game.zanC=null;return null;}const L=zanM[spec.id],lost=1-car.hp/spec.hpMax,sat=L&&L.d>0&&lost>.05?Math.round(lost*(spec.id==='alph'?3000:Math.max(1000,(CARS.find(c=>c.id===spec.id)||{price:0}).price*.2))/100)*100:0;
+  const want=ids.reduce((a,k)=>a+Math.min(zanM[k].p,zanM[k].d+(k===spec.id?sat:0)),0);game.zanC={sat,want,n:ids.length};return game.zanC;}
+function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い（'+z.n+'台）',-z.want]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(spec.type==='noah')rows=rows.concat([['家族の笑顔（接触 '+game.hits+'回）',familyBonus()]]);if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
-function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus();if(b){wallet+=b;earned+=b;}}{const z=game.zanC;if(z){zan+=z.sat;const want=Math.min(ZAN_PAY,zan),pay=Math.min(want,Math.max(0,wallet));wallet-=pay;earned-=pay;zan-=pay;store.set('touge_zan',zan);game.zanC=null;setTimeout(()=>flash(zan<=0?'完済！ このアルファーゾは本当にあなたのものになった':pay<want?'支払いが足りない… 延滞です（残債 '+zan.toLocaleString()+' P）':'残債 あと '+zan.toLocaleString()+' P'),1900);}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
+function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus();if(b){wallet+=b;earned+=b;}}{const z=game.zanC;if(z){if(z.sat&&zanM[spec.id])zanM[spec.id].d+=z.sat;let paid=0,short=false;const done=[];zanList().forEach(k=>{const L=zanM[k],w=Math.min(L.p,L.d),pay=Math.min(w,Math.max(0,wallet));wallet-=pay;paid+=pay;L.d-=pay;if(pay<w)short=true;if(L.d<=0)done.push(k);});earned-=paid;zanSave();game.zanC=null;
+  const left=zanList().reduce((a,k)=>a+zanM[k].d,0),nm=k=>(CARS.find(c=>c.id===k)||{name:k}).name;setTimeout(()=>flash(done.length?'完済！ '+done.map(nm).join('・')+'は本当にあなたのものになった':short?'支払いが足りない… 延滞です（残債 '+left.toLocaleString()+' P）':'残債 あと '+left.toLocaleString()+' P'),1900);}}const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
 function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
   if(mode!=='collect'&&mode!=='escape'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
