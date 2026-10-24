@@ -1136,11 +1136,12 @@ function makeCar(spec,isPlayer){
   const tg=glowTex('rgba(255,40,40,.9)');
   if(!spec.sprite)[-.6,.6].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tg,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(1.1,1.1,1);s.position.set(x,.74,-2.15);body.add(s);});
   if(isPlayer){
-    const nose=(spec.len||4.2)/2-.2;const spot=new THREE.SpotLight(0xfff0d0,2.6,90,.55,.5,1.2);spot.position.set(0,spec.type==='train'?1.6:.9,nose);const tgt=new THREE.Object3D();tgt.position.set(0,-.6,nose+12);g.add(spot,tgt);spot.target=tgt;
+    const nose=(spec.len||4.2)/2-.2;const dark=['sled','cart','tank','dashi'].includes(spec.type),spot=new THREE.SpotLight(dark?0xc8d4ff:0xfff0d0,dark?1.1:['bike','demae','roller','fork'].includes(spec.type)?1.8:2.6,dark?45:90,.55,.5,1.2);spot.position.set(0,spec.type==='train'?1.6:.9,nose);const tgt=new THREE.Object3D();tgt.position.set(0,-.6,nose+12);g.add(spot,tgt);spot.target=tgt;
   }
   const hg=glowTex('rgba(255,245,220,.9)');
-  {const bk=spec.type==='bike',nz=bk?.95:(spec.len||4.2)/2+.05,hy=bk?.85:spec.type==='train'?1.4:.72;
-   (bk?[0]:[-.6,.6]).forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:hg,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(bk?.6:1.3,bk?.6:1.3,1);s.position.set(x,hy,nz);body.add(s);});}
+  {const LT={sled:0,cart:0,tank:0,dashi:'lantern',roller:'small',fork:'small',bike:1,demae:1,f14:1}[spec.type],bk=LT===1,nz=bk?(spec.type==='bike'?.95:(spec.len||2)/2):(spec.len||4.2)/2+.05,hy=spec.type==='bike'?.85:spec.type==='demae'?1.0:spec.type==='f14'?1.1:spec.type==='train'?1.4:.72;
+   if(LT==='lantern'){const lg=glowTex('rgba(255,150,60,.9)');[-.8,.8].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:lg,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(.9,1.1,1);s.position.set(x,2.6,nz-.4);body.add(s);});}
+   else if(LT!==0)(bk?[0]:[-.6,.6]).forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:hg,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));const sc=bk?.6:LT==='small'?.6:1.3;s.scale.set(sc,sc,1);s.position.set(x*(LT==='small'?.7:1),hy,nz);body.add(s);});}
   if(spec.type==='police'||spec.type==='amb'||spec.type==='fire'){const rt=glowTex('rgba(255,30,30,1)'),lt=[-.38,.38].map(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:rt,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(1.6,1.6,1);s.position.set(x*(spec.type==='police'?1:1.6),spec.type==='amb'?2.55:spec.type==='fire'?2.95:1.72,spec.type==='amb'?.9:spec.type==='fire'?1.9:-.2);s.visible=false;g.add(s);return s;});g.userData.siren=lt;}
   scene.add(g);return {g,body,wheels};
 }
