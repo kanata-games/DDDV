@@ -285,7 +285,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     </section>
     <section class="pane" id="pane-free" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
-      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに、海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>と区間が切り替わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
+      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに区間が切り替わる。海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>、海の上の<b>レインボーブリッジ</b>、長い<b>山手トンネル</b>、高架が重なる<b>箱崎ジャンクション</b>。区間の順番は走るたびに変わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
       <p class="lede" style="font-size:12px">バトルはSPゲージの削り合い。前にいれば相手のSPが、後ろにいれば自分のSPが減っていき、離れるほど速く減る。壁にぶつけても自分のSPが減る。相手のSPを0にすれば勝ち。5勝するごとに「首都高の主」が現れる。</p>
       <p class="lede" style="font-size:12px">やめる時は画面上の<b>「PAに入る」</b>（Pキー）。そこまでのバトルの賞金と走行距離ぶんのポイントがもらえる。大破すると稼ぎは半分になる。</p></div>
     </section>
@@ -369,16 +369,24 @@ const LOOP_TUN=[['S',60,0,'T'],['C',140,35,0,'T'],['C',140,-35,0,'T'],['S',60,0,
 const LOOP_BODY={
   W:[['S',400,0],['C',500,18,0],['S',350,0],['C',420,-25,0],['S',300,0],['C',260,30,0],['S',380,0],['C',600,-15,0],['S',300,0],['C',350,-8,0],['S',200,0]],
   C:[['S',120,0],['C',60,70,0],['S',80,0],['C',70,-60,0,'T'],['S',90,0,'T'],['C',55,-55,0,'T'],['S',100,0],['C',80,80,0],['S',70,0],['C',65,-75,0],['S',140,0],['C',90,45,0,'T'],['S',80,0,'T'],['C',90,-5,0],['S',120,0]],
-  Y:[['S',250,0],['C',220,-35,0],['S',200,0],['C',160,50,0],['S',260,0],['C',300,-30,0],['S',180,0],['C',140,40,0],['S',220,0],['C',240,-25,0],['S',200,0]]};
+  Y:[['S',250,0],['C',220,-35,0],['S',200,0],['C',160,50,0],['S',260,0],['C',300,-30,0],['S',180,0],['C',140,40,0],['S',220,0],['C',240,-25,0],['S',200,0]],
+  B:[['S',300,0],['C',900,8,0],['S',500,0],['C',900,-8,0],['S',600,0],['C',500,-10,0],['S',300,0],['C',500,10,0],['S',200,0]],
+  K:[['S',100,0],['S',300,0,'T'],['C',600,20,0,'T'],['S',400,0,'T'],['C',500,-30,0,'T'],['S',350,0,'T'],['C',700,10,0,'T'],['S',200,0,'T'],['S',100,0]],
+  J:[['S',150,0],['C',110,40,0],['S',100,0],['C',90,-65,0],['S',120,0],['C',140,50,0],['S',90,0],['C',100,-25,0],['S',200,0]]};
 const SECT={
   W:{name:'湾岸線',sub:'海沿いの長い直線',signs:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明','台場 1km'],dens:.3,o0:220,o1:650,h0:20,h1:90,sea:true},
   C:{name:'C1 都心環状',sub:'ビルの谷間とトンネル',signs:['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留','江戸橋JCT'],dens:1,o0:14,o1:110,h0:30,h1:170},
-  Y:{name:'横羽線',sub:'防音壁の高架',signs:['横羽線','羽田 3km','浜崎橋JCT','EXIT 芝浦','大師 2km'],dens:.55,o0:45,o1:320,h0:15,h1:110,wall:true}};
-const LOOP_LEAD=60,LOOP_ORDER='WCYCWYC';
-const LOOP_SEGS=[['S',LOOP_LEAD,0]].concat(...LOOP_ORDER.split('').map(k=>LOOP_TUN.concat(LOOP_BODY[k])),LOOP_TUN,[['S',900,0]]);
-function loopLayout(){const cnt=x=>genPts(x,0).length-1,tn=cnt(LOOP_TUN);let i=LOOP_LEAD;const r=[];
-  for(const k of LOOP_ORDER){const a=i;i+=tn;const b=i;i+=cnt(LOOP_BODY[k]);r.push({k,from:a,body:b,to:i});}
-  r.push({k:LOOP_ORDER[0],from:i,body:i+tn,to:1e9});return {ranges:r,w0:LOOP_LEAD+146,wF:i+146};}
+  Y:{name:'横羽線',sub:'防音壁の高架',signs:['横羽線','羽田 3km','浜崎橋JCT','EXIT 芝浦','大師 2km'],dens:.55,o0:45,o1:320,h0:15,h1:110,wall:true},
+  B:{name:'レインボーブリッジ',sub:'海の上の吊り橋',signs:['レインボーブリッジ','芝浦 2km','台場 出口','EXIT 芝浦ふ頭'],dens:.12,o0:700,o1:1100,h0:30,h1:120,sea:true,sea2:true,bridge:true},
+  K:{name:'山手トンネル',sub:'地下を抜ける長いトンネル',signs:['山手トンネル','西新宿JCT 2km','大橋JCT','EXIT 富ヶ谷'],dens:.5,o0:30,o1:250,h0:20,h1:120},
+  J:{name:'箱崎ジャンクション',sub:'高架が重なり合う分岐',signs:['箱崎JCT','向島線','深川線','EXIT 浜町','両国 1km'],dens:.9,o0:22,o1:160,h0:20,h1:130,jct:true}};
+const LOOP_LEAD=60;
+function makeLoopOrder(){const pick=a=>a[Math.random()*a.length|0],T='WCYBKJ'.split('');for(let tries=0;tries<200;tries++){const o=T.slice().sort(()=>Math.random()-.5).concat([pick(T),pick(T)]).sort(()=>Math.random()-.5);
+    let ok=true;for(let i=1;i<o.length;i++)if(o[i]===o[i-1])ok=false;if(o[o.length-1]===o[0])ok=false;if(ok)return o.join('');}return 'WCYBKJCY';}
+function loopSegs(order){return [['S',LOOP_LEAD,0]].concat(...order.split('').map(k=>LOOP_TUN.concat(LOOP_BODY[k])),LOOP_TUN,[['S',900,0]]);}
+function loopLayout(order){const cnt=x=>genPts(x,0).length-1,tn=cnt(LOOP_TUN);let i=LOOP_LEAD;const r=[];
+  for(const k of order){const a=i;i+=tn;const b=i;i+=cnt(LOOP_BODY[k]);r.push({k,from:a,body:b,to:i});}
+  r.push({k:order[0],from:i,body:i+tn,to:1e9});return {ranges:r,w0:LOOP_LEAD+146,wF:i+146};}
 // コース一覧（区間の並びだけで道・景色・CPUの走り方まで自動で作られる）
 const COURSES=[
   {id:'lake',name:'湖畔ハイウェイ',sub:'湖沿いの高速コーナーが続く',segs:LAKE_SEGS,y0:60,water:true,lampStep:55},
@@ -388,7 +396,7 @@ const COURSES=[
   {id:'ridge',name:'稜線トンネルロード',sub:'長いトンネルを抜ける高速コース',segs:RIDGE_SEGS,y0:140,lampStep:70},
   {id:'wangan',name:'湾岸線',sub:'首都高。長い直線で一般車を縫って走る',segs:WANGAN_SEGS,y0:30,env:'highway',half:8,traffic:16},
   {id:'c1',name:'C1環状',sub:'首都高。壁が迫る連続コーナーとトンネル',segs:C1_SEGS,y0:30,env:'highway',half:6.5,traffic:10},
-  {id:'loop',name:'首都高 夜の環状',sub:'終わりのない首都高。野良バトルの舞台',segs:LOOP_SEGS,y0:30,env:'highway',half:8,traffic:14,loop:true,hidden:true},
+  {id:'loop',name:'首都高 夜の環状',sub:'終わりのない首都高。野良バトルの舞台',segs:loopSegs('WCYBKJCY'),order:'WCYBKJCY',y0:30,env:'highway',half:8,traffic:14,loop:true,hidden:true},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -630,14 +638,15 @@ function buildHighway(G){
   // ビル群
   {const list=[];let tries=0;const want=course.loop?Math.min(quality===0?1100:2200,Math.round(N/(quality===0?14:7))):(quality===0?120:220);
    while(list.length<want&&tries<want*14){tries++;const i=Math.random()*N|0,p=P[i],cf=p.blk?SECT[p.blk]:null;if(cf&&Math.random()>cf.dens)continue;
-     const sd=cf&&cf.sea?-1:Math.random()<.5?-1:1,off=cf?W+cf.o0+Math.random()*(cf.o1-cf.o0):W+35+Math.random()*230;
+     const sd=cf&&cf.sea&&!cf.sea2?-1:Math.random()<.5?-1:1,off=cf?W+cf.o0+Math.random()*(cf.o1-cf.o0):W+35+Math.random()*230;
      const x=p.x+p.rx*sd*off,z=p.z+p.rz*sd*off,w=14+Math.random()*22,d=14+Math.random()*22;if(nearRoad(x,z,W+Math.max(w,d)*.75+8,-1,-1))continue;
      list.push({x,z,y:gy,w,d,h:cf?cf.h0+Math.random()*Math.random()*cf.h1:30+Math.random()*Math.random()*140,r:p.h});}
    cityBlocks(G,list);}
   // 湾岸の区間：右手に夜の海
   if(course.sect){const seaM=new THREE.MeshPhongMaterial({color:0x0a1830,emissive:0x040a16,specular:0x6f86c8,shininess:60,side:THREE.DoubleSide});
-   course.sect.forEach(r=>{if(!SECT[r.k].sea)return;const rows=[];for(let i=Math.max(0,r.body-40);i<Math.min(N,r.to+40);i+=8){const p=P[i];rows.push([[p.x+p.rx*(W+30),gy+1.5,p.z+p.rz*(W+30),0,0],[p.x+p.rx*(W+1400),gy+1.5,p.z+p.rz*(W+1400),1,0]]);}
-     if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),seaM));});}
+   course.sect.forEach(r=>{const cf=SECT[r.k];if(!cf.sea)return;(cf.sea2?[1,-1]:[1]).forEach(sd=>{const rows=[];for(let i=Math.max(0,r.body-40);i<Math.min(N,r.to+40);i+=8){const p=P[i];rows.push([[p.x+p.rx*sd*(W+30),gy+1.5,p.z+p.rz*sd*(W+30),0,0],[p.x+p.rx*sd*(W+1400),gy+1.5,p.z+p.rz*sd*(W+1400),1,0]]);}
+     if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),seaM));});});
+   course.sect.forEach(r=>{const cf=SECT[r.k];if(r.to>N)return;if(cf.bridge)buildBridge(G,r,gy);if(cf.jct)buildJct(G,r,gy);});}
   // 照明（左右交互）
   {const L=[];let sd=1;for(let i=20;i<N;i+=40){const p=P[i];sd=-sd;if(p.T)continue;const b=W+.4,hh=W-2.2;L.push({x:p.x+p.rx*sd*b,z:p.z+p.rz*sd*b,y:p.y+1.1,hx:p.x+p.rx*sd*hh,hz:p.z+p.rz*sd*hh,h:p.h});}
    lampRow(G,L,8.4);
@@ -653,6 +662,28 @@ function buildHighway(G){
      const sign=new THREE.Mesh(new THREE.PlaneGeometry(7,1.75),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sign.position.set(-W*.35,5.8,-.25);sign.rotation.y=Math.PI;gr.add(sign);
      gr.position.set(p.x,p.y,p.z);gr.rotation.y=p.h;G.add(gr);}}
 }
+// 吊り橋：2本の主塔と、ライトの並んだメインケーブル
+function buildBridge(G,r,gy){const W=HALF,a=r.body+260,b=r.body+1500;if(b>=r.to-50)return;const H=95,pm=new THREE.MeshLambertMaterial({color:0xcfd3da,emissive:0x2a2c33});
+  [a,b].forEach(i=>{const p=P[i];[-1,1].forEach(sd=>{const m=new THREE.Mesh(new THREE.BoxGeometry(3,H+(p.y-gy),3),pm);m.position.set(p.x+p.rx*sd*(W+2.5),(gy+p.y+H)/2,p.z+p.rz*sd*(W+2.5));m.rotation.y=p.h;G.add(m);});
+    for(const hh of [H*.55,H-4]){const bm=new THREE.Mesh(new THREE.BoxGeometry(W*2+8,2.4,2.4),pm);bm.position.set(p.x,p.y+hh,p.z);bm.rotation.y=p.h;G.add(bm);}
+    const lt=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(255,80,80,.9)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));lt.scale.set(6,6,1);lt.position.set(p.x,p.y+H+2,p.z);G.add(lt);});
+  const ext=380,pts=[],lp=[],cols=[],cc=new THREE.Color();
+  [-1,1].forEach(sd=>{let prev=null;for(let i=a-ext;i<=b+ext;i+=6){const p=P[Math.max(0,Math.min(N-1,i))];let y;
+      if(i<a){const t=(a-i)/ext;y=p.y+(H-2)*(1-t)+1.5*t;}else if(i>b){const t=(i-b)/ext;y=p.y+(H-2)*(1-t)+1.5*t;}else{const t=(i-a)/(b-a);y=p.y+4+(H-6)*Math.pow(2*t-1,2);}
+      const x=p.x+p.rx*sd*(W+2.5),z=p.z+p.rz*sd*(W+2.5);if(prev)pts.push(prev[0],prev[1],prev[2],x,y,z);prev=[x,y,z];
+      if(i>=a&&i<=b&&(i-a)%18===0){pts.push(x,p.y+1,z,x,y,z);}
+      if((i-a)%12===0){lp.push(x,y+.3,z);cc.setHSL(.58,.2,.85);cols.push(cc.r,cc.g,cc.b);}}});
+  const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));G.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xb8c4d8})));
+  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));pg.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+  G.add(new THREE.Points(pg,new THREE.PointsMaterial({size:3,sizeAttenuation:false,vertexColors:true})));}
+// ジャンクション：頭上を斜めに横切る高架と、その柱
+function buildJct(G,r,gy){const W=HALF,conc=new THREE.MeshLambertMaterial({color:0x7c8088}),dm=new THREE.MeshLambertMaterial({color:0x5c6068});
+  const lampM=new THREE.SpriteMaterial({map:glowTex('rgba(255,200,120,.8)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+  for(let i=r.body+90;i<r.to-60;i+=110+Math.random()*80|0){const p=P[i],yaw=p.h+Math.PI/2+(Math.random()-.5)*.9,hgt=9+Math.random()*7,len=360,dx=Math.sin(yaw),dz=Math.cos(yaw);
+    const deck=new THREE.Mesh(new THREE.BoxGeometry(12,1.4,len),dm);deck.position.set(p.x,p.y+hgt,p.z);deck.rotation.y=yaw;G.add(deck);
+    [-1,1].forEach(sd=>{const wl=new THREE.Mesh(new THREE.BoxGeometry(.4,1.2,len),conc);wl.position.set(p.x+Math.cos(yaw)*sd*5.8,p.y+hgt+1.3,p.z-Math.sin(yaw)*sd*5.8);wl.rotation.y=yaw;G.add(wl);});
+    for(let k=-len/2+15;k<len/2;k+=30){const x=p.x+dx*k,z=p.z+dz*k;if(nearRoad(x,z,W+3.5,-1,-1))continue;const h=p.y+hgt-gy;const pl=new THREE.Mesh(new THREE.BoxGeometry(2.6,h,2.6),conc);pl.position.set(x,gy+h/2,z);G.add(pl);}
+    for(let k=-len/2+10;k<len/2;k+=40){const l=new THREE.Sprite(lampM);l.scale.set(5,5,1);l.position.set(p.x+dx*k,p.y+hgt+4,p.z+dz*k);G.add(l);}}}
 const NEON_WORDS=['BAR','カラオケ','ラーメン','24H','GAME','ホテル','居酒屋','焼肉','パチンコ','CAFE','寿司','DRIFT'];
 const neonTex=NEON_WORDS.map((t,k)=>{const hue=[330,190,50,280,120,15][k%6];return canvasTex(256,96,(g,w,h)=>{g.fillStyle='rgba(6,6,14,.9)';g.fillRect(0,0,w,h);
   g.strokeStyle=`hsl(${hue},100%,62%)`;g.lineWidth=5;g.shadowColor=`hsl(${hue},100%,60%)`;g.shadowBlur=14;g.strokeRect(8,8,w-16,h-16);
@@ -1005,11 +1036,11 @@ function buildProfiles(){
 }
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
-  course=courseOf(id);HALF=course.half||4.6;
+  course=courseOf(id);HALF=course.half||4.6;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
   {const urban=course.env==='highway'||course.env==='city',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
-  if(course.loop){const lo=loopLayout();course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
-    lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=LOOP_ORDER[0];}
+  if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
+    lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=course.order[0];}
   computeWidth();buildScenery();buildProfiles();buildMinimap();
   railGroup.visible=spec.type==='train';
   skid.count=0;skidI=0;demo.s=START_I;demo.v=0;
@@ -1071,7 +1102,7 @@ $('autoGas').addEventListener('change',e=>{autoGas=e.target.checked;store.set('t
 $('btnStart').addEventListener('click',startFromMenu);
 $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
   if(mode==='cup'){if(cupState&&cupState.race<CUPS[cupIdx].courses.length){loadCourse(CUPS[cupIdx].courses[cupState.race]);resetRace();}else toMenu();}
-  else resetRace();});
+  else{if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}resetRace();}});
 $('btnMenu').addEventListener('click',toMenu);
 $('btnPA').addEventListener('click',()=>{if(mode==='free'&&game.state==='race')enterPA();});
 const DIFF=[{scale:.84,mult:.7},{scale:.9,mult:1},{scale:1.0,mult:1.6}];
@@ -1223,7 +1254,7 @@ function startFromMenu(){
   if(mode==='cup'){if(!cupState||cupState.race>=CUPS[cupIdx].courses.length)newCup();const id=CUPS[cupIdx].courses[cupState.race];if(course.id!==id)loadCourse(id);}
   else if(mode==='collect'){if(course.id!=='neon')loadCourse('neon');}
   else if(mode==='escape'){if(course.id!==escCourse)loadCourse(escCourse);}
-  else if(mode==='free'){if(course.id!=='loop')loadCourse('loop');}
+  else if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
