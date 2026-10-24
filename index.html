@@ -931,6 +931,7 @@ SPR.ita86=sprSet('ita86',{back:[1.84,1.84*371/514],diag:[3.24,3.24*275/595],side
 SPR.hearse=sprSet('hearse',{back:[2.8*362/385,2.8],diag:[2.9*591/366,2.9],side:[5.6,5.6*322/592],front:[2.8*378/387,2.8]},{back:1.6,diag:1.6,side:.7,front:1.6},.5);
 SPR.gtr=sprSet('gtr',{back:[1.95,1.95*348/524],diag:[3.4,3.4*276/593],side:[4.6,4.6*197/593],front:[2.05,2.05*349/566]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
 SPR.evo=sprSet('evo',{back:[1.9,1.9*348/481],diag:[3.35,3.35*283/593],side:[4.5,4.5*213/591],front:[2.0,2.0*354/522]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
+SPR.jzx=sprSet('jzx',{back:[1.95,1.95*347/502],diag:[3.45,3.45*261/590],side:[4.75,4.75*190/587],front:[2.05,2.05*352/547]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -981,6 +982,7 @@ const CARS=[
   {id:'hearse',dur:170,armor:.8,name:'宮型霊柩車',note:'金色のお宮を背負った黒い霊柩車。前を走る一般車は、何も言わなくても自然と道をあけてくれる。ぶつけず・ドリフトせず・クラクションを鳴らさずに静かに走りきると「静粛走行」ボーナス。ただしスタート直後の1回だけは「出棺のクラクション」として鳴らしてよい（ボーナス）。長くて重い。',price:5000,top:0x111214,bot:0xc8a030,pow:.9,grip:.9,drift:.75,shape:'sedan',sprite:'hearse',img:'cars/hearse-diag.png',type:'hearse',steerMul:.85,len:5.6,halfW:.95,cam:[7,3.9,0,4.5,1.4]},
   {id:'gtr',dur:130,name:'スカイランGT-R（R34）',note:'ベイサイドブルーの4WDターボ。低回転ではターボが効くまで少しもたつくが、アクセルを踏み続けるとブースト圧が上がり、全開になると一気に伸びる。首都高の直線で真価を発揮。アクセルを戻すとブローオフの「プシュー」。',price:13000,top:0x1f4fd8,bot:0x1a1d24,pow:1.4,grip:1.2,drift:.82,vmax:1.06,shape:'coupe',sprite:'gtr',img:'cars/gtr-diag.png',type:'gtr'},
   {id:'evo',dur:130,name:'ランナーエボIX',note:'赤い4ドアの4WDターボ。曲がりながら踏める電子制御4WDで、コーナーの立ち上がりは全車でいちばん鋭い（カーブの中と出口で加速1.15倍）。そのかわり直線の伸びはGT-Rに負ける。峠向き。',price:11000,top:0xd8141c,bot:0x1a1d24,pow:1.34,grip:1.25,drift:.78,steerMul:1.12,shape:'sedan',sprite:'evo',img:'cars/evo-diag.png',type:'evo'},
+  {id:'jzx',dur:120,name:'チェイザー ツアラーV（JZX100）',note:'白い4ドアのおじさんセダン…の皮をかぶったドリ車。とにかく横を向きやすく、ドリフトポイントが1.4倍。ドリフトが途切れても少しのあいだならチェインがつながる「つなぎドリ」で、S字やヘアピンの連続で大きなポイントになる。',price:7500,top:0xf2f2f0,bot:0x1a1d24,pow:1.2,grip:.95,drift:1.35,shape:'sedan',sprite:'jzx',img:'cars/jzx-diag.png',type:'jzx'},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -1301,7 +1303,7 @@ function renderParts(){
     else{btn.textContent=nx.n+'　あと '+(nx.p-wallet).toLocaleString()+' P';btn.disabled=true;}
     d.querySelector('.act').appendChild(btn);box.appendChild(d);});
 }
-const CAR_CAT={'86':'run',fr:'run',re:'run','4wd':'run',boss:'run',nbox:'town',tanto:'town',alph:'town',noah:'town',taxi:'town',kyoshu:'town',kei:'work',packer:'work',fork:'work',police:'work',roller:'work',train:'neta',bike:'neta',tank:'neta',sled:'neta',dashi:'neta',hokora:'friend',ita86:'friend',hearse:'work',gtr:'run',evo:'run'};
+const CAR_CAT={'86':'run',fr:'run',re:'run','4wd':'run',boss:'run',nbox:'town',tanto:'town',alph:'town',noah:'town',taxi:'town',kyoshu:'town',kei:'work',packer:'work',fork:'work',police:'work',roller:'work',train:'neta',bike:'neta',tank:'neta',sled:'neta',dashi:'neta',hokora:'friend',ita86:'friend',hearse:'work',gtr:'run',evo:'run',jzx:'run'};
 const CAT_NAMES=[['all','すべて'],['own','所有'],['run','走り屋'],['town','街の車'],['work','はたらく車'],['neta','ネタ'],['friend','友達']];
 let gFilt=store.get('touge_gfilt')||'all';
 function renderGarage(){
@@ -1799,7 +1801,7 @@ function frame(now){
   if(racing){
     game.t+=dt;
     // drift scoring
-    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=car.slip*info.sp*dt*.45*(spec.type==='ita'?1.25:1);car.nitro=Math.min(1,car.nitro+car.slip*info.sp*dt*.45/1500);game.chainT=.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
+    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=car.slip*info.sp*dt*.45*(spec.type==='ita'?1.25:spec.type==='jzx'?1.4:1);car.nitro=Math.min(1,car.nitro+car.slip*info.sp*dt*.45/1500);game.chainT=spec.type==='jzx'?1.6:.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
     else if(game.chainT>0){game.chainT-=dt;if(game.chainT<=0){endChain(true);$('drift').classList.remove('show');}}
     if(info.sp<1.5)game.stuck+=dt;else game.stuck=0;if(game.stuck>(mode==='collect'?9:3.5)){recover();game.stuck=0;}
     if(mode==='battle'&&!game.passed&&cpus[0]&&car.idx>cpus[0].s+4&&game.t>2){game.passed=true;flash('追い抜いた！ +500 P');beep(990,.2);}
