@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#070b16">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -28,7 +28,10 @@
 }
 [hidden]{display:none!important}
 html,body{height:100%;overflow:hidden;background:var(--night);color:var(--ink);font-family:var(--f-body)}
-body{touch-action:none;user-select:none;-webkit-user-select:none}
+body{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+#touch,#touch *,#c,#cockpit,#speedfx,.hud{touch-action:none}
+button,.tb,label,input,select{touch-action:manipulation}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block}
 #speedfx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 #cockpit{position:fixed;left:50%;bottom:0;width:calc(var(--W,100vw)*1.04);max-width:none;transform:translateX(-50%);pointer-events:none;z-index:1}
@@ -375,7 +378,7 @@ const $=id=>document.getElementById(id);
 const isTouch=matchMedia('(pointer:coarse)').matches||('ontouchstart' in window);
 if(isTouch)document.body.classList.add('is-touch');
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-let rotMode=+(store.get('touge_rot')??(isTouch?1:0));if(![0,1,2].includes(rotMode))rotMode=0;
+let rotMode=+(store.get('touge_rot')??0);if(![0,1,2].includes(rotMode))rotMode=0;
 const canSave=(()=>{try{localStorage.setItem('touge_t','1');const ok=localStorage.getItem('touge_t')==='1';localStorage.removeItem('touge_t');return ok;}catch(e){return false;}})();
 
 /* ================= TRACK ================= */
@@ -1242,6 +1245,12 @@ function toggleView(){game.view=(game.view+1)%4;wheelRig.visible=game.view===1;$
 $('btnView').addEventListener('click',toggleView);
 document.querySelectorAll('#qSeg button').forEach(b=>b.addEventListener('click',()=>{quality=+b.dataset.q;store.set('touge_q',quality);applyQuality();}));
 {const sr=()=>document.querySelectorAll('#rotSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r===rotMode));document.querySelectorAll('#rotSeg button').forEach(b=>b.addEventListener('click',()=>{rotMode=+b.dataset.r;store.set('touge_rot',rotMode);sr();resize();}));sr();}
+// iPhoneのダブルタップ・ピンチでのズームを止める
+try{['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+{let lastTouch=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouch<350&&!(e.target.closest&&e.target.closest('input,select,textarea')))e.preventDefault();lastTouch=now;},{passive:false});}
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+{const vp=document.querySelector('meta[name="viewport"]');if(vp)vp.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover');else{const m=document.createElement('meta');m.name='viewport';m.content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';document.head&&document.head.appendChild(m);}}}catch(e){}
 $('autoGas').addEventListener('change',e=>{autoGas=e.target.checked;store.set('touge_auto',autoGas?'1':'0');});
 $('btnStart').addEventListener('click',startFromMenu);
 $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
