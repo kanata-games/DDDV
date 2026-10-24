@@ -327,7 +327,7 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
       <div class="courseList" id="escList"></div></div>
     </section>
     <section class="pane" id="pane-densha" role="tabpanel" hidden>
-      <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士</b><span id="denBest">BEST --</span></div>
+      <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士（山手線・大阪環状線も）</b><span id="denBest">BEST --</span></div>
       <p class="lede" style="font-size:12px">峠の電車の運転士になって、駅に<b>停止位置ぴったり</b>で止めよう。ダイヤ（定刻）どおりに着くとさらに加点。止まるとドアが開いて、発車ベルのあと次の駅へ。</p>
       <p class="lede" style="font-size:12px">アクセルで加速、ブレーキはやさしめの常用ブレーキ。<b>N で非常ブレーキ</b>（強く止まるが減点）。停止位置を20 m以上行きすぎると「通過」で大減点。カーブの制限速度を超えすぎると脱線する。この面だけは、持っていなくても電車を借りて運転できる。</p>
       <div class="courseList" id="denList"></div></div>
@@ -465,6 +465,8 @@ const COURSES=[
   {id:'sc3',name:'クランク',sub:'直角が続く',segs:[['S',45,0],['C',5,90,0],['S',12,0],['C',5,-90,0],['S',14,0],['C',5,-90,0],['S',12,0],['C',5,90,0],['S',45,0]],y0:0,env:'school',half:3.0,limit:15,stops:[],hidden:true},
   {id:'sc4',name:'坂道発進',sub:'坂の途中で止まって、下がらずに発進',segs:[['S',60,0],['C',20,40,0],['S',30,0],['S',70,-.1],['S',25,0],['S',70,.1],['C',20,-40,0],['S',60,0]],y0:0,env:'school',half:3.4,limit:30,stops:[{seg:3,at:48,t:'hill'}],hidden:true},
   {id:'sc5',name:'卒業検定',sub:'外周・S字・クランク・坂道を全部',segs:[['S',60,0],['C',14,90,0],['S',70,0],['C',10,75,0],['C',10,-150,0],['C',10,150,0],['C',10,-75,0],['S',40,0],['C',5,-90,0],['S',12,0],['C',5,90,0],['S',14,0],['C',5,90,0],['S',12,0],['C',5,-90,0],['S',40,0],['S',60,-.1],['S',20,0],['S',60,.1],['S',30,0],['C',14,-90,0],['S',80,0]],y0:0,env:'school',half:3.2,limit:40,stops:[{seg:2,at:45,t:'stop'},{seg:16,at:40,t:'hill'},{seg:21,at:18,t:'stop'}],hidden:true},
+  {id:'yamanote',name:'山手線（東京→品川）',sub:'都心の高架をゆく環状線',segs:[['S',260,0],['C',400,-18,0],['S',360,0],['C',300,15,0],['S',420,0],['C',500,-12,0],['S',380,0],['C',260,25,0],['S',400,0],['C',350,-20,0],['S',300,0]],y0:30,env:'highway',half:5.5,signs:['山手線 外回り','有楽町','新橋','浜松町','品川 方面'],hidden:true},
+  {id:'kanjo',name:'大阪環状線（大阪→玉造）',sub:'大阪の街を回る環状線',segs:[['S',240,0],['C',300,30,0],['S',380,0],['C',420,-15,0],['S',340,0],['C',260,35,0],['S',420,0],['C',380,-20,0],['S',360,0],['C',300,25,0],['S',260,0]],y0:30,env:'highway',half:5.5,signs:['大阪環状線','天満','京橋','大阪城公園','鶴橋 方面'],hidden:true},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -726,7 +728,7 @@ function buildHighway(G){
    const arm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,.1,.1),new THREE.MeshLambertMaterial({color:0x6b7078}),L.length),o=new THREE.Object3D();
    L.forEach((l,k)=>{o.position.set((l.x+l.hx)/2,l.y+8.3,(l.z+l.hz)/2);o.rotation.set(0,Math.atan2(l.hx-l.x,l.hz-l.z)+Math.PI/2,0);o.scale.set(Math.hypot(l.hx-l.x,l.hz-l.z),1,1);o.updateMatrix();arm.setMatrixAt(k,o.matrix);});G.add(arm);}
   // 案内標識
-  {const names=course.id==='c1'?['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留']:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明'];let n=0;
+  {const names=course.signs?course.signs:course.id==='c1'?['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留']:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明'];let n=0;
    const at=[];if(course.sect){course.sect.forEach(r=>{if(r.to<1e9){at.push([r.body+25,SECT[r.k].name,'#1d4f9c']);for(let i=r.body+330;i<r.to-60;i+=520)at.push([i,null]);}});}else for(let i=260;i<N-120;i+=430)at.push([i,null]);
    for(const [i,label,bg] of at){const p=P[i];if(!p||p.T)continue;const nm=label||(p.blk?pick(SECT[p.blk].signs):names[n++%names.length]);const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle=bg||'#0f6a3c';g.fillRect(0,0,w,h);g.strokeStyle='#e9f3ec';g.lineWidth=6;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 54px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(nm,w/2,h/2+3);});
      const gr=new THREE.Group(),cm=new THREE.MeshLambertMaterial({color:0x7d838c});
@@ -2152,7 +2154,7 @@ function stampBonus(){if(spec.type!=='umicar'||game.retired||mode==='free')retur
 function fanBonus(){return spec.type==='ita'&&!game.retired?Math.round((game.dTotal||0)*.1):0;}
 function tatariBonus(){return spec.type==='hokora'?(game.tatari||0)*80:0;}
 // ===== 電車でGO風：DDDV電鉄 =====
-const DEN_LINES=[{id:'lake',name:'湖畔線',st:['湖畔口','白樺台','月見ヶ浜','湖畔温泉'],spd:18},{id:'ridge',name:'稜線トンネル線',st:['稜線口','風穴','星見峠','稜線終点'],spd:19},{id:'down',name:'月見峠線',st:['月見峠','九十九折','ヘアピン前','峠の麓'],spd:10}];
+const DEN_LINES=[{id:'yamanote',name:'山手線',st:['東京','有楽町','新橋','浜松町','田町','高輪ゲートウェイ','品川'],spd:18,col:'#7ac943'},{id:'kanjo',name:'大阪環状線',st:['大阪','天満','桜ノ宮','京橋','大阪城公園','森ノ宮','玉造'],spd:18,col:'#f08a24'},{id:'lake',name:'湖畔線',st:['湖畔口','白樺台','月見ヶ浜','湖畔温泉'],spd:20},{id:'ridge',name:'稜線トンネル線',st:['稜線口','風穴','星見峠','稜線終点'],spd:19},{id:'down',name:'月見峠線',st:['月見峠','九十九折','ヘアピン前','峠の麓'],spd:10}];
 let denLine=store.get('touge_den_line')||'lake';if(!DEN_LINES.some(l=>l.id===denLine))denLine='lake';let denPrev=null;
 const stationGroup=new THREE.Group();scene.add(stationGroup);
 function clearStations(){while(stationGroup.children.length){const o=stationGroup.children[0];stationGroup.remove(o);o.traverse&&o.traverse(q=>{if(q.geometry)q.geometry.dispose();});}}
@@ -2171,11 +2173,11 @@ function setupDen(){const L=DEN_LINES.find(l=>l.id===course.id)||DEN_LINES[0],n=
     const p=P[Math.min(N-1,i)];if(!isStart){const bx=p.x+p.rx*2.3,bz=p.z+p.rz*2.3,pl=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.4,6),poleM);pl.position.set(bx,p.y+1.2,bz);stationGroup.add(pl);
       const tx=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#d8141c';g.fillRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 40px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('停止',w/2,h/2-18);g.fillText('位置',w/2,h/2+24);});
       const sg=new THREE.Mesh(new THREE.PlaneGeometry(.9,.9),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(bx,p.y+2.6,bz);sg.rotation.y=p.h+Math.PI;stationGroup.add(sg);}
-    const q=P[Math.max(0,i-40)],nx=q.x-q.rx*(W+2.6),nz=q.z-q.rz*(W+2.6);const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle='#f4f4f0';g.fillRect(0,0,w,h);g.fillStyle='#1d4f9c';g.fillRect(0,h-26,w,26);g.fillStyle='#111';g.font='bold 64px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(name,w/2,h/2-10);});
+    const q=P[Math.max(0,i-40)],nx=q.x-q.rx*(W+2.6),nz=q.z-q.rz*(W+2.6);const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle='#f4f4f0';g.fillRect(0,0,w,h);g.fillStyle=L.col||'#1d4f9c';g.fillRect(0,h-26,w,26);g.fillStyle='#111';g.font='bold 64px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(name,w/2,h/2-10);});
     const nb=new THREE.Mesh(new THREE.PlaneGeometry(4,1),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));nb.position.set(nx,q.y+3.2,nz);nb.rotation.y=q.h+Math.PI/2;stationGroup.add(nb);
     for(const pz of [nb]){const p2=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.6,6),poleM);p2.position.set(nx,q.y+1.9,nz);stationGroup.add(p2);}};
   mkStation(START_I+4,L.st[0],true);stops.forEach(o=>mkStation(o.i,o.name,false));
-  setTimeout(()=>say({name:'車掌',col:0x9fd3ea},'本日もDDDV電鉄をご利用いただきありがとうございます。次は'+stops[0].name+'です。',4),900);}
+  setTimeout(()=>say({name:'車掌',col:0x9fd3ea},(L.col?'本日も'+L.name+'をご利用いただきありがとうございます。次は'+stops[0].name+'、'+stops[0].name+'。':'本日もDDDV電鉄をご利用いただきありがとうございます。次は'+stops[0].name+'です。'),4),900);}
 function denChime(){if(!ac)return;[0,.35].forEach((d,k)=>setTimeout(()=>beep(k?784:988,.5),d*1000));}
 function stepDen(dt,info){const D=game.den;if(!D)return;
   if(game.dwell>0&&game.t>=game.dwell){game.dwell=0;if(D.cur>=D.stops.length){finish();return;}flash('発車！');}
