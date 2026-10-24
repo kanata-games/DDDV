@@ -285,7 +285,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     </section>
     <section class="pane" id="pane-free" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
-      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
+      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに、海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>と区間が切り替わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
       <p class="lede" style="font-size:12px">バトルはSPゲージの削り合い。前にいれば相手のSPが、後ろにいれば自分のSPが減っていき、離れるほど速く減る。壁にぶつけても自分のSPが減る。相手のSPを0にすれば勝ち。5勝するごとに「首都高の主」が現れる。</p>
       <p class="lede" style="font-size:12px">やめる時は画面上の<b>「PAに入る」</b>（Pキー）。そこまでのバトルの賞金と走行距離ぶんのポイントがもらえる。大破すると稼ぎは半分になる。</p></div>
     </section>
@@ -363,9 +363,22 @@ const C1_SEGS=[['S',150,0],['C',70,60,0],['S',90,0,'T'],['C',90,-45,0,'T'],['S',
  ['C',60,-90,0],['S',80,0,'T'],['C',100,40,0,'T'],['S',100,0],['C',50,75,0],['S',130,0],['C',90,-50,0],['S',160,0]];
 const NEON_SEGS=[['S',110,0],['C',14,90,0],['S',90,0],['C',14,-90,0],['S',130,0],['C',40,25,0],['C',40,-25,0],['S',70,0],['C',14,-90,0],['S',80,0],['C',14,90,0],['S',150,0],
  ['C',14,90,0],['S',70,0],['C',14,-90,0],['S',100,0],['C',30,-40,0],['C',30,40,0],['S',90,0],['C',14,-90,0],['S',90,0],['C',14,90,0],['S',140,0]];
-// 首都高フリー走行：同じ区間（向きの合計0°）を3回つなぎ、曲がったトンネルの中で1区間ぶん前に戻して終わりなく走る
-const LOOP_BLOCK=[['S',60,0,'T'],['C',140,35,0,'T'],['C',140,-35,0,'T'],['S',60,0,'T'],['S',240,0],['C',260,-30,0],['S',200,0],['C',90,55,0],['S',140,0],['C',120,-40,0],['S',300,0],['C',380,20,0],['S',220,0],['C',150,-45,0],['S',160,0],['C',200,45,0],['S',260,0],['C',300,-20,0],['S',180,0],['C',420,15,0],['S',120,0]];
-const LOOP_LEAD=60,LOOP_SEGS=[['S',LOOP_LEAD,0]].concat(LOOP_BLOCK,LOOP_BLOCK,LOOP_BLOCK);
+// 首都高フリー走行：曲がったトンネル（つなぎ）＋区間をいくつもつなぎ、最後のトンネルの中で最初のトンネルへ戻して終わりなく走る
+// どの区間も向きの合計は0°。区間ごとに景色（ビルの近さ・海・防音壁・標識）が変わる
+const LOOP_TUN=[['S',60,0,'T'],['C',140,35,0,'T'],['C',140,-35,0,'T'],['S',60,0,'T']];
+const LOOP_BODY={
+  W:[['S',400,0],['C',500,18,0],['S',350,0],['C',420,-25,0],['S',300,0],['C',260,30,0],['S',380,0],['C',600,-15,0],['S',300,0],['C',350,-8,0],['S',200,0]],
+  C:[['S',120,0],['C',60,70,0],['S',80,0],['C',70,-60,0,'T'],['S',90,0,'T'],['C',55,-55,0,'T'],['S',100,0],['C',80,80,0],['S',70,0],['C',65,-75,0],['S',140,0],['C',90,45,0,'T'],['S',80,0,'T'],['C',90,-5,0],['S',120,0]],
+  Y:[['S',250,0],['C',220,-35,0],['S',200,0],['C',160,50,0],['S',260,0],['C',300,-30,0],['S',180,0],['C',140,40,0],['S',220,0],['C',240,-25,0],['S',200,0]]};
+const SECT={
+  W:{name:'湾岸線',sub:'海沿いの長い直線',signs:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明','台場 1km'],dens:.3,o0:220,o1:650,h0:20,h1:90,sea:true},
+  C:{name:'C1 都心環状',sub:'ビルの谷間とトンネル',signs:['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留','江戸橋JCT'],dens:1,o0:14,o1:110,h0:30,h1:170},
+  Y:{name:'横羽線',sub:'防音壁の高架',signs:['横羽線','羽田 3km','浜崎橋JCT','EXIT 芝浦','大師 2km'],dens:.55,o0:45,o1:320,h0:15,h1:110,wall:true}};
+const LOOP_LEAD=60,LOOP_ORDER='WCYCWYC';
+const LOOP_SEGS=[['S',LOOP_LEAD,0]].concat(...LOOP_ORDER.split('').map(k=>LOOP_TUN.concat(LOOP_BODY[k])),LOOP_TUN,[['S',900,0]]);
+function loopLayout(){const cnt=x=>genPts(x,0).length-1,tn=cnt(LOOP_TUN);let i=LOOP_LEAD;const r=[];
+  for(const k of LOOP_ORDER){const a=i;i+=tn;const b=i;i+=cnt(LOOP_BODY[k]);r.push({k,from:a,body:b,to:i});}
+  r.push({k:LOOP_ORDER[0],from:i,body:i+tn,to:1e9});return {ranges:r,w0:LOOP_LEAD+146,wF:i+146};}
 // コース一覧（区間の並びだけで道・景色・CPUの走り方まで自動で作られる）
 const COURSES=[
   {id:'lake',name:'湖畔ハイウェイ',sub:'湖沿いの高速コーナーが続く',segs:LAKE_SEGS,y0:60,water:true,lampStep:55},
@@ -411,6 +424,7 @@ const MAXW=46;let width={};
 function computeWidth(){
   grid=new Map();P.forEach((p,i)=>{const k=Math.floor(p.x/CELL)+','+Math.floor(p.z/CELL);(grid.get(k)||grid.set(k,[]).get(k)).push(i);});
   width={'-1':new Float32Array(N),'1':new Float32Array(N)};
+  if(course&&(course.env==='highway'||course.env==='city')){width['-1'].fill(2);width['1'].fill(2);return;}
   for(const s of [-1,1]){
     const w=width[s];
     for(let i=0;i<N;i++){const p=P[i];let t=HALF+2;
@@ -600,7 +614,7 @@ function buildHighway(G){
   [-1,1].forEach(sd=>{const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i],pt=(a,b)=>[p.x+p.rx*sd*a,p.y+b,p.z+p.rz*sd*a];
       rows.push([[...pt(W+.2,0),0,0],[...pt(W+.2,1.1),.3,0],[...pt(W+.6,1.1),.4,0],[...pt(W+.6,-1.3),1,0]]);}
     G.add(new THREE.Mesh(ribbon(rows,{}),conc));
-    const pan=[];for(let i=0;i<N;i+=STEP){const p=P[i];if(p.T){pan.push([[p.x,p.y-50,p.z,0,0],[p.x,p.y-50,p.z,1,0]]);continue;}const a=W+.5;pan.push([[p.x+p.rx*sd*a,p.y+1.1,p.z+p.rz*sd*a,0,0],[p.x+p.rx*sd*a,p.y+3.2,p.z+p.rz*sd*a,1,0]]);}
+    const pan=[];for(let i=0;i<N;i+=STEP){const p=P[i];if(p.T){pan.push([[p.x,p.y-50,p.z,0,0],[p.x,p.y-50,p.z,1,0]]);continue;}const a=W+.5,ph=p.blk&&SECT[p.blk].wall?6.2:3.2;pan.push([[p.x+p.rx*sd*a,p.y+1.1,p.z+p.rz*sd*a,0,0],[p.x+p.rx*sd*a,p.y+ph,p.z+p.rz*sd*a,1,0]]);}
     G.add(new THREE.Mesh(ribbon(pan,{}),new THREE.MeshLambertMaterial({color:0x3a4a6a,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false})));});
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x-p.rx*(W+.6),p.y-1.3,p.z-p.rz*(W+.6),0,0],[p.x+p.rx*(W+.6),p.y-1.3,p.z+p.rz*(W+.6),1,0]]);}
    G.add(new THREE.Mesh(ribbon(rows,{}),conc));}
@@ -608,15 +622,22 @@ function buildHighway(G){
   {const idx=[];for(let i=10;i<N;i+=40)if(!P[i].T)idx.push(i);const m=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0x5e6168}),idx.length),o=new THREE.Object3D();
    idx.forEach((i,k)=>{const p=P[i],h=p.y-1.3-gy;o.position.set(p.x,gy+h/2,p.z);o.rotation.set(0,p.h,0);o.scale.set(3,h,2.4);o.updateMatrix();m.setMatrixAt(k,o.matrix);});G.add(m);}
   // 地面と街の灯り
-  {const m=new THREE.Mesh(new THREE.PlaneGeometry(4000,4000),new THREE.MeshLambertMaterial({color:0x0b0d14}));m.rotation.x=-Math.PI/2;m.position.set(cx,gy,cz);G.add(m);
-   const pos=[],cols=[],c=new THREE.Color();for(let k=0;k<5000;k++){pos.push(cx+(Math.random()-.5)*1400,gy+.3,cz+(Math.random()-.5)*1400);c.setHSL(Math.random()<.7?.09:.6,.7,.55+Math.random()*.3);cols.push(c.r,c.g,c.b);}
+  {let ex=0;P.forEach(p=>{ex=Math.max(ex,Math.abs(p.x-cx),Math.abs(p.z-cz));});const gs=Math.max(4000,ex*2+2000);
+   const m=new THREE.Mesh(new THREE.PlaneGeometry(gs,gs),new THREE.MeshLambertMaterial({color:0x0b0d14}));m.rotation.x=-Math.PI/2;m.position.set(cx,gy,cz);G.add(m);
+   const pos=[],cols=[],c=new THREE.Color(),LP=course.loop?Math.min(24000,Math.round(N*1.4)):5000;for(let k=0;k<LP;k++){if(course.loop){const p=P[Math.random()*N|0];if(p.blk&&SECT[p.blk].sea&&Math.random()<.7)continue;const sd=Math.random()<.5?-1:1,o=W+40+Math.random()*700,al=(Math.random()-.5)*60;pos.push(p.x+p.rx*sd*o+Math.sin(p.h)*al,gy+.3,p.z+p.rz*sd*o+Math.cos(p.h)*al);}else pos.push(cx+(Math.random()-.5)*1400,gy+.3,cz+(Math.random()-.5)*1400);c.setHSL(Math.random()<.7?.09:.6,.7,.55+Math.random()*.3);cols.push(c.r,c.g,c.b);}
    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
    G.add(new THREE.Points(g,new THREE.PointsMaterial({size:2,sizeAttenuation:false,vertexColors:true,fog:false})));}
   // ビル群
-  {const list=[];let tries=0;while(list.length<(quality===0?120:220)&&tries<3000){tries++;const i=Math.random()*N|0,p=P[i],sd=Math.random()<.5?-1:1,off=W+35+Math.random()*230;
+  {const list=[];let tries=0;const want=course.loop?Math.min(quality===0?1100:2200,Math.round(N/(quality===0?14:7))):(quality===0?120:220);
+   while(list.length<want&&tries<want*14){tries++;const i=Math.random()*N|0,p=P[i],cf=p.blk?SECT[p.blk]:null;if(cf&&Math.random()>cf.dens)continue;
+     const sd=cf&&cf.sea?-1:Math.random()<.5?-1:1,off=cf?W+cf.o0+Math.random()*(cf.o1-cf.o0):W+35+Math.random()*230;
      const x=p.x+p.rx*sd*off,z=p.z+p.rz*sd*off,w=14+Math.random()*22,d=14+Math.random()*22;if(nearRoad(x,z,W+Math.max(w,d)*.75+8,-1,-1))continue;
-     list.push({x,z,y:gy,w,d,h:30+Math.random()*Math.random()*140,r:p.h});}
+     list.push({x,z,y:gy,w,d,h:cf?cf.h0+Math.random()*Math.random()*cf.h1:30+Math.random()*Math.random()*140,r:p.h});}
    cityBlocks(G,list);}
+  // 湾岸の区間：右手に夜の海
+  if(course.sect){const seaM=new THREE.MeshPhongMaterial({color:0x0a1830,emissive:0x040a16,specular:0x6f86c8,shininess:60,side:THREE.DoubleSide});
+   course.sect.forEach(r=>{if(!SECT[r.k].sea)return;const rows=[];for(let i=Math.max(0,r.body-40);i<Math.min(N,r.to+40);i+=8){const p=P[i];rows.push([[p.x+p.rx*(W+30),gy+1.5,p.z+p.rz*(W+30),0,0],[p.x+p.rx*(W+1400),gy+1.5,p.z+p.rz*(W+1400),1,0]]);}
+     if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),seaM));});}
   // 照明（左右交互）
   {const L=[];let sd=1;for(let i=20;i<N;i+=40){const p=P[i];sd=-sd;if(p.T)continue;const b=W+.4,hh=W-2.2;L.push({x:p.x+p.rx*sd*b,z:p.z+p.rz*sd*b,y:p.y+1.1,hx:p.x+p.rx*sd*hh,hz:p.z+p.rz*sd*hh,h:p.h});}
    lampRow(G,L,8.4);
@@ -624,7 +645,8 @@ function buildHighway(G){
    L.forEach((l,k)=>{o.position.set((l.x+l.hx)/2,l.y+8.3,(l.z+l.hz)/2);o.rotation.set(0,Math.atan2(l.hx-l.x,l.hz-l.z)+Math.PI/2,0);o.scale.set(Math.hypot(l.hx-l.x,l.hz-l.z),1,1);o.updateMatrix();arm.setMatrixAt(k,o.matrix);});G.add(arm);}
   // 案内標識
   {const names=course.id==='c1'?['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留']:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明'];let n=0;
-   for(let i=260;i<N-120;i+=430){const p=P[i];if(p.T)continue;const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle='#0f6a3c';g.fillRect(0,0,w,h);g.strokeStyle='#e9f3ec';g.lineWidth=6;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 54px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(names[n++%names.length],w/2,h/2+3);});
+   const at=[];if(course.sect){course.sect.forEach(r=>{if(r.to<1e9){at.push([r.body+25,SECT[r.k].name,'#1d4f9c']);for(let i=r.body+330;i<r.to-60;i+=520)at.push([i,null]);}});}else for(let i=260;i<N-120;i+=430)at.push([i,null]);
+   for(const [i,label,bg] of at){const p=P[i];if(!p||p.T)continue;const nm=label||(p.blk?pick(SECT[p.blk].signs):names[n++%names.length]);const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle=bg||'#0f6a3c';g.fillRect(0,0,w,h);g.strokeStyle='#e9f3ec';g.lineWidth=6;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 54px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(nm,w/2,h/2+3);});
      const gr=new THREE.Group(),cm=new THREE.MeshLambertMaterial({color:0x7d838c});
      [-1,1].forEach(sd=>{const pl=new THREE.Mesh(new THREE.BoxGeometry(.3,7,.3),cm);pl.position.set(sd*(W+.4),3.5,0);gr.add(pl);});
      const beam=new THREE.Mesh(new THREE.BoxGeometry(W*2+1,.35,.35),cm);beam.position.y=6.9;gr.add(beam);
@@ -986,7 +1008,8 @@ function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;
   {const urban=course.env==='highway'||course.env==='city',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
-  if(course.loop){course.loopL=genPts(LOOP_BLOCK,0).length-1;course.loopW=LOOP_LEAD+146;const a=course.loopW;course.loopD={x:P[a].x-P[a+course.loopL].x,y:P[a].y-P[a+course.loopL].y,z:P[a].z-P[a+course.loopL].z};}
+  if(course.loop){const lo=loopLayout();course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
+    lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=LOOP_ORDER[0];}
   computeWidth();buildScenery();buildProfiles();buildMinimap();
   railGroup.visible=spec.type==='train';
   skid.count=0;skidI=0;demo.s=START_I;demo.v=0;
@@ -1598,7 +1621,7 @@ function frame(now){
   if(game.state!=='title'){
     acc+=dt;const h=1/120;
     while(acc>=h){info=stepVehicle(h,racing);if(racing||game.state==='done'){cpus.forEach(c=>stepCpu(c,h,true));stepTraffic(h);}acc-=h;}
-    if(course.loop&&car.idx>=course.loopW+course.loopL)loopWarp();
+    if(course.loop&&car.idx>=course.loopF)loopWarp();
     // 車どうしの接触
     {const PK=spec.type==='packer'||spec.type==='tank'||spec.type==='dashi',R=PK?3.3:2.3,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
     cpus.concat(traffic).forEach(c=>{const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz);
@@ -1803,8 +1826,9 @@ const FREE_BOSS=Object.assign({},DRIVERS.veil,{name:'首都高の主 ヴェイ�
 function loopWarp(){const L=course.loopL,D=course.loopD;
   car.x+=D.x;car.y+=D.y;car.z+=D.z;car.idx-=L;car.s-=L;game.startD-=L;
   trail.forEach(q=>{q.x+=D.x;q.y+=D.y;q.z+=D.z;});camera.position.x+=D.x;camera.position.y+=D.y;camera.position.z+=D.z;
-  cpus.forEach(c=>{if(c.s-L>=2){c.s-=L;placeCpu(c);}});
-  traffic.forEach(t=>{if(t.s-L>=2){t.s-=L;const a=sampleAt(t.s);t.x=a.x+a.rx*t.lat;t.z=a.z+a.rz*t.lat;t.y=a.y;}});
+  const near=x=>x>course.loopF-400;
+  cpus.slice().forEach(c=>{if(near(c.s)){c.s-=L;placeCpu(c);}else if(game.fb&&game.fb.rival===c)despawnRival();else{scene.remove(c.mesh.g);cpus=cpus.filter(x=>x!==c);}});
+  traffic.forEach(t=>{if(near(t.s))t.s-=L;else{t.s=car.idx+250+Math.random()*480;t.lat=pick(lanesNow());}const a=sampleAt(t.s);t.x=a.x+a.rx*t.lat;t.z=a.z+a.rz*t.lat;t.y=a.y;});
   smokes.forEach(q=>{q.s.position.x+=D.x;q.s.position.z+=D.z;});}
 function freeSpawn(){const fb=game.fb;fb.enc++;
   const boss=fb.wins>0&&fb.wins%5===0&&!fb.bossDone,def=boss?FREE_BOSS:pick(FREE_RIVALS),tier=Math.min(6,fb.wins)+(def.tier||0);
@@ -1838,7 +1862,8 @@ function stepFree(dt){const fb=game.fb;if(!fb)return;const c=fb.rival;
   else if(fb.phase==='after'){if(Math.abs(g)>260)despawnRival();}}
 function despawnRival(){const fb=game.fb,c=fb.rival;if(c){scene.remove(c.mesh.g);cpus=cpus.filter(x=>x!==c);}fb.rival=null;fb.close=0;if(fb.phase!=='after')fb.next=game.t+10+Math.random()*10;fb.phase='cruise';}
 function freeKm(){return Math.max(0,(P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000);}
-function freeHud(ge){const fb=game.fb;if(!fb)return;const c=fb.rival,km=freeKm().toFixed(1)+' km　'+fb.wins+'勝　賞金 '+fb.earn.toLocaleString()+' P';
+function freeHud(ge){const fb=game.fb;if(!fb)return;const c=fb.rival,bk=P[car.idx]&&P[car.idx].blk,km=(bk?SECT[bk].name+'　':'')+freeKm().toFixed(1)+' km　'+fb.wins+'勝　賞金 '+fb.earn.toLocaleString()+' P';
+  if(bk&&P[car.idx].T!==true&&bk!==fb.sect){if(fb.sect&&fb.phase!=='battle')flash('— '+SECT[bk].name+' — '+SECT[bk].sub);fb.sect=bk;}
   if(fb.phase==='battle'&&c){const g=car.idx-c.s;ge.textContent='BATTLE vs '+c.name+'　'+(g>=0?'リード ':'離されて ')+Math.round(Math.abs(g))+' m';ge.className=g>=0?'lead':'';}
   else if(fb.phase==='wait'&&c){ge.textContent='前方に挑戦者 '+Math.max(0,Math.round(c.s-car.idx))+' m（ホーンで勝負）　'+km;ge.className='';}
   else if(fb.phase==='chase'&&c){ge.textContent='後方からライバル接近 '+Math.round(Math.max(0,car.idx-c.s))+' m　'+km;ge.className='';}
