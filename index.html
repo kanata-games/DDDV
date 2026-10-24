@@ -481,6 +481,9 @@ const COURSES=[
   {id:'sc5',name:'卒業検定',sub:'外周・S字・クランク・坂道を全部',segs:[['S',60,0],['C',14,90,0],['S',70,0],['C',10,75,0],['C',10,-150,0],['C',10,150,0],['C',10,-75,0],['S',40,0],['C',5,-90,0],['S',12,0],['C',5,90,0],['S',14,0],['C',5,90,0],['S',12,0],['C',5,-90,0],['S',40,0],['S',60,-.1],['S',20,0],['S',60,.1],['S',30,0],['C',14,-90,0],['S',80,0]],y0:0,env:'school',half:3.2,limit:40,stops:[{seg:2,at:45,t:'stop'},{seg:16,at:40,t:'hill'},{seg:21,at:18,t:'stop'}],hidden:true},
   {id:'yamanote',name:'山手線（東京→品川）',sub:'都心の高架をゆく環状線',segs:[['S',260,0],['C',400,-18,0],['S',360,0],['C',300,15,0],['S',420,0],['C',500,-12,0],['S',380,0],['C',260,25,0],['S',400,0],['C',350,-20,0],['S',300,0]],y0:30,env:'highway',half:5.5,signs:['山手線 外回り','有楽町','新橋','浜松町','品川 方面'],hidden:true},
   {id:'kanjo',name:'大阪環状線（大阪→玉造）',sub:'大阪の街を回る環状線',segs:[['S',240,0],['C',300,30,0],['S',380,0],['C',420,-15,0],['S',340,0],['C',260,35,0],['S',420,0],['C',380,-20,0],['S',360,0],['C',300,25,0],['S',260,0]],y0:30,env:'highway',half:5.5,signs:['大阪環状線','天満','京橋','大阪城公園','鶴橋 方面'],hidden:true},
+  {id:'hanshin',name:'阪神高速 環状線',sub:'大阪の環状をぐるり。料金所あり',segs:[['S',220,0],['S',200,0],['C',80,90,0],['S',300,0],['C',70,90,0],['S',180,0],['C',90,-40,0],['C',90,40,0],['S',200,0],['C',80,90,0],['S',280,0],['C',80,-30,0],['S',160,0]],y0:30,env:'highway',half:8,traffic:14,toll:110,signs:['阪神高速 環状線','本町 1km','湊町','なんば 出口','梅田 方面','信濃橋']},
+  {id:'dotonbori',name:'道頓堀ネオン',sub:'大阪ミナミ。たこ焼きと串カツの看板の谷間',segs:[['S',120,0],['C',14,90,0],['S',100,0],['C',30,-30,0],['C',30,30,0],['S',120,0],['C',14,-90,0],['S',90,0],['C',14,-90,0],['S',110,0],['C',14,90,0],['S',160,0]],y0:0,env:'city',half:6,traffic:6,osaka:true},
+  {id:'arcade',name:'天神橋筋商店街',sub:'日本一長いアーケード。屋根の下の細い道',segs:[['S',260,0],['C',30,14,0],['S',200,0],['C',12,90,0],['S',140,0],['C',12,-90,0],['S',240,0],['C',22,-22,0],['C',22,22,0],['S',260,0]],y0:0,env:'arcade',half:3.4},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -516,7 +519,7 @@ const MAXW=46;let width={};
 function computeWidth(){
   grid=new Map();P.forEach((p,i)=>{const k=Math.floor(p.x/CELL)+','+Math.floor(p.z/CELL);(grid.get(k)||grid.set(k,[]).get(k)).push(i);});
   width={'-1':new Float32Array(N),'1':new Float32Array(N)};
-  if(course&&(course.env==='highway'||course.env==='city'||course.env==='school')){width['-1'].fill(2);width['1'].fill(2);return;}
+  if(course&&(course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade')){width['-1'].fill(2);width['1'].fill(2);return;}
   for(const s of [-1,1]){
     const w=width[s];
     for(let i=0;i<N;i++){const p=P[i];let t=HALF+2;
@@ -612,10 +615,12 @@ function buildScenery(){
   const G=trackGroup;
   // road
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
-   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'?roadTexCity:roadTex})));}
+   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'?roadTexCity:roadTex})));}
   if(course.env==='highway')buildHighway(G);
   else if(course.env==='city')buildCity(G);
   else if(course.env==='school')buildSchool(G);
+  else if(course.env==='arcade')buildArcade(G);
+  if(course.toll)buildToll(G,course.toll);
   else{
   // cliff (left) & drop (right)
   {const offsC=[0,1.2,1.2,1.6,7,20,46],offsD=[0,6,14,30,46];
@@ -787,6 +792,42 @@ function buildSchool(G){const W=HALF;let minY=1e9,cx=0,cz=0;P.forEach(p=>{minY=M
   {const p=P[Math.min(N-1,30)],sd=-1,off=W+26,bx=p.x+p.rx*sd*off,bz=p.z+p.rz*sd*off;const b=new THREE.Mesh(new THREE.BoxGeometry(34,13,14),new THREE.MeshLambertMaterial({color:0x1b2030,emissive:0xffffff,emissiveMap:winTex}));b.position.set(bx,minY+6.5,bz);b.rotation.y=p.h;G.add(b);
    const tx=canvasTex(512,96,(g,w,h)=>{g.fillStyle='#16407a';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 52px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('DDDV自動車学校',w/2,h/2+2);});
    const sg=new THREE.Mesh(new THREE.PlaneGeometry(20,3.75),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(bx+p.rx*7.1,minY+11,bz+p.rz*7.1);sg.rotation.y=p.h+Math.PI/2;G.add(sg);}}
+// 料金所：屋根・ブース・ETCゲート・看板
+function buildToll(G,ti){const W=HALF,p=P[ti];if(!p)return;const gr=new THREE.Group();const cm=new THREE.MeshLambertMaterial({color:0x8a8d93}),bm=new THREE.MeshLambertMaterial({color:0xd8dade,emissive:0x202226});
+  const roof=new THREE.Mesh(new THREE.BoxGeometry(W*2+3,.8,16),new THREE.MeshLambertMaterial({color:0x2c4a7a,emissive:0x0a1426}));roof.position.y=6.4;gr.add(roof);
+  const under=new THREE.Mesh(new THREE.PlaneGeometry(W*2+2,15).rotateX(Math.PI/2),new THREE.MeshBasicMaterial({color:0xe8eef8}));under.position.y=5.95;gr.add(under);
+  const isl=[-W/3,W/3];course.tollIsl=isl;
+  [-W-1,...isl,W+1].forEach(x=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x===-W-1||x===W+1?.8:1.1,6,x===-W-1||x===W+1?14:6),cm);b.position.set(x,3,0);gr.add(b);});
+  isl.forEach(x=>{const bo=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.4,2.2),bm);bo.position.set(x,1.2,1.5);gr.add(bo);const w=new THREE.Mesh(new THREE.PlaneGeometry(1,.8),new THREE.MeshBasicMaterial({color:0xffd59a}));w.position.set(x,1.6,2.62);gr.add(w);});
+  [-2*W/3,0,2*W/3].forEach(x=>{const bar=new THREE.Mesh(new THREE.BoxGeometry(.12,2.2,.12),new THREE.MeshBasicMaterial({color:0xf2c200}));bar.position.set(x-.9,2.0,-2.6);bar.rotation.z=.15;gr.add(bar);
+    const etc=canvasTex(256,96,(g,w,h)=>{g.fillStyle='#7a1fa2';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 60px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('ETC',w/2,h/2+2);});
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,.68),new THREE.MeshBasicMaterial({map:etc,side:THREE.DoubleSide}));sg.position.set(x,5.4,7.9);gr.add(sg);});
+  const nt=canvasTex(512,96,(g,w,h)=>{g.fillStyle='#0f6a3c';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 56px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText((course.signs&&course.signs[0]||'首都高')+' 料金所',w/2,h/2+3);});
+  const ns=new THREE.Mesh(new THREE.PlaneGeometry(10,1.9),new THREE.MeshBasicMaterial({map:nt,side:THREE.DoubleSide}));ns.position.set(0,7.9,8);gr.add(ns);
+  gr.position.set(p.x,p.y,p.z);gr.rotation.y=p.h+Math.PI;G.add(gr);}
+// 商店街アーケード：両側の店・半透明の屋根・提灯
+const shopTex=['たこ焼','八百屋','喫茶','古書','お茶','呉服','薬局','パン','精肉','鮮魚','玩具','餃子','金物','花屋','和菓子','串カツ'].map((t,k)=>canvasTex(256,256,(g,w,h)=>{const hue=(k*47)%360;g.fillStyle=`hsl(${hue},35%,18%)`;g.fillRect(0,0,w,h);
+  g.fillStyle=`hsl(${hue},70%,45%)`;g.fillRect(0,0,w,60);g.fillStyle='#fff';g.font='bold 44px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,w/2,32);
+  g.fillStyle='rgba(255,220,150,.85)';g.fillRect(20,80,w-40,120);g.fillStyle='rgba(60,40,20,.6)';for(let i=0;i<5;i++)g.fillRect(30+i*42,100,30,80);
+  g.fillStyle='#777';for(let y=200;y<h;y+=8)g.fillRect(0,y,w,4);}));
+function buildArcade(G){const W=HALF;let cx=0,cz=0,minY=1e9;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;
+  {const m=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshLambertMaterial({color:0x121419}));m.rotation.x=-Math.PI/2;m.position.set(cx,minY-.06,cz);G.add(m);}
+  const shopM=shopTex.map(t=>new THREE.MeshLambertMaterial({map:t,emissive:0xffffff,emissiveMap:t,emissiveIntensity:.55}));
+  [-1,1].forEach(sd=>{for(let i=2;i<N-2;i+=6){const p=P[i];if(Math.abs(p.k)>.03)continue;const off=W+.6,x=p.x+p.rx*sd*off,z=p.z+p.rz*sd*off;
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(6,4.5),shopM[(i*7+(sd>0?3:0))%shopM.length]);m.position.set(x,p.y+2.25,z);m.rotation.y=p.h+(sd>0?-Math.PI/2:Math.PI/2);G.add(m);
+    const up=new THREE.Mesh(new THREE.PlaneGeometry(6,3),new THREE.MeshLambertMaterial({color:0x3a3530}));up.position.set(x,p.y+6,z);up.rotation.y=m.rotation.y;G.add(up);}});
+  // 屋根（アーチ）
+  {const rows=[];const A=[-1,-.7,-.35,0,.35,.7,1];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push(A.map((a,k)=>{const xo=a*(W+.6),yo=7.5+(1-a*a)*2.2;return[p.x+p.rx*xo,p.y+yo,p.z+p.rz*xo,k/6,p.d/6];}));}
+   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({color:0xcfd8e8,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false})));}
+  {const L=[];for(let i=5;i<N;i+=9){const p=P[i];L.push({x:p.x,z:p.z,y:p.y,hx:p.x,hz:p.z,h:p.h});}const pool=new THREE.InstancedMesh(new THREE.PlaneGeometry(8,8).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:poolT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,polygonOffset:true,polygonOffsetFactor:-2}),L.length),
+    lamp=new THREE.InstancedMesh(new THREE.BoxGeometry(1.4,.12,.5),new THREE.MeshBasicMaterial({color:0xfff2d0}),L.length),o=new THREE.Object3D();
+   L.forEach((l,k)=>{o.position.set(l.x,l.y+.05,l.z);o.rotation.set(0,l.h,0);o.updateMatrix();pool.setMatrixAt(k,o.matrix);o.position.set(l.x,l.y+8.6,l.z);o.updateMatrix();lamp.setMatrixAt(k,o.matrix);});G.add(pool,lamp);}
+  // 提灯と垂れ幕
+  {const lt=glowTex('rgba(255,90,60,.85)'),lm=new THREE.SpriteMaterial({map:lt,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+   const ban=canvasTex(128,384,(g,w,h)=>{g.fillStyle='#b0142a';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 56px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';['天','神','橋','筋'].forEach((c,k)=>g.fillText(c,w/2,70+k*85));});
+   const bm=new THREE.MeshBasicMaterial({map:ban,side:THREE.DoubleSide});
+   for(let i=12;i<N;i+=24){const p=P[i];[-1,1].forEach(sd=>{const x=p.x+p.rx*sd*(W-.5),z=p.z+p.rz*sd*(W-.5);const s=new THREE.Sprite(lm);s.scale.set(1.3,1.6,1);s.position.set(x,p.y+5.4,z);G.add(s);});
+     if(i%72===12){const b=new THREE.Mesh(new THREE.PlaneGeometry(1,3),bm);b.position.set(p.x,p.y+6.6,p.z);b.rotation.y=p.h+Math.PI/2;G.add(b);}}}}
 // 下道：歩道・ビル・ネオン看板・街灯・横断歩道・信号
 function buildStreet(G,r,gy){const W=HALF,lo=r.body,hi=Math.min(N-1,r.to),st=i=>P[i]&&P[i].y-gy<1.5;
   [-1,1].forEach(sd=>{const rows=[];for(let i=lo;i<hi;i+=STEP){const p=P[i];if(!st(i)){if(rows.length>1){G.add(new THREE.Mesh(ribbon(rows.splice(0),{}),new THREE.MeshLambertMaterial({color:0x3b3e45,side:THREE.DoubleSide})));}rows.length=0;continue;}
@@ -799,7 +840,7 @@ function buildStreet(G,r,gy){const W=HALF,lo=r.body,hi=Math.min(N-1,r.to),st=i=>
     if(Math.random()<.7){const f=W+4.35,sx=p.x+p.rx*sd*f,sz=p.z+p.rz*sd*f,vert=Math.random()<.3;signs.push({x:sx,z:sz,y:p.y+(vert?6:3.6+Math.random()*4),r:p.h+(sd>0?-Math.PI/2:Math.PI/2),t:Math.random()*neonTex.length|0,vert});}}});
   cityBlocks(G,list);
   const glowM=[330,190,50,280,120,15].map(hh=>{const c=new THREE.Color().setHSL(hh/360,1,.6);return new THREE.SpriteMaterial({map:glowTex(`rgba(${c.r*255|0},${c.g*255|0},${c.b*255|0},.6)`),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});});
-  const neonM=neonTex.map(t=>new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})),signG=new THREE.PlaneGeometry(4.6,1.7);
+  const neonM=(course.osaka?neonTexOsaka:neonTex).map(t=>new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})),signG=new THREE.PlaneGeometry(4.6,1.7);
   signs.forEach(sg=>{const m=new THREE.Mesh(signG,neonM[sg.t]);m.position.set(sg.x,sg.y,sg.z);m.rotation.set(0,sg.r,sg.vert?Math.PI/2:0);G.add(m);
     const gl=new THREE.Sprite(glowM[sg.t%6]);gl.scale.set(7,4,1);gl.position.set(sg.x,sg.y,sg.z);G.add(gl);});
   const cm=new THREE.MeshBasicMaterial({map:crossTex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3});
@@ -820,6 +861,8 @@ function buildJct(G,r,gy){const W=HALF,conc=new THREE.MeshLambertMaterial({color
     for(let k=-len/2+15;k<len/2;k+=30){const x=p.x+dx*k,z=p.z+dz*k;if(nearRoad(x,z,W+3.5,-1,-1))continue;const h=p.y+hgt-gy;const pl=new THREE.Mesh(new THREE.BoxGeometry(2.6,h,2.6),conc);pl.position.set(x,gy+h/2,z);G.add(pl);}
     for(let k=-len/2+10;k<len/2;k+=40){const l=new THREE.Sprite(lampM);l.scale.set(5,5,1);l.position.set(p.x+dx*k,p.y+hgt+4,p.z+dz*k);G.add(l);}}}
 const NEON_WORDS=['BAR','カラオケ','ラーメン','24H','GAME','ホテル','居酒屋','焼肉','パチンコ','CAFE','寿司','DRIFT'];
+const OSAKA_WORDS=['たこ焼き','お好み焼き','串カツ','かに料理','ふぐ','二度づけ禁止','なんでやねん','いらっしゃい','回転寿司','焼肉','ホルモン','BAR'];
+const neonTexOsaka=OSAKA_WORDS.map((t,k)=>{const hue=[0,45,330,190,120,280][k%6];return canvasTex(256,96,(g,w,h)=>{g.fillStyle='rgba(6,6,14,.9)';g.fillRect(0,0,w,h);g.strokeStyle=`hsl(${hue},100%,62%)`;g.lineWidth=5;g.shadowColor=`hsl(${hue},100%,60%)`;g.shadowBlur=14;g.strokeRect(8,8,w-16,h-16);g.fillStyle=`hsl(${hue},100%,74%)`;g.font='bold '+(t.length>4?40:52)+'px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,w/2,h/2+3);});});
 const neonTex=NEON_WORDS.map((t,k)=>{const hue=[330,190,50,280,120,15][k%6];return canvasTex(256,96,(g,w,h)=>{g.fillStyle='rgba(6,6,14,.9)';g.fillRect(0,0,w,h);
   g.strokeStyle=`hsl(${hue},100%,62%)`;g.lineWidth=5;g.shadowColor=`hsl(${hue},100%,60%)`;g.shadowBlur=14;g.strokeRect(8,8,w-16,h-16);
   g.fillStyle=`hsl(${hue},100%,74%)`;g.font='bold 52px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,w/2,h/2+3);});});
@@ -838,7 +881,7 @@ function buildCity(G){
     if(Math.random()<.65){const f=W+3.55,sx=p.x+p.rx*sd*f,sz=p.z+p.rz*sd*f,vert=Math.random()<.3;signs.push({x:sx,z:sz,y:p.y+(vert?6:3.6+Math.random()*4),r:p.h+(sd>0?-Math.PI/2:Math.PI/2),t:Math.random()*neonTex.length|0,vert});}}});
   cityBlocks(G,list);
   const glowM=[330,190,50,280,120,15].map(hh=>{const c=new THREE.Color().setHSL(hh/360,1,.6);return new THREE.SpriteMaterial({map:glowTex(`rgba(${c.r*255|0},${c.g*255|0},${c.b*255|0},.6)`),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});});
-  const neonM=neonTex.map(t=>new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})),signG=new THREE.PlaneGeometry(4.6,1.7);
+  const neonM=(course.osaka?neonTexOsaka:neonTex).map(t=>new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})),signG=new THREE.PlaneGeometry(4.6,1.7);
   signs.forEach(sg=>{const m=new THREE.Mesh(signG,neonM[sg.t]);
     m.position.set(sg.x,sg.y,sg.z);m.rotation.set(0,sg.r,sg.vert?Math.PI/2:0);G.add(m);
     const gl=new THREE.Sprite(glowM[sg.t%6]);gl.scale.set(7,4,1);gl.position.set(sg.x,sg.y,sg.z);G.add(gl);});
@@ -1246,8 +1289,8 @@ function buildProfiles(){
 }
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
-  course=courseOf(id);HALF=course.half||4.6;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
-  {const urban=course.env==='highway'||course.env==='city'||course.env==='school',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
+  course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
+  {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
     lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=course.order[0];}
@@ -1359,6 +1402,7 @@ const CUPS=[
   {id:'W',name:'はたらく車 グランプリ',courses:['neon','c1','lake'],drivers:['packer','fireman','medic','mixerman'],skill:[.8,.83,.86,.89],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'work',catName:'はたらく車'},
   {id:'X',name:'ネタ車 グランプリ',courses:['down','tsuzura','lake'],drivers:['cartboy','danjiri','hearseman','tanker'],skill:[.78,.82,.86,.9],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'neta',catName:'ネタ車'},
   {id:'F',name:'月夜の友達 グランプリ',courses:['ridge','lake','tsuzura'],drivers:['shii','umi','astarte','sensei'],skill:[.92,.95,1.0,1.06],prize:20000,pos:[6000,4000,2600,1600,900],req:'C',cat:'friend',catName:'友達の車',title:'月夜の走り仲間'},
+  {id:'O',name:'なにわ グランプリ',courses:['hanshin','dotonbori','arcade'],drivers:['danjiri','shiroi','redbolt','kurenai'],skill:[.86,.89,.92,.95],prize:12000,pos:[4000,2700,1800,1100,700],req:'N'},
   {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[1.0,1.02,1.05,1.08],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'},
   {id:'S',name:'S級 グランプリ',courses:['ridge','tsuzura','down'],drivers:['yellow','kurenai','sensei','veil'],skill:[1.16,1.2,1.25,1.28],prize:40000,pos:[11000,7000,4500,2800,1500],req:'A',title:'峠の神'}
 ];
@@ -1478,7 +1522,7 @@ function renderGarage(){
       pl.addEventListener('click',()=>{const o=tuneOf(c.id),cs=tuneCost(o[T.k]+1);if(o[T.k]>=TUNE_MAX||wallet<cs)return;wallet-=cs;o[T.k]++;tuneM[c.id]=o;store.set('touge_tune',JSON.stringify(tuneM));store.set('touge_p',wallet);if(selId===c.id)swapCar(c.id);renderAll();});
       row.append(nm,mi,pips,pl);tb.appendChild(row);});}
 }
-const ESC_COURSES=['wangan','c1','neon','down'];
+const ESC_COURSES=['wangan','c1','hanshin','neon','dotonbori','down'];
 let escCourse=store.get('touge_esc_course')||'wangan';if(!ESC_COURSES.includes(escCourse))escCourse='wangan';
 function renderEsc(){const l=$('escList');l.innerHTML='';const st=sj('touge_esc',{});
   ESC_COURSES.forEach(id=>{const c=courseOf(id),b=document.createElement('button');b.type='button';b.className='courseBtn'+(id===escCourse?' sel':'');
@@ -1737,6 +1781,7 @@ function stepCar(dt,racing){
   const edge=Math.abs(lat)-(lim-1.2);
   if(edge>0&&racing){const s=Math.sign(lat),vn=car.vx*p.rx*s+car.vz*p.rz*s;if(vn>0)car.yr+=s*Math.min(1.2,vn*.25)*edge*dt*2.2*Math.sign(vf||1);}
   car.wall=false;
+  if(course.tollIsl&&Math.abs(bi-course.toll)<4){for(const ix of course.tollIsl){const hw=.55+(spec.halfW||.92);if(Math.abs(lat-ix)<hw){const sd=lat>=ix?1:-1,pen=hw-Math.abs(lat-ix);car.x+=p.rx*sd*pen;car.z+=p.rz*sd*pen;const vn=-(car.vx*p.rx+car.vz*p.rz)*sd;if(vn>0){car.vx+=p.rx*sd*vn*1.05;car.vz+=p.rz*sd*vn*1.05;}const sp0=Math.hypot(car.vx,car.vz);car.vx*=.8;car.vz*=.8;if(racing&&sp0>6&&!(game.tollHit>game.t)){game.tollHit=game.t+1;game.hits++;damage(Math.min(20,sp0*.5));hitSound();game.shake=.6;flash('料金所のブースに激突！');}}}}
   if(Math.abs(lat)>lim){
     const s=Math.sign(lat),pen=Math.abs(lat)-lim;car.x-=p.rx*s*pen;car.z-=p.rz*s*pen;car.wall=true;
     const vn=car.vx*p.rx*s+car.vz*p.rz*s;
@@ -1825,6 +1870,7 @@ function stepCpu(c,dt,traffic){
     if(gap>-6&&gap<18){tl=plat+(gap<3?(c.lat>plat?1.9:-1.9):0);tv=Math.min(tv0*1.08,psp+(gap>3?1.8:-.3));passing=true;}
     else if(gap<=-6)tv=Math.min(tv0,psp*.9);}
   if(spec.type==='roller'&&game.state==='race'&&c.def){const pp=P[car.idx],gb=pp.d-c.s,pl=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;if(gb>3&&gb<70&&Math.abs(c.lat-pl)<2.4){tv*=.78;if(!(c.slick>game.t)){c.slick=game.t+6;c.wob=.4;if(radioCd<=0)say(c.def,pick(['路面がツルツルだ!?','滑る、滑るって！','なんだこの道、ピカピカじゃねえか！']));}}}
+  if(course.tollIsl&&Math.abs(c.s-course.toll)<35){const ln=[-2*HALF/3,0,2*HALF/3];tl=ln.reduce((a,b)=>Math.abs(b-c.lat)<Math.abs(a-c.lat)?b:a);}
   if(c.cruise)tv=Math.min(tv,c.cruiseV);else if(c.free&&game.state==='race'&&game.fb&&game.fb.phase==='chase'&&game.fb.rival===c)tv*=1.25;else if(c.free&&game.state==='race'){const g=c.s-car.idx;if(g<-70)tv*=1.1;else if(g>140)tv*=.95;}
   tl=Math.max(-lim,Math.min(lim,tl));
   c.v+=Math.sign(tv-c.v)*Math.min(Math.abs(tv-c.v),(tv>c.v?6:10)*dt);
