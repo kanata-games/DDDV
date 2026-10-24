@@ -952,8 +952,8 @@ function makeCar(spec,isPlayer){
 }
 const texL=new THREE.TextureLoader();
 function sprTex(f){const t=texL.load(f);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
-const SPR={'86':{back:sprTex('cars/86-back.png'),diag:sprTex('cars/86-diag.png'),side:sprTex('cars/86-side.png'),front:sprTex('cars/86-front.png'),
-  size:{back:[1.42*576/444,1.42],diag:[1.75*576/311,1.75],side:[4.25,4.25*195/576],front:[1.46*535/361,1.46]},push:{back:1.3,diag:1.3,side:.6,front:1.3},cockpit:'cars/86-cockpit.png',shield:.52}};
+const SPR={'86':{back:sprTex('cars/86-back.webp'),diag:sprTex('cars/86-diag.webp'),side:sprTex('cars/86-side.webp'),front:sprTex('cars/86-front.webp'),
+  size:{back:[1.42*576/444,1.42],diag:[1.75*576/311,1.75],side:[4.25,4.25*195/576],front:[1.46*535/361,1.46]},push:{back:1.3,diag:1.3,side:.6,front:1.3},cockpit:'cars/86-cockpit.webp',shield:.52}};
 function sprSet(id,sz,push,shield){const o={size:sz,push,cockpit:'cars/'+id+'-cockpit.png',shield};['back','diag','side','front'].forEach(v=>o[v]=sprTex('cars/'+id+'-'+v+'.png'));return o;}
 SPR.kei=sprSet('kei',{back:[1.9*523/502,1.9],diag:[2.15*560/313,2.15],side:[3.4,3.4*304/575],front:[1.9*538/502,1.9]},{back:1.2,diag:1.2,side:.5,front:1.2},.51);
 SPR.fr=sprSet('fr',{back:[1.36*549/378,1.36],diag:[1.62*560/230,1.62],side:[4.5,4.5*177/571],front:[1.36*569/389,1.36]},{back:1.4,diag:1.4,side:.6,front:1.4},.50);
@@ -1017,7 +1017,7 @@ function updateSprite(obj,yaw,hide){
   sp.plane.position.x=-(lx/L)*push;sp.plane.position.z=(lz/L)*push;
 }
 const CARS=[
-  {id:'86',dur:100,name:'白黒パチロク',note:'軽くて素直。サイドで流しやすい最初の相棒。',price:0,top:0xf2f2ee,bot:0x15161a,pow:1,grip:1,drift:1,shape:'hatch',sprite:'86',img:'cars/86-diag.png'},
+  {id:'86',dur:100,name:'白黒パチロク',note:'軽くて素直。サイドで流しやすい最初の相棒。',price:0,top:0xf2f2ee,bot:0x15161a,pow:1,grip:1,drift:1,shape:'hatch',sprite:'86',img:'cars/86-diag.webp'},
   {id:'kei',dur:130,name:'軽トラ',note:'遅いけど、とにかくよく滑る。荷台つき。',price:1500,top:0xe7e9e3,bot:0xd8dad4,pow:.8,grip:.9,drift:1.35,shape:'truck',sprite:'kei',img:'cars/kei-diag.png'},
   {id:'train',dur:220,name:'峠の電車',note:'線路の上を走る。カーブでサイドを引くと脱線して横に流れ、線路に戻れば再レール成功。',price:5000,top:0xd9dde3,bot:0x2f55c8,pow:1.15,grip:.75,drift:1.5,shape:'sedan',sprite:'train',img:'cars/train-diag.png',type:'train',len:18,halfW:1.45,cam:[13,7.5,-6,14],seat:[0,2.5,8.2]},
   {id:'fr',dur:100,name:'銀のシルヴィー',note:'後ろが出やすいドリフト向き。長く流せる。',price:4000,top:0xc4c8cf,bot:0x9aa0a8,pow:1.1,grip:.97,drift:1.28,shape:'coupe',sprite:'fr',img:'cars/fr-diag.png'},
