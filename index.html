@@ -106,7 +106,8 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .cup{background:var(--panel);border:1px solid rgba(159,182,255,.15);border-radius:5px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .cup.locked{opacity:.55}
 .cup.sel{border-color:var(--sodium)}
-.rivals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
+.rivals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 10px}
+@media (max-width:620px){.rivals{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .rivals div{display:grid;grid-template-columns:8px 1fr;gap:0 8px;align-items:center;min-width:0}
 .rivals i{grid-row:span 2;width:8px;height:100%;border-radius:2px}
 .rivals b{font-size:13px}.rivals small{font-size:11px;color:var(--dim);min-width:0}
@@ -245,6 +246,15 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
 .tuneRow .pips{display:flex;gap:2px}.tuneRow .pips i{flex:1;height:8px;border-radius:1px;background:rgba(233,236,245,.12)}.tuneRow .pips i.on{background:var(--sodium)}
 .tb2{font-family:var(--f-num);font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid rgba(159,182,255,.3);background:transparent;color:var(--ink);cursor:pointer;min-width:26px;white-space:nowrap}
 .tb2:disabled{opacity:.35;cursor:default}
+.cupWrap{display:flex;flex-direction:column;gap:10px}
+.cupList{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.cupChip{text-align:left;background:rgba(159,182,255,.05);border:1px solid rgba(159,182,255,.18);border-radius:5px;padding:7px 9px;color:var(--ink);font-family:var(--f-body);cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cupChip b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cupChip small{font-size:10.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cupChip.sel{border-color:var(--sodium);background:var(--sodium-soft)}.cupChip.done b{color:var(--sodium)}.cupChip.locked{opacity:.45;cursor:default}
+.cupChip:focus-visible{outline:2px solid var(--moon);outline-offset:2px}
+.cupFoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.cupFoot small{font-size:11px;color:var(--dim)}
+.cupWrap .cup{padding:12px;gap:8px}.cupWrap .cupHead b{font-size:18px}
+@media (max-width:620px){.cupList{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){#drift,#msg{transition:none}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
@@ -1105,7 +1115,7 @@ const DRIVERS={
     passed:['ちっ、やるじゃねえか！','まだ終わってねえぞ！'],pass:['甘いぜ！','お先に！'],win:'峠はオレの庭だ。',lose:'…次は負けねえ。'},
   blue:{name:'ブルーサンダー',car:'青い4WDターボ',col:0x2a6fe0,bot:0x1a1d24,shape:'sedan',sprite:'4wdw',fav:'lake',
     pre:['4WDの立ち上がり、見せてやるよ。','直線で並んだら、もう終わりだ。'],passed:['な、コーナーで!?','計算外だ…！'],pass:['直線ならこっちのもんだ！','ブースト全開！'],win:'計算どおり。',lose:'データが足りなかったか…'},
-  silver:{name:'シルバーフォックス',car:'銀のシルビア',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr',fav:'tsuzura',
+  silver:{name:'シルバーフォックス',car:'銀のシルヴィー',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr',fav:'tsuzura',
     pre:['ヘアピンは横向きで抜けるもんだ。','狐はね、ずる賢いのさ。'],passed:['…ほう。','いい角度で入るじゃないか。'],pass:['インががら空きだよ。','お見事、とは言わないよ。'],win:'流し方がちがうのさ。',lose:'今日は譲ってあげる。'},
   green:{name:'みどりの風',car:'緑の4WDターボ',col:0x3fb26a,bot:0x1d2a22,shape:'sedan',sprite:'4wdG',fav:'up',
     pre:['風になります！','がんばりまーす！'],passed:['わわっ、速い！','す、すごい…！'],pass:['すみません、通りまーす！','風になりました！'],win:'やったー！',lose:'楽しかったです！'},
@@ -1361,30 +1371,29 @@ function tblHTML(rows,cols){const e=document.createElement('div');e.className='t
   cols.forEach(c=>{const h=document.createElement('span');h.className='h'+(c.num?' num':'');h.textContent=c.h;e.appendChild(h);});
   rows.forEach((r,k)=>cols.forEach(c=>{const x=document.createElement('span');x.className=(c.num?'num ':'')+(r.you?'you':'');x.textContent=c.f(r,k);e.appendChild(x);}));return e;}
 function renderCup(){
-  const box=$('cupBox');box.innerHTML='';
-  CUPS.forEach((c,ci)=>{const open=cupOpen(c),sel=ci===cupIdx,stt=cupStates[c.id]||null;
-    const d=document.createElement('div');d.className='cup'+(open?'':' locked')+(sel?' sel':'');
-    const head=document.createElement('div');head.className='cupHead';head.innerHTML='<b></b><span></span>';head.querySelector('b').textContent=c.name;
-    const st=head.querySelector('span');
-    if(!open){st.textContent=CUPS.find(x=>x.id===c.req).name+'で優勝すると開放';d.appendChild(head);box.appendChild(d);return;}
-    const done=cleared.includes(c.id);st.textContent=done?'優勝済み'+(c.title?'（称号「'+c.title+'」）':''):'優勝賞金 '+c.prize.toLocaleString()+' P';if(done)st.className='done';
-    d.appendChild(head);
-    if(!sel){const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';p.textContent=c.courses.map(id=>courseOf(id).name).join(' → ')+'　／ ライバル：'+c.drivers.map(k=>DRIVERS[k].name+'（'+DRIVERS[k].car+'）').join('・')+(c.cat?'　／ '+c.catName+'で出ると賞金1.5倍':'');d.appendChild(p);
-      const b=document.createElement('button');b.type='button';b.className='ghost';b.textContent='この大会に出る'+(stt&&stt.race>0&&stt.race<3?'（第'+(stt.race+1)+'戦から）':'');
-      b.addEventListener('click',()=>{selectCup(ci);renderCup();syncStart();});d.appendChild(b);box.appendChild(d);return;}
-    const races=document.createElement('div');races.className='races';
-    c.courses.forEach((id,k)=>{const r=document.createElement('div');const nowR=cupState?cupState.race:0;r.className=k<nowR?'past':k===nowR?'now':'';
-      r.innerHTML='<small></small><span></span>';r.querySelector('small').textContent='第'+(k+1)+'戦'+(cupState&&k<nowR?'　'+(cupState.hist[k]||'')+'位':'');r.querySelector('span').textContent=courseOf(id).name;races.appendChild(r);});
-    d.appendChild(races);
-    const rv=document.createElement('div');rv.className='rivals';
-    cupDrivers().forEach(dr=>{const e=document.createElement('div');e.innerHTML='<i></i><b></b><small></small>';e.querySelector('i').style.background=hex(dr.col);e.querySelector('b').textContent=dr.name;e.querySelector('small').textContent=dr.car+'　得意：'+courseOf(dr.fav).name;rv.appendChild(e);});
-    d.appendChild(rv);
-    if(cupState&&cupState.race>0&&cupState.race<3){d.appendChild(tblHTML(standingsRows(),[{h:'',f:(r,k)=>(k+1)+'.'},{h:'途中経過',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));}
-    const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';
-    p.textContent='CPU 4台と3レース。順位ごとに 10・6・4・2・1 ポイント。合計で1位なら優勝。レースごとに順位に応じた賞金も入ります。';
-    d.appendChild(p);
-    if(cupState&&cupState.race>0){const rs=document.createElement('button');rs.type='button';rs.className='ghost';rs.textContent='大会を最初からやり直す';rs.addEventListener('click',()=>{newCup();renderCup();syncStart();});d.appendChild(rs);}
-    box.appendChild(d);});
+  const box=$('cupBox');box.innerHTML='';box.className='cupWrap';
+  const list=document.createElement('div');list.className='cupList';
+  CUPS.forEach((c,ci)=>{const open=cupOpen(c),sel=ci===cupIdx,stt=cupStates[c.id]||null,done=cleared.includes(c.id);
+    const b=document.createElement('button');b.type='button';b.className='cupChip'+(sel?' sel':'')+(open?'':' locked')+(done?' done':'');b.disabled=!open;
+    b.innerHTML='<b></b><small></small>';b.querySelector('b').textContent=(done?'★ ':'')+c.name.replace(' グランプリ','');
+    b.querySelector('small').textContent=!open?'🔒 '+CUPS.find(x=>x.id===c.req).name.replace(' グランプリ','')+'で優勝':stt&&stt.race>0&&stt.race<3?'第'+(stt.race+1)+'戦から':done?'優勝済み':'賞金 '+c.prize.toLocaleString()+' P';
+    if(open)b.addEventListener('click',()=>{selectCup(ci);renderCup();syncStart();});list.appendChild(b);});
+  box.appendChild(list);
+  const c=CUPS[cupIdx],d=document.createElement('div');d.className='cup sel';
+  const head=document.createElement('div');head.className='cupHead';head.innerHTML='<b></b><span></span>';head.querySelector('b').textContent=c.name;
+  const done=cleared.includes(c.id),st=head.querySelector('span');st.textContent=done?'優勝済み'+(c.title?'（称号「'+c.title+'」）':''):'優勝賞金 '+c.prize.toLocaleString()+' P'+(c.title?'・称号あり':'');if(done)st.className='done';d.appendChild(head);
+  const races=document.createElement('div');races.className='races';
+  c.courses.forEach((id,k)=>{const r=document.createElement('div');const nowR=cupState?cupState.race:0;r.className=k<nowR?'past':k===nowR?'now':'';
+    r.innerHTML='<small></small><span></span>';r.querySelector('small').textContent='第'+(k+1)+'戦'+(cupState&&k<nowR?'　'+(cupState.hist[k]||'')+'位':'');r.querySelector('span').textContent=courseOf(id).name;races.appendChild(r);});
+  d.appendChild(races);
+  const rv=document.createElement('div');rv.className='rivals';
+  cupDrivers().forEach(dr=>{const e=document.createElement('div');e.innerHTML='<i></i><b></b><small></small>';e.querySelector('i').style.background=hex(dr.col);e.querySelector('b').textContent=dr.name;e.querySelector('small').textContent=dr.car;e.title='得意：'+courseOf(dr.fav).name;rv.appendChild(e);});
+  d.appendChild(rv);
+  if(cupState&&cupState.race>0&&cupState.race<3){d.appendChild(tblHTML(standingsRows(),[{h:'',f:(r,k)=>(k+1)+'.'},{h:'途中経過',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));}
+  const foot=document.createElement('div');foot.className='cupFoot';const p=document.createElement('small');
+  p.textContent='3レースの合計ポイント（10・6・4・2・1）で優勝を争う'+(c.cat?'。'+c.catName+'で出ると賞金1.5倍':'');foot.appendChild(p);
+  if(cupState&&cupState.race>0){const rs=document.createElement('button');rs.type='button';rs.className='ghost';rs.textContent='最初からやり直す';rs.addEventListener('click',()=>{newCup();renderCup();syncStart();});foot.appendChild(rs);}
+  d.appendChild(foot);box.appendChild(d);
 }
 function renderCourses(){
   const l=$('courseList');l.innerHTML='';
