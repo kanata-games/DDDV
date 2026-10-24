@@ -286,7 +286,7 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button><button type="button" role="tab" data-tab="densha">電車</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -322,6 +322,12 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
       <div class="cup"><div class="cupHead"><b>深夜の逃走劇</b><span id="escBest">逃げ切り 0回</span></div>
       <p class="lede" style="font-size:12px">後ろからパトカーが追ってくる。パトカーにくっつかれると捕獲ゲージがたまり、満タンで逮捕。スピードで振り切るか、一般車を盾にしてゴールまで逃げ切ろう。途中で増援も来る。</p>
       <div class="courseList" id="escList"></div></div>
+    </section>
+    <section class="pane" id="pane-densha" role="tabpanel" hidden>
+      <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士</b><span id="denBest">BEST --</span></div>
+      <p class="lede" style="font-size:12px">峠の電車の運転士になって、駅に<b>停止位置ぴったり</b>で止めよう。ダイヤ（定刻）どおりに着くとさらに加点。止まるとドアが開いて、発車ベルのあと次の駅へ。</p>
+      <p class="lede" style="font-size:12px">アクセルで加速、ブレーキはやさしめの常用ブレーキ。<b>N で非常ブレーキ</b>（強く止まるが減点）。停止位置を20 m以上行きすぎると「通過」で大減点。カーブの制限速度を超えすぎると脱線する。この面だけは、持っていなくても電車を借りて運転できる。</p>
+      <div class="courseList" id="denList"></div></div>
     </section>
     <section class="pane" id="pane-school" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>DDDV自動車学校 夜間教習</b><span id="schoolLic">免許 なし</span></div>
@@ -1223,6 +1229,8 @@ function resetRace(){
     ps=slots(4);
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
+  } else if(mode==='densha'){
+    ps={s:START_I,lat:0};
   } else if(mode==='free'||mode==='school'){
     ps={s:mode==='school'?START_I-14:START_I,lat:0};
   } else if(mode==='escape'){
@@ -1242,6 +1250,7 @@ function resetRace(){
   cpus.forEach(c=>{placeCpu(c);c.ahead=c.s>car.idx||!c.def.cop;});
   if(mode==='escape'){game.bust=0;game.reinf=0;startCopSiren();}
   spawnTraffic();if(mode==='collect')spawnSpots();
+  clearStations();if(mode==='densha')setupDen();
   if(spec.type==='amb')setTimeout(()=>say(MEDIC,pick(['患者さん収容完了！ 病院（ゴール）へ急いでください！','出発します！ やさしく、でも急いで！']),3.2),1500);
   if(spec.type==='astarte')setTimeout(()=>ast(['さあ、夜を走りましょう。','この子の機嫌は…上々ね。','月が綺麗な夜。悪くないわ。'],true),1800);
   if(spec.type==='ita'||spec.type==='umicar')setTimeout(()=>umi(['今夜はどこまで行けるかな？ 旅のはじまりです！','わあ、夜景がきれい…！ 行きましょう！','安全運転で…いえ、全力でいきます！'],true),1800);
@@ -1305,7 +1314,7 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
-let mode=['battle','collect','escape','free','school'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
+let mode=['battle','collect','escape','free','school','densha'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
 const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
@@ -1431,12 +1440,14 @@ function syncStart(){
   else if(mode==='escape')b.textContent='逃走開始（'+courseOf(escCourse).name+'）';
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
   else if(mode==='free')b.textContent='首都高へ出る（夜の環状）';
+  else if(mode==='densha')b.textContent='乗務開始（'+DEN_LINES.find(l=>l.id===denLine).name+'）';
   else if(mode==='school')b.textContent='検定を受ける（'+courseOf(schoolStage).name+'）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  ['gp','battle','garage','parts','collect','escape','free','school'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  ['gp','battle','garage','parts','collect','escape','free','school','densha'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  if(t==='densha'){mode='densha';store.set('touge_mode','densha');if(!course||course.id!==denLine)loadCourse(denLine);renderDen();}
   if(t==='school'){mode='school';store.set('touge_mode','school');if(!course||course.id!==schoolStage)loadCourse(schoolStage);renderSchool();}
   if(t==='free'){mode='free';store.set('touge_mode','free');if(!course||course.id!=='loop')loadCourse('loop');const b=sj('touge_free_best',null);$('freeBest').textContent=b?'BEST '+b.w+'勝 ／ '+b.km.toFixed(1)+' km':'BEST --';}
   if(t==='gp'){mode='cup';store.set('touge_mode','cup');const id=CUPS[cupIdx].courses[cupState&&cupState.race<3?cupState.race:0];if(!course||course.id!==id)loadCourse(id);}
@@ -1454,10 +1465,11 @@ function startFromMenu(){
   else if(mode==='escape'){if(course.id!==escCourse)loadCourse(escCourse);}
   else if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}
   else if(mode==='school'){if(course.id!==schoolStage)loadCourse(schoolStage);}
+  else if(mode==='densha'){if(selId!=='train'){denPrev=selId;swapCar('train');}if(course.id!==denLine)loadCourse(denLine);railGroup.visible=true;}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
-function toMenu(){if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -1704,12 +1716,12 @@ function stepVehicle(dt,racing){
     }
     return r;
   }
-  const gas=racing?(autoGas&&!input.brake&&!input.hand?1:input.gas):0,brake=racing?input.brake:1;
+  let gas=racing?(autoGas&&!input.brake&&!input.hand?1:input.gas):0,brake=racing?input.brake:1;if(mode==='densha'&&(game.dwell>game.t||input.nitro))gas=0;
   const i=Math.max(0,Math.min(N-2,Math.floor(car.s)));
   const grade=(P[Math.max(0,i-1)].y-P[Math.min(N-1,i+1)].y)/2;
   let v=car.v;
   {const gg=car.boost?1:gas;if(gg)v+=gg*6.4*spec.pow*hpPow()*accMul()*Math.max(0,1-v/(46*topMul()))*dt;}
-  if(brake)v=Math.max(0,v-11*dt);
+  if(mode==='densha'&&racing&&input.nitro){v=Math.max(0,v-11*dt);if(v>1&&!game.ebT){game.ebT=1;game.ebN=(game.ebN||0)+1;flash('非常ブレーキ！');}}else{game.ebT=0;if(brake)v=Math.max(0,v-(mode==='densha'&&racing?3.6:11)*dt);}
   v+=grade*9.8*.6*dt;v-=(0.0008*v*v+.15)*dt;v=Math.max(0,v);
   const safe=railSafe(i);
   if(racing&&v>safe)car.gauge+=(v-safe)*dt*.09;else car.gauge=Math.max(0,car.gauge-dt*.25);
@@ -1720,7 +1732,7 @@ function stepVehicle(dt,racing){
   const nx=P[Math.min(N-1,a.i+1)],pv=P[Math.max(0,a.i-1)];car.pitch=Math.atan2(pv.y-nx.y,2);
   let g=1;while(g<6&&v>GEARS[g])g++;car.gear=g;car.rpm=Math.min(1,.18+(v-GEARS[g-1])/(GEARS[g]-GEARS[g-1])*.82)*(gas?1:.8);
   const k=P[Math.min(N-1,i+8)].k,forced=car.gauge>=1;
-  if(racing&&v>11&&((input.hand&&Math.abs(k)>.004)||forced)){
+  if(racing&&v>11&&((mode!=='densha'&&input.hand&&Math.abs(k)>.004)||forced)){
     car.derail=true;car.derailT=0;car.drifting=true;car.gauge=0;
     car.yr=Math.sign(k||1)*(forced?-1.4:1.1);
     if(forced){game.hits++;damage(18);game.shake=.8;hitSound();endChain(false);flash('脱線！ 線路に戻れ');}
@@ -1842,7 +1854,7 @@ function frame(now){
           if(sp0<23+Math.min(8,car.combo)*.4){car.vx+=Math.sin(car.yaw)*imp;car.vz+=Math.cos(car.yaw)*imp;}car.hop=1;flash('そーりゃ！'+(car.combo>1?' ×'+car.combo:''));kane();}
         else{car.combo=0;flash('リズムがずれた…');}}}
     car.nitro=(car.beatT||0)/BEAT;}
-  {const was=car.boost;car.boost=racing&&input.nitro&&car.nitro>0.02&&!car.derail&&spec.type!=='dashi'&&spec.type!=='fire';
+  {const was=car.boost;car.boost=racing&&mode!=='densha'&&input.nitro&&car.nitro>0.02&&!car.derail&&spec.type!=='dashi'&&spec.type!=='fire';
    if(car.boost){car.nitro=Math.max(0,car.nitro-dt*.4);if(!was&&game.kyo){game.kyo.score=Math.max(0,game.kyo.score-10);kyoSay(['ニトロは教習課程にありません！','いま何押しました!?'],true);}if(!was){if(spec.type==='bike')flash('立ちこぎ！');else{flash('NITRO!');whoosh();}}}
    else if(spec.type==='bike'&&racing)car.nitro=Math.min(1,car.nitro+dt*.09);
    if(spec.type==='fire'&&racing)stepSpray(dt);
@@ -1910,7 +1922,8 @@ function frame(now){
     if(spec.type==='amb'&&game.state==='race')stepAmb(dt,info);
     if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
     if(mode==='free'&&game.state==='race')stepFree(dt);
-    if(game.state==='race'&&mode!=='free'&&car.idx>=GOAL_I)finish();
+    if(mode==='densha'&&game.state==='race')stepDen(dt,info);
+    if(game.state==='race'&&mode!=='free'&&mode!=='densha'&&car.idx>=GOAL_I)finish();
   }
   // 耐久が減ると車から煙
   if(game.state!=='title'&&car.hp<spec.hpMax*.5&&Math.random()<dt*(car.hp<=0?30:6+(1-car.hp/spec.hpMax)*18)){
@@ -2015,6 +2028,7 @@ function frame(now){
       ge.className=b>.5||game.copDist<12?'':'lead';}
     else if(mode==='free')freeHud(ge);
     else if(mode==='school')schoolHud(ge);
+    else if(mode==='densha')denHud(ge);
     if(spec.type==='amb'&&game.state!=='title'&&!game.kyo){const k=$('kyo');k.hidden=false;k.innerHTML='患者の容体 <b>'+Math.round(game.pat)+'</b>%　'+(car.siren?'サイレン ON':'Hでサイレン');k.className=game.pat<60?'hud bad':'hud';}
     if(game.kyo){$('kyoPt').textContent=Math.round(game.kyo.score);$('kyoLim').textContent=kyoLimit();$('kyo').className=game.kyo.score<70?'hud bad':'hud';}
     if(spec.type==='taxi'){const f=taxiFare(),m=$('meter');if(f!==game.fareShown){if(game.fareShown&&ac)beep(2300,.03);game.fareShown=f;$('meterV').textContent=f.toLocaleString();m.classList.add('tick');setTimeout(()=>m.classList.remove('tick'),150);}m.classList.toggle('ck',cockpitOn);}
@@ -2126,6 +2140,51 @@ function omikuji(){if(spec.type!=='hokora'||game.retired)return null;if(!game.om
 function stampBonus(){if(spec.type!=='umicar'||game.retired||mode==='free')return 0;if(game.stampNew==null){const st=sj('touge_umi_stamp',[]);game.stampNew=!st.includes(course.id);if(game.stampNew){st.push(course.id);store.set('touge_umi_stamp',JSON.stringify(st));game.stampN=st.length;}}return game.stampNew?500:0;}
 function fanBonus(){return spec.type==='ita'&&!game.retired?Math.round((game.dTotal||0)*.1):0;}
 function tatariBonus(){return spec.type==='hokora'?(game.tatari||0)*80:0;}
+// ===== 電車でGO風：DDDV電鉄 =====
+const DEN_LINES=[{id:'lake',name:'湖畔線',st:['湖畔口','白樺台','月見ヶ浜','湖畔温泉'],spd:18},{id:'ridge',name:'稜線トンネル線',st:['稜線口','風穴','星見峠','稜線終点'],spd:19},{id:'down',name:'月見峠線',st:['月見峠','九十九折','ヘアピン前','峠の麓'],spd:10}];
+let denLine=store.get('touge_den_line')||'lake';if(!DEN_LINES.some(l=>l.id===denLine))denLine='lake';let denPrev=null;
+const stationGroup=new THREE.Group();scene.add(stationGroup);
+function clearStations(){while(stationGroup.children.length){const o=stationGroup.children[0];stationGroup.remove(o);o.traverse&&o.traverse(q=>{if(q.geometry)q.geometry.dispose();});}}
+function renderDen(){const l=$('denList');l.innerHTML='';const st=sj('touge_den',{});
+  DEN_LINES.forEach(L=>{const c=courseOf(L.id),b=document.createElement('button');b.type='button';b.className='courseBtn'+(L.id===denLine?' sel':'');b.innerHTML='<b></b><small></small><small></small>';const sm=b.querySelectorAll('small');
+    b.querySelector('b').textContent=L.name;sm[0].textContent=L.st.join(' → ');sm[1].textContent=st[L.id]?'最高 '+st[L.id].toLocaleString()+' 点':'まだ運転していない';
+    b.addEventListener('click',()=>{denLine=L.id;store.set('touge_den_line',L.id);loadCourse(L.id);renderDen();syncStart();});l.appendChild(b);});
+  const tot=Object.values(st).reduce((a,b)=>a+b,0);$('denBest').textContent=tot?'合計 '+tot.toLocaleString()+' 点':'BEST --';}
+function setupDen(){const L=DEN_LINES.find(l=>l.id===course.id)||DEN_LINES[0],n=L.st.length,a=START_I+40,b=GOAL_I-10,stops=[];
+  let t=0,prev=START_I;for(let k=1;k<n;k++){const i=Math.round(a+(b-a)*k/(n-1));t+=(i-prev)/L.spd+(k>1?7:0);stops.push({i,name:L.st[k],sched:t+6,done:false,res:null});prev=i;}
+  game.den={L,stops,score:0,cur:0,last:L.st[0]};game.dwell=0;game.ebN=0;
+  const platM=new THREE.MeshLambertMaterial({color:0x8d8a84}),edgeM=new THREE.MeshBasicMaterial({color:0xf2c200}),poleM=new THREE.MeshLambertMaterial({color:0x6b7078});
+  const mkStation=(i,name,isStart)=>{const W=2.2;for(let j=Math.max(0,i-80);j<i+6;j+=2){const p=P[Math.min(N-1,j)],x=p.x-p.rx*(W+1.6),z=p.z-p.rz*(W+1.6);
+      const m=new THREE.Mesh(new THREE.BoxGeometry(3.2,1.0,2.1),platM);m.position.set(x,p.y+.5,z);m.rotation.y=p.h;stationGroup.add(m);
+      const e=new THREE.Mesh(new THREE.BoxGeometry(.25,.02,2.1),edgeM);e.position.set(p.x-p.rx*(W+.3),p.y+1.01,p.z-p.rz*(W+.3));e.rotation.y=p.h;stationGroup.add(e);}
+    const p=P[Math.min(N-1,i)];if(!isStart){const bx=p.x+p.rx*2.3,bz=p.z+p.rz*2.3,pl=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.4,6),poleM);pl.position.set(bx,p.y+1.2,bz);stationGroup.add(pl);
+      const tx=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#d8141c';g.fillRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 40px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('停止',w/2,h/2-18);g.fillText('位置',w/2,h/2+24);});
+      const sg=new THREE.Mesh(new THREE.PlaneGeometry(.9,.9),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(bx,p.y+2.6,bz);sg.rotation.y=p.h+Math.PI;stationGroup.add(sg);}
+    const q=P[Math.max(0,i-40)],nx=q.x-q.rx*(W+2.6),nz=q.z-q.rz*(W+2.6);const tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle='#f4f4f0';g.fillRect(0,0,w,h);g.fillStyle='#1d4f9c';g.fillRect(0,h-26,w,26);g.fillStyle='#111';g.font='bold 64px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(name,w/2,h/2-10);});
+    const nb=new THREE.Mesh(new THREE.PlaneGeometry(4,1),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));nb.position.set(nx,q.y+3.2,nz);nb.rotation.y=q.h+Math.PI/2;stationGroup.add(nb);
+    for(const pz of [nb]){const p2=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.6,6),poleM);p2.position.set(nx,q.y+1.9,nz);stationGroup.add(p2);}};
+  mkStation(START_I+4,L.st[0],true);stops.forEach(o=>mkStation(o.i,o.name,false));
+  setTimeout(()=>say({name:'車掌',col:0x9fd3ea},'本日もDDDV電鉄をご利用いただきありがとうございます。次は'+stops[0].name+'です。',4),900);}
+function denChime(){if(!ac)return;[0,.35].forEach((d,k)=>setTimeout(()=>beep(k?784:988,.5),d*1000));}
+function stepDen(dt,info){const D=game.den;if(!D)return;
+  if(game.dwell>0&&game.t>=game.dwell){game.dwell=0;if(D.cur>=D.stops.length){finish();return;}flash('発車！');}
+  if(game.dwell)return;const o=D.stops[D.cur];if(!o)return;const gap=o.i-car.s,v=car.v||0;
+  if(gap<-20&&!o.done){o.done=true;o.res={d:null,late:game.t-o.sched,pts:-500};D.score-=500;flash('通過！ '+o.name+'に止まれなかった −500');say({name:'車掌',col:0x9fd3ea},'ちょっ…'+o.name+'、通過しちゃいましたよ！',3);D.cur++;D.last=o.name;if(D.cur>=D.stops.length)setTimeout(finish,1200);return;}
+  if(v<.05&&Math.abs(gap)<20&&!o.done&&game.t>2){o.done=true;const d=Math.abs(gap),late=game.t-o.sched;
+    const acc=d<.3?1000:Math.max(0,Math.round(700-d*45)),tm=Math.abs(late)<5?300:Math.max(-300,Math.round(300-(Math.abs(late)-5)*15)),pts=acc+tm;
+    o.res={d:gap,late,pts};D.score+=pts;D.cur++;D.last=o.name;
+    flash((d<.3?'ピッタリ停止！':d<1?'ほぼピッタリ':d<5?'停止位置から '+d.toFixed(1)+' m':'ずれすぎ… '+d.toFixed(1)+' m')+'　'+(Math.abs(late)<5?'定刻':late>0?Math.round(late)+'秒遅れ':Math.round(-late)+'秒早着')+'　+'+pts);
+    denChime();game.dwell=game.t+(D.cur>=D.stops.length?2:6);
+    setTimeout(()=>{if(D.cur<D.stops.length){say({name:'車掌',col:0x9fd3ea},o.name+'、'+o.name+'です。次は'+D.stops[D.cur].name+'に止まります。',3.5);if(ac)setTimeout(()=>{[0,.12,.24,.36,.48,.6].forEach(dd=>setTimeout(()=>beep(1900,.07),dd*1000));},2400);}},600);}}
+function denHud(ge){const D=game.den;if(!D)return;const o=D.stops[D.cur];const lim=Math.round(Math.min(130,railSafe(Math.max(0,Math.floor(car.s)))*3.6));
+  if(!o){ge.textContent='終点到着';ge.className='lead';return;}
+  const gap=o.i-car.s,rem=o.sched-game.t;ge.textContent=(game.dwell?'停車中…　':'')+'次は '+o.name+'　'+(gap>0?Math.round(gap*10)/10+' m':'行きすぎ '+Math.round(-gap*10)/10+' m')+'　定刻まで '+(rem>=0?Math.round(rem)+'秒':'遅れ '+Math.round(-rem)+'秒')+'　制限 '+lim;ge.className=gap<30&&gap>-1?'':'lead';}
+function finishDen(){const D=game.den||{stops:[],score:0,L:{name:''}},eb=(game.ebN||0)*50,der=game.retired?0:0,score=Math.max(0,D.score-eb-game.hits*100);
+  const earned=Math.max(100,Math.round(score*.8));wallet+=earned;const st=sj('touge_den',{});if(!st[course.id]||score>st[course.id]){st[course.id]=score;store.set('touge_den',JSON.stringify(st));}
+  $('resKick').textContent='DDDV電鉄 ／ '+D.L.name;$('resHead').textContent=game.retired?'運転打ち切り':score.toLocaleString()+' 点';$('resHead').className='res-big '+(score>=2000?'win':'lose');
+  $('resSub').textContent=game.retired?'脱線しすぎて車両が大破した。':'終点まで乗務完了。'+(score>=3000?'ベテラン運転士の腕前。':score>=1500?'安定した運転。':'停止位置と定刻を意識してみよう。');
+  addRows(D.stops.map(o=>[o.name+(o.res?(o.res.d==null?'　通過':'　'+Math.abs(o.res.d).toFixed(1)+' m／'+(Math.abs(o.res.late)<5?'定刻':o.res.late>0?Math.round(o.res.late)+'秒遅れ':Math.round(-o.res.late)+'秒早着')):'　未到着'),o.res?o.res.pts:0]).concat(eb?[['非常ブレーキ '+game.ebN+'回',-eb]]:[],game.hits?[['脱線・衝撃 '+game.hits+'回',-game.hits*100]]:[]));
+  addTotal(earned);$('btnRetry').textContent='もう一回乗務';$('btnMenu').hidden=false;}
 function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
 function zanCalc(){const ids=zanList();if(!ids.length){game.zanC=null;return null;}const L=zanM[spec.id],lost=1-car.hp/spec.hpMax,sat=L&&L.d>0&&lost>.05?Math.round(lost*(spec.id==='alph'?3000:Math.max(1000,(CARS.find(c=>c.id===spec.id)||{price:0}).price*.2))/100)*100:0;
   const want=ids.reduce((a,k)=>a+Math.min(zanM[k].p,zanM[k].d+(k===spec.id?sat:0)),0);game.zanC={sat,want,n:ids.length};return game.zanC;}
@@ -2142,13 +2201,13 @@ function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus()+kyoBonu
 function addTotalRest(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
 function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
   $('btnPA').hidden=true;$('spBox').hidden=true;
   if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
-  if(mode==='free')finishFree();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
+  if(mode==='free')finishFree();else if(mode==='densha')finishDen();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
 }
