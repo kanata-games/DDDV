@@ -486,6 +486,7 @@ const COURSES=[
   {id:'dotonbori',name:'道頓堀ネオン',sub:'大阪ミナミ。たこ焼きと串カツの看板の谷間',segs:[['S',120,0],['C',14,90,0],['S',100,0],['C',30,-30,0],['C',30,30,0],['S',120,0],['C',14,-90,0],['S',90,0],['C',14,-90,0],['S',110,0],['C',14,90,0],['S',160,0]],y0:0,env:'city',half:6,traffic:6,osaka:true,osakaMark:true,hidden:true},
   {id:'arcade',name:'天神橋筋商店街',sub:'日本一長いアーケード。屋根の下の細い道',segs:[['S',260,0],['C',30,14,0],['S',200,0],['C',12,90,0],['S',140,0],['C',12,-90,0],['S',240,0],['C',22,-22,0],['C',22,22,0],['S',260,0]],y0:0,env:'arcade',half:3.4,traffic:3,osakaMark:true},
   {id:'park',name:'夜の遊園地 DDDVランド',sub:'観覧車とメリーゴーランドの横、ジェットコースターの下を抜ける',segs:[['S',90,0],['C',26,90,0],['S',70,0],['C',30,-120,0],['S',100,0],['C',22,150,0],['S',80,0],['C',40,-60,0],['C',40,60,0],['S',110,0],['C',22,-140,0],['S',90,0],['C',35,70,0],['S',130,0],['C',50,-45,0],['S',120,0],['C',24,-130,0],['S',90,0],['C',30,100,0],['S',80,0],['C',45,-50,0],['C',45,50,0],['S',140,0],['C',22,160,0],['S',110,0],['C',38,-80,0],['S',100,0],['C',60,30,0],['S',160,0]],y0:0,env:'park',half:5,traffic:4},
+  {id:'snow',name:'白銀ゲレンデ下り',sub:'雪山を一気に下る。全車すべりやすい。アイスバーン・雪だるま・コブ・リフト',segs:[['S',110,.06],['C',60,45,.08],['S',90,.1],['C',30,-130,.08],['S',110,.11],['C',45,70,.1],['C',45,-70,.1],['S',140,.12],['C',22,170,.07],['S',100,.11],['C',35,-90,.1],['S',120,.12],['C',50,40,.1],['C',50,-40,.1],['S',100,.11],['C',22,-165,.07],['S',130,.12],['C',40,80,.1],['S',90,.1],['C',70,-30,.08],['S',180,.06]],y0:320,snow:true,lampStep:65},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -629,7 +630,7 @@ function buildScenery(){
   const G=trackGroup;
   // road
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
-   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'?roadTexCity:roadTex})));}
+   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'?roadTexCity:roadTex,color:course.snow?0xc8d4e4:0xffffff})));}
   if(course.env==='highway')buildHighway(G);
   else if(course.env==='city')buildCity(G);
   else if(course.env==='school')buildSchool(G);
@@ -637,6 +638,7 @@ function buildScenery(){
   else if(course.env==='park')buildPark(G);
   if(course.toll)buildToll(G,course.toll);
   if(course.osakaMark)buildOsaka(G);
+  if(course.snow)buildSnow(G);
   else{
   // cliff (left) & drop (right)
   {const offsC=[0,1.2,1.2,1.6,7,20,46],offsD=[0,6,14,30,46];
@@ -647,6 +649,7 @@ function buildScenery(){
          const x=p.x+p.rx*s*off,z=p.z+p.rz*s*off;
          let r,g,b; if(s<0){ if(oo<1.3){r=.32;g=.33;b=.34;} else if(oo<7){r=.45;g=.47;b=.44;} else {r=.16;g=.24;b=.15;} }
          else { if(oo<1){r=.2;g=.24;b=.17;} else {r=.13;g=.2;b=.12;} }
+         if(course.snow){const w=oo<1.3?.7:.88;r=w;g=w+.03;b=w+.08;}
          row.push([x,p.y+hh,z,oo/4,p.d/4,r,g,b]);});
        if(s<0)row.reverse();
        rows.push(row);}
@@ -654,7 +657,7 @@ function buildScenery(){
    }}
   // valley floor / lake
   {let minY=1e9,cx=0,cz=0;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;
-   const m=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),course.water?new THREE.MeshPhongMaterial({color:0x0c1c33,emissive:0x050b16,specular:0x6f86c8,shininess:60}):new THREE.MeshLambertMaterial({color:0x0d1810}));
+   const m=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),course.water?new THREE.MeshPhongMaterial({color:0x0c1c33,emissive:0x050b16,specular:0x6f86c8,shininess:60}):new THREE.MeshLambertMaterial({color:course.snow?0xb8c4d6:0x0d1810}));
    m.rotation.x=-Math.PI/2;m.position.set(cx,minY-(course.water?7:45),cz);G.add(m);
    if(course.water){ // 湖面に映る月
      const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(170,195,255,.5)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));gl.scale.set(220,40,1);gl.position.set(cx-300,minY-6.8,cz+460);G.add(gl);}}
@@ -669,7 +672,7 @@ function buildScenery(){
   {const cnt=quality===0?900:1800;
    const coneG=new THREE.ConeGeometry(1.6,6,6);coneG.translate(0,4,0);
    const trunkG=new THREE.CylinderGeometry(.18,.25,1.4,5);trunkG.translate(0,.7,0);
-   const cone=new THREE.InstancedMesh(coneG,new THREE.MeshLambertMaterial({color:0x1d3a24}),cnt);
+   const cone=new THREE.InstancedMesh(coneG,new THREE.MeshLambertMaterial({color:course.snow?0x9fb4b0:0x1d3a24,emissive:course.snow?0x1a2430:0x000000}),cnt);
    const trunk=new THREE.InstancedMesh(trunkG,new THREE.MeshLambertMaterial({color:0x3a2a1c}),cnt);
    const o=new THREE.Object3D();let n=0,tries=0;
    while(n<cnt&&tries<cnt*6){tries++;
@@ -808,6 +811,34 @@ function buildSchool(G){const W=HALF;let minY=1e9,cx=0,cz=0;P.forEach(p=>{minY=M
   {const p=P[Math.min(N-1,30)],sd=-1,off=W+26,bx=p.x+p.rx*sd*off,bz=p.z+p.rz*sd*off;const b=new THREE.Mesh(new THREE.BoxGeometry(34,13,14),new THREE.MeshLambertMaterial({color:0x1b2030,emissive:0xffffff,emissiveMap:winTex}));b.position.set(bx,minY+6.5,bz);b.rotation.y=p.h;G.add(b);
    const tx=canvasTex(512,96,(g,w,h)=>{g.fillStyle='#16407a';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 52px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('DDDV自動車学校',w/2,h/2+2);});
    const sg=new THREE.Mesh(new THREE.PlaneGeometry(20,3.75),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(bx+p.rx*7.1,minY+11,bz+p.rz*7.1);sg.rotation.y=p.h+Math.PI/2;G.add(sg);}}
+// 雪：降る雪（カメラについてくる）
+const snowFx=(()=>{const n=1400,pos=new Float32Array(n*3);for(let i=0;i<n;i++){pos[i*3]=(Math.random()-.5)*80;pos[i*3+1]=Math.random()*40;pos[i*3+2]=(Math.random()-.5)*80;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:.25,transparent:true,opacity:.85,depthWrite:false}));pts.visible=false;scene.add(pts);return pts;})();
+function stepSnowFx(dt){if(!snowFx.visible)return;const a=snowFx.geometry.attributes.position,arr=a.array;for(let i=0;i<arr.length;i+=3){arr[i+1]-=dt*(3+(i%7));arr[i]+=Math.sin(i+performance.now()*.001)*dt*.6;if(arr[i+1]<0)arr[i+1]+=40;}a.needsUpdate=true;snowFx.position.set(camera.position.x,camera.position.y-14,camera.position.z);}
+// ゲレンデのギミック：アイスバーン・雪だるま・コブ・リフト
+function buildSnow(G){const W=HALF,gim=[];const at=f=>{let i=Math.round(N*f);while(i<N-30&&Math.abs(P[i].k)>.006)i++;return i;};
+  [.16,.38,.62,.84].forEach(f=>{const i=at(f),p=P[i],lat=(f*13%2-1)*1.6,m=new THREE.Mesh(new THREE.PlaneGeometry(4.2,14).rotateX(-Math.PI/2),new THREE.MeshPhongMaterial({color:0x9fd8ff,transparent:true,opacity:.55,specular:0xffffff,shininess:90,polygonOffset:true,polygonOffsetFactor:-3}));
+    m.position.set(p.x+p.rx*lat,p.y+.04,p.z+p.rz*lat);m.rotation.y=p.h;G.add(m);gim.push({t:'ice',i,lat});});
+  const sm=new THREE.MeshLambertMaterial({color:0xf4f8ff,emissive:0x2a3240});
+  [.1,.27,.45,.55,.7,.9].forEach((f,k)=>{const i=at(f),p=P[i],lat=[-2.2,1.8,0,-1.2,2.3,-.4][k],gr=new THREE.Group();
+    const b1=new THREE.Mesh(new THREE.SphereGeometry(.9,10,8),sm);b1.position.y=.8;gr.add(b1);const b2=new THREE.Mesh(new THREE.SphereGeometry(.6,10,8),sm);b2.position.y=2;gr.add(b2);
+    const hat=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.5,8),new THREE.MeshLambertMaterial({color:0xd8141c}));hat.position.y=2.7;gr.add(hat);const nose=new THREE.Mesh(new THREE.ConeGeometry(.1,.45,6),new THREE.MeshLambertMaterial({color:0xff8a20}));nose.rotation.x=Math.PI/2;nose.position.set(0,2,.6);gr.add(nose);
+    gr.position.set(p.x+p.rx*lat,p.y,p.z+p.rz*lat);gr.rotation.y=p.h+Math.PI;G.add(gr);gim.push({t:'snowman',i,lat,obj:gr});});
+  {const a=at(.5),mm=new THREE.MeshLambertMaterial({color:0xe8eef8,emissive:0x202836});for(let j=0;j<60;j+=3){const p=P[a+j];if(!p)break;const lat=Math.sin(j)*2.5,b=new THREE.Mesh(new THREE.SphereGeometry(1.1,10,6,0,Math.PI*2,0,Math.PI/2),mm);b.scale.y=.35;b.position.set(p.x+p.rx*lat,p.y,p.z+p.rz*lat);G.add(b);}gim.push({t:'mogul',i:a,len:60});}
+  // リフト：コースをまたぐ鉄塔とケーブル、動く椅子
+  [.22,.66].forEach(f=>{const i=at(f),p=P[i],dx=Math.cos(p.h+.5),dz=-Math.sin(p.h+.5),tm=new THREE.MeshLambertMaterial({color:0x8a8d93});const ends=[-60,60].map(d=>({x:p.x+dx*d,z:p.z+dz*d}));
+    const T=[];for(let d=-60;d<=60;d+=30){const x=p.x+dx*d,z=p.z+dz*d;if(nearRoad(x,z,W+2,-1,-1))continue;const t=new THREE.Mesh(new THREE.BoxGeometry(.8,16,.8),tm);t.position.set(x,p.y+8+d*.05,z);G.add(t);const arm=new THREE.Mesh(new THREE.BoxGeometry(4,.4,.4),tm);arm.position.set(x,p.y+16+d*.05,z);arm.rotation.y=Math.atan2(dx,dz)+Math.PI/2;G.add(arm);}
+    const cab=[];[-1.6,1.6].forEach(o=>{const ox=-dz*o,oz=dx*o;cab.push(ends[0].x+ox,p.y+15.6-3,ends[0].z+oz,ends[1].x+ox,p.y+15.6+3,ends[1].z+oz);});const cg=new THREE.BufferGeometry();cg.setAttribute('position',new THREE.Float32BufferAttribute(cab,3));G.add(new THREE.LineSegments(cg,new THREE.LineBasicMaterial({color:0x222222})));
+    const chairs=[];for(let k=0;k<8;k++){const c=new THREE.Group(),seat=new THREE.Mesh(new THREE.BoxGeometry(1.6,.2,.8),new THREE.MeshLambertMaterial({color:k%2?0xd8141c:0x2a6fe0}));seat.position.y=-2.2;c.add(seat);const rod=new THREE.Mesh(new THREE.BoxGeometry(.08,2.2,.08),tm);rod.position.y=-1.1;c.add(rod);G.add(c);chairs.push(c);}
+    gim.push({t:'lift',p,dx,dz,chairs});});
+  course.gim=gim;}
+function stepSnow(dt){const g=course.gim;if(!g)return;const T=performance.now()/1000,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;car.onIce=false;
+  for(const o of g){if(o.t==='ice'){if(Math.abs(car.idx-o.i)<7&&Math.abs(plat-o.lat)<2.1){car.onIce=true;if(!(o.cd>game.t)){o.cd=game.t+3;flash('アイスバーン！');}}}
+    else if(o.t==='snowman'&&!o.gone){const hit=Math.abs(car.idx-o.i)<2&&Math.abs(plat-o.lat)<1.6+(spec.halfW||.9);
+      if(hit&&game.state==='race'){o.gone=true;o.obj.visible=false;car.vx*=.6;car.vz*=.6;game.snowmen=(game.snowmen||0)+1;for(let k=0;k<14;k++)puff(o.obj.position.x+(Math.random()-.5)*2,o.obj.position.y+Math.random()*2,o.obj.position.z+(Math.random()-.5)*2,(Math.random()-.5)*20,(Math.random()-.5)*20);hitSound();game.shake=.4;flash('雪だるまを粉砕！');}
+      cpus.forEach(c=>{if(!o.gone&&Math.abs(c.s-o.i)<2&&Math.abs(c.lat-o.lat)<2.2){o.gone=true;o.obj.visible=false;c.v*=.6;c.wob=.4;}});}
+    else if(o.t==='mogul'){if(car.idx>=o.i&&car.idx<o.i+o.len&&game.state==='race'){const sp=Math.hypot(car.vx,car.vz);car.yr+=Math.sin(T*18)*Math.min(1.5,sp*.04)*dt*6;if(sp>18){car.vx*=1-dt*.4;car.vz*=1-dt*.4;}game.shake=Math.max(game.shake,Math.min(.3,sp*.012));if(!o.msg){o.msg=1;flash('コブ斜面！');}}else o.msg=0;}
+    else if(o.t==='lift'){o.chairs.forEach((c,k)=>{const u=((T*.05+k/8)%1)*120-60;c.position.set(o.p.x+o.dx*u+(-o.dz*1.6),o.p.y+15.6+u*.05,o.p.z+o.dz*u+(o.dx*1.6));});}}}
 // 遊園地：入場ゲート・観覧車・メリーゴーランド・ジェットコースター・電飾
 function buildPark(G){const W=HALF;let cx=0,cz=0,minY=1e9;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;const spin=[];
   {const m=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),new THREE.MeshLambertMaterial({color:0x10201a}));m.rotation.x=-Math.PI/2;m.position.set(cx,minY-.06,cz);G.add(m);}
@@ -1409,12 +1440,14 @@ function buildProfiles(){
   // 上り坂は少し遅く
   for(let i=1;i<N-1;i++){const g=(P[i+1].y-P[i-1].y)/2;if(g>0)vProf[i]*=Math.max(.86,1-g*1.6);}
   vProf[0]=0;for(let i=1;i<N;i++)vProf[i]=Math.min(vProf[i],Math.sqrt(vProf[i-1]**2+2*5.5));
+  if(course.snow)for(let i=0;i<N;i++)vProf[i]*=.86;
   for(let i=0;i<N;i++){let s=0;for(let j=Math.max(0,i-25);j<=Math.min(N-1,i+25);j++)s+=P[j].k;latProf[i]=Math.max(-2.4,Math.min(2.4,-s*14));}
 }
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;course.spin=null;course.coaster=null;course.gim=null;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
-  {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
+  {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park',fc=course.snow?0x3a4660:urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:course.snow?20:25;scene.fog.far=urban?560:course.snow?200:240;}
+  snowFx.visible=!!course.snow;
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
     lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=course.order[0];}
@@ -1453,7 +1486,7 @@ function resetRace(){
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if((spec.type==='sled'||spec.type==='cart')&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash(spec.type==='cart'?'上り坂をカートで…？ ひたすら押すしかない':'上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',amb:'サイレン',fire:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺',astarte:'星詠み',umicar:'ヴェール',cart:'放送',deco:'全灯',f14:'機銃',icecream:'メロディ'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ',fire:'放水',mixer:'生コン',f14:'AB'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';if(spec.type==='fire'){$('nitroLbl').textContent='水タンク';}if(spec.type==='mixer'){$('nitroLbl').textContent='生コン';}car.gunCd=0;car.oraT=0;car.turbo=0;game.iceT=0;game.iceSale=0;game.iceMelt=0;game.iceAcc=0;car.sweep=0;if(spec.type==='f14'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.f14;game.gunT=0;game.decoT=0;game.decoOn=0;car.ride=false;game.pizza=100;game.demaT=spec.type==='demae'&&course&&vProf.length===N?demaeTarget():0;car.spraying=false;game.soaked=0;if(spec.type==='fire')car.nitro=1;game.pat=100;game.ambV=null;game.patCd=0;game.sirenHint=false;game.saleT=0;game.veilT=0;game.veilOn=0;game.stampNew=null;game.starT=0;game.starOn=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'||spec.type==='fire'||spec.type==='mixer'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if((spec.type==='sled'||spec.type==='cart')&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash(spec.type==='cart'?'上り坂をカートで…？ ひたすら押すしかない':'上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',amb:'サイレン',fire:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺',astarte:'星詠み',umicar:'ヴェール',cart:'放送',deco:'全灯',f14:'機銃',icecream:'メロディ'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ',fire:'放水',mixer:'生コン',f14:'AB'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';if(spec.type==='fire'){$('nitroLbl').textContent='水タンク';}if(spec.type==='mixer'){$('nitroLbl').textContent='生コン';}car.gunCd=0;car.oraT=0;car.turbo=0;car.onIce=false;game.snowmen=0;game.iceT=0;game.iceSale=0;game.iceMelt=0;game.iceAcc=0;car.sweep=0;if(spec.type==='f14'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.f14;game.gunT=0;game.decoT=0;game.decoOn=0;car.ride=false;game.pizza=100;game.demaT=spec.type==='demae'&&course&&vProf.length===N?demaeTarget():0;car.spraying=false;game.soaked=0;if(spec.type==='fire')car.nitro=1;game.pat=100;game.ambV=null;game.patCd=0;game.sirenHint=false;game.saleT=0;game.veilT=0;game.veilOn=0;game.stampNew=null;game.starT=0;game.starOn=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'||spec.type==='fire'||spec.type==='mixer'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   game.startD=P[car.idx].d;car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1691,7 +1724,7 @@ function toMenu(){clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hu
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
-function f14Grip(){return spec.type==='f14'?1.15-.35*(car.sweep||0):1;}
+function f14Grip(){return (spec.type==='f14'?1.15-.35*(car.sweep||0):1)*(course&&course.snow?(spec.type==='sled'?1.1:.72):1)*(car.onIce?.4:1);}
 function accMul(){return (car.boost||game.aquaOn>game.t?(spec.type==='f14'?2.2:1.7):1)*(car.draft?1.12:1)*(spec.type==='gtr'?.82+.38*(car.turbo||0):1)*(spec.type==='evo'&&car.evoX?1.15:1);}
 function topMul(){return (car.boost||game.aquaOn>game.t?1.2:1)*(spec.type==='f14'?.9+.2*(car.sweep||0):1)*(car.draft?1.06:1)*(spec.type==='gtr'?1+.06*(car.turbo||0):1);}
 function hpPow(){const f=car.hp/spec.hpMax;return f<.5?.8+.4*f:1;}
@@ -2155,7 +2188,7 @@ function frame(now){
     if(spec.type==='demae'&&game.state==='race')stepDemae(dt,info);
     if(spec.type==='icecream'&&game.state==='race')stepIce(dt,info);
     if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
-    if(course.gim)stepGim(dt);
+    if(course.gim)(course.snow?stepSnow:stepGim)(dt);
     if(mode==='free'&&game.state==='race')stepFree(dt);
     if(mode==='densha'&&game.state==='race')stepDen(dt,info);
     if(game.state==='race'&&mode!=='free'&&mode!=='densha'&&car.idx>=GOAL_I)finish();
@@ -2245,6 +2278,7 @@ function frame(now){
   {const on=(car.boost||game.aquaOn>game.t)&&game.state!=='title'&&spec.type!=='bike'&&spec.type!=='sled'&&spec.type!=='cart',hl=(spec.len||4.2)/2+.3,fx=-Math.sin(car.yaw),fz=-Math.cos(car.yaw),rx=-Math.cos(car.yaw),rz=Math.sin(car.yaw);
    flames.forEach((f,k)=>{f.visible=on;if(!on)return;const sd=k?-.45:.45,j=.8+Math.random()*.5;f.position.set(car.x+fx*hl+rx*sd,car.y+.45,car.z+fz*hl+rz*sd);f.scale.set(.9*j,.9*j,1);});}
   if(game.shake>.01){camera.position.x+=(Math.random()-.5)*game.shake*.3;camera.position.y+=(Math.random()-.5)*game.shake*.3;}
+  stepSnowFx(dt);
   trackGroup.children.forEach(o=>{if(o.userData&&o.userData.wheel)o.userData.wheel.rotation.z+=dt*.05;});
   if(course&&course.spin)course.spin.forEach(([o,ax,v])=>o.rotation[ax]+=dt*v);
   if(course&&course.coaster&&course.coaster.path.length>1&&dt>0){const C=course.coaster,L=C.path.length;C.t=((C.t||0)+dt*14)%L;const k=Math.min(L-1,Math.max(0,Math.floor(C.t))),q=C.path[k],n=C.path[(k+1)%L];C.train.position.set(q.x,q.y+.8,q.z);C.train.rotation.set(0,Math.atan2(n.x-q.x,n.z-q.z),0);}
