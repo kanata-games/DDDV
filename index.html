@@ -1515,7 +1515,11 @@ const TRACKS=[
   {f:'bgm/stone-to-mountain.mp3',t:'From Stone to Mountain'},
   {f:'bgm/alps-10000-feet.mp3',t:'ALPS 10,000 FEET - CLIMB TO THE SKY MIX'},
   {f:'bgm/joy-overdrive.mp3',t:'歓喜超速 — JOY OVERDRIVE'},
-  {f:'bgm/homecoming-drive.mp3',t:'遥か故郷 — HOMECOMING DRIVE —'}
+  {f:'bgm/homecoming-drive.mp3',t:'遥か故郷 — HOMECOMING DRIVE —'},
+{f:'bgm/gesshoku-butou.mp3',t:'月蝕の舞踏（アスターテのテーマ）'},
+{f:'bgm/aoki-majo.mp3',t:'蒼き魔女の疾走（海音のテーマ）'},
+{f:'bgm/show-mirage.mp3',t:'Show Mirage'},
+{f:'bgm/evolve.mp3',t:'evolve'}
 ];
 const vol=Object.assign({bgm:70,eng:40,fx:60},(()=>{try{return JSON.parse(store.get('touge_vol')||'{}')}catch(e){return{}}})());
 let bgmMode=store.get('touge_bgm')||'shuffle',viaGraph=false; // 'shuffle' | 'off' | '0'..'5'
@@ -1557,9 +1561,12 @@ function playTrack(i){
   nowPlaying();if(game.state==='race'||game.state==='count')flash('♪ '+TRACKS[cur].t);
 }
 function randomTrack(){let i;do{i=Math.random()*TRACKS.length|0;}while(TRACKS.length>1&&i===cur);return i;}
+// 友達の車に乗った時・友達と勝負する時はテーマ曲（シャッフル中のみ）
+function themeTrack(){const who=mode==='battle'&&!senseiMatch&&typeof battleRival!=='undefined'&&battleRival!=='yellow'?battleRival:spec.type==='astarte'?'astarte':(spec.type==='umicar'||spec.type==='ita')?'umi':null;
+  const f=who==='astarte'?'bgm/gesshoku-butou.mp3':who==='umi'?'bgm/aoki-majo.mp3':null;return f?TRACKS.findIndex(t=>t.f===f):-1;}
 function startBgm(){
   if(bgmMode==='off'){bgmEl.pause();cur=-1;nowPlaying();return;}
-  if(bgmMode==='shuffle'){if(bgmEl.paused||cur<0)playTrack(randomTrack());}
+  if(bgmMode==='shuffle'){const th=themeTrack();if(th>=0){if(cur!==th||bgmEl.paused)playTrack(th);}else if(bgmEl.paused||cur<0)playTrack(randomTrack());}
   else {const i=+bgmMode;if(cur!==i||bgmEl.paused)playTrack(i);}
 }
 function stepTrack(dir){
