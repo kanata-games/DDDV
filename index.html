@@ -260,7 +260,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -290,6 +290,12 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <div class="cup"><div class="cupHead"><b>深夜の逃走劇</b><span id="escBest">逃げ切り 0回</span></div>
       <p class="lede" style="font-size:12px">後ろからパトカーが追ってくる。パトカーにくっつかれると捕獲ゲージがたまり、満タンで逮捕。スピードで振り切るか、一般車を盾にしてゴールまで逃げ切ろう。途中で増援も来る。</p>
       <div class="courseList" id="escList"></div></div>
+    </section>
+    <section class="pane" id="pane-school" role="tabpanel" hidden>
+      <div class="cup"><div class="cupHead"><b>DDDV自動車学校 夜間教習</b><span id="schoolLic">免許 なし</span></div>
+      <p class="lede" style="font-size:12px">助手席の教官が採点する検定。100点から始まり、制限速度オーバー・縁石に乗る（脱輪）・一時停止で止まらない・坂道でずり下がる・ぶつける・ドリフト・ニトロで減点。<b>70点以上で合格</b>、0点になると検定中止。合格すると次の段階に進める。卒業検定に受かれば免許取得。</p>
+      <p class="lede" style="font-size:12px">「止まれ」の線ではいったん完全に止まる。坂道発進は黄色い標識の線で止まってから、下がらないように発進。どの乗り物でも受験できる（教官の反応が変わる）。</p>
+      <div class="courseList" id="schoolList"></div></div>
     </section>
     <section class="pane" id="pane-free" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
@@ -407,6 +413,11 @@ const COURSES=[
   {id:'wangan',name:'湾岸線',sub:'首都高。長い直線で一般車を縫って走る',segs:WANGAN_SEGS,y0:30,env:'highway',half:8,traffic:16},
   {id:'c1',name:'C1環状',sub:'首都高。壁が迫る連続コーナーとトンネル',segs:C1_SEGS,y0:30,env:'highway',half:6.5,traffic:10},
   {id:'loop',name:'首都高 夜の環状',sub:'終わりのない首都高。野良バトルの舞台',segs:loopSegs('WCYBKJCY'),order:'WCYBKJCY',y0:30,env:'highway',half:8,traffic:14,loop:true,hidden:true},
+  {id:'sc1',name:'外周コース',sub:'一時停止で止まれるか',segs:[['S',70,0],['C',14,90,0],['S',90,0],['C',14,-90,0],['S',60,0],['C',14,-90,0],['S',90,0],['C',14,90,0],['S',70,0]],y0:0,env:'school',half:3.6,limit:40,stops:[{seg:2,at:58,t:'stop'},{seg:6,at:44,t:'stop'}],hidden:true},
+  {id:'sc2',name:'S字コース',sub:'せまいクネクネ道',segs:[['S',50,0],['C',10,75,0],['C',10,-150,0],['C',10,150,0],['C',10,-75,0],['S',50,0]],y0:0,env:'school',half:3.2,limit:20,stops:[],hidden:true},
+  {id:'sc3',name:'クランク',sub:'直角が続く',segs:[['S',45,0],['C',5,90,0],['S',12,0],['C',5,-90,0],['S',14,0],['C',5,-90,0],['S',12,0],['C',5,90,0],['S',45,0]],y0:0,env:'school',half:3.0,limit:15,stops:[],hidden:true},
+  {id:'sc4',name:'坂道発進',sub:'坂の途中で止まって、下がらずに発進',segs:[['S',60,0],['C',20,40,0],['S',30,0],['S',70,-.1],['S',25,0],['S',70,.1],['C',20,-40,0],['S',60,0]],y0:0,env:'school',half:3.4,limit:30,stops:[{seg:3,at:48,t:'hill'}],hidden:true},
+  {id:'sc5',name:'卒業検定',sub:'外周・S字・クランク・坂道を全部',segs:[['S',60,0],['C',14,90,0],['S',70,0],['C',10,75,0],['C',10,-150,0],['C',10,150,0],['C',10,-75,0],['S',40,0],['C',5,-90,0],['S',12,0],['C',5,90,0],['S',14,0],['C',5,90,0],['S',12,0],['C',5,-90,0],['S',40,0],['S',60,-.1],['S',20,0],['S',60,.1],['S',30,0],['C',14,-90,0],['S',80,0]],y0:0,env:'school',half:3.2,limit:40,stops:[{seg:2,at:45,t:'stop'},{seg:16,at:40,t:'hill'},{seg:21,at:18,t:'stop'}],hidden:true},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -442,7 +453,7 @@ const MAXW=46;let width={};
 function computeWidth(){
   grid=new Map();P.forEach((p,i)=>{const k=Math.floor(p.x/CELL)+','+Math.floor(p.z/CELL);(grid.get(k)||grid.set(k,[]).get(k)).push(i);});
   width={'-1':new Float32Array(N),'1':new Float32Array(N)};
-  if(course&&(course.env==='highway'||course.env==='city')){width['-1'].fill(2);width['1'].fill(2);return;}
+  if(course&&(course.env==='highway'||course.env==='city'||course.env==='school')){width['-1'].fill(2);width['1'].fill(2);return;}
   for(const s of [-1,1]){
     const w=width[s];
     for(let i=0;i<N;i++){const p=P[i];let t=HALF+2;
@@ -535,9 +546,10 @@ function buildScenery(){
   const G=trackGroup;
   // road
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
-   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'?roadTexCity:roadTex})));}
+   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'?roadTexCity:roadTex})));}
   if(course.env==='highway')buildHighway(G);
   else if(course.env==='city')buildCity(G);
+  else if(course.env==='school')buildSchool(G);
   else{
   // cliff (left) & drop (right)
   {const offsC=[0,1.2,1.2,1.6,7,20,46],offsD=[0,6,14,30,46];
@@ -687,6 +699,28 @@ function buildBridge(G,r,gy){const W=HALF,a=r.body+260,b=r.body+1500;if(b>=r.to-
   const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));G.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xb8c4d8})));
   const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));pg.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
   G.add(new THREE.Points(pg,new THREE.PointsMaterial({size:3,sizeAttenuation:false,vertexColors:true})));}
+// 教習所：縁石・パイロン・停止線・止まれ標識・校舎
+const curbTex=canvasTex(64,64,(g,w,h)=>{g.fillStyle='#e8e8e8';g.fillRect(0,0,w,h);g.fillStyle='#c8242a';g.fillRect(0,0,w,h/2);},true);
+function signTex(txt,bg,fg,shape){return canvasTex(256,256,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle=bg;g.beginPath();if(shape==='tri'){g.moveTo(10,20);g.lineTo(w-10,20);g.lineTo(w/2,h-10);}else{g.moveTo(w/2,8);g.lineTo(w-8,h/2);g.lineTo(w/2,h-8);g.lineTo(8,h/2);}g.closePath();g.fill();g.lineWidth=10;g.strokeStyle='#fff';g.stroke();
+  g.fillStyle=fg;g.font='bold 56px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';const ls=txt.split('\n');ls.forEach((l,k)=>g.fillText(l,w/2,(shape==='tri'?h*.4:h/2)+(k-(ls.length-1)/2)*60));});}
+function buildSchool(G){const W=HALF;let minY=1e9,cx=0,cz=0;P.forEach(p=>{minY=Math.min(minY,p.y);cx+=p.x;cz+=p.z;});cx/=N;cz/=N;
+  {const m=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400),new THREE.MeshLambertMaterial({color:0x15201a}));m.rotation.x=-Math.PI/2;m.position.set(cx,minY-.08,cz);G.add(m);}
+  // 坂の下を埋める土手
+  [-1,1].forEach(sd=>{const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];if(p.y-minY<.3){rows.push([[p.x+p.rx*sd*W,minY-.05,p.z+p.rz*sd*W,0,0],[p.x+p.rx*sd*W,minY-.05,p.z+p.rz*sd*W,1,0]]);continue;}rows.push([[p.x+p.rx*sd*(W+.35),p.y,p.z+p.rz*sd*(W+.35),0,0],[p.x+p.rx*sd*(W+.35),minY-.05,p.z+p.rz*sd*(W+.35),1,0]]);}
+    G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({color:0x6e6f72,side:THREE.DoubleSide})));});
+  [-1,1].forEach(sd=>{const rows=[];for(let i=0;i<N;i++){const p=P[i],pt=a=>[p.x+p.rx*sd*a,p.z+p.rz*sd*a],a=pt(W),b=pt(W+.35);rows.push([[a[0],p.y,a[1],0,p.d/1.2],[a[0],p.y+.16,a[1],.3,p.d/1.2],[b[0],p.y+.16,b[1],1,p.d/1.2]]);}
+    G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:curbTex,side:THREE.DoubleSide})));});
+  {const L=[];let sd=1;for(let i=10;i<N;i+=28){const p=P[i];sd=-sd;const b=W+1.4,hh=W-.6;L.push({x:p.x+p.rx*sd*b,z:p.z+p.rz*sd*b,y:p.y,hx:p.x+p.rx*sd*hh,hz:p.z+p.rz*sd*hh,h:p.h});}lampRow(G,L,6.5);}
+  {const cg=new THREE.ConeGeometry(.28,.75,10).translate(0,.375,0),cmM=new THREE.MeshLambertMaterial({color:0xff6a10,emissive:0x401800});const idx=[];
+   for(let i=2;i<N-2;i+=2)if(Math.abs(P[i].k)>.15)idx.push(i);const im=new THREE.InstancedMesh(cg,cmM,Math.max(1,idx.length*2)),o=new THREE.Object3D();let n=0;
+   idx.forEach(i=>{const p=P[i];[-1,1].forEach(sd=>{o.position.set(p.x+p.rx*sd*(W+.75),p.y,p.z+p.rz*sd*(W+.75));o.updateMatrix();im.setMatrixAt(n++,o.matrix);});});im.count=n;G.add(im);}
+  const stopT=signTex('止まれ','#d81e1e','#fff','tri'),hillT=signTex('坂道\n発進','#f2c200','#111','dia'),poleM=new THREE.MeshLambertMaterial({color:0x8d939a});
+  (course.stopI||[]).forEach(o=>{const p=P[o.i];if(!p)return;const ln=new THREE.Mesh(new THREE.PlaneGeometry(W*2,.45).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xf2f2f2,polygonOffset:true,polygonOffsetFactor:-3}));ln.position.set(p.x,p.y+.03,p.z);ln.rotation.y=p.h;G.add(ln);
+    const bx=p.x+p.rx*(W+1.1),bz=p.z+p.rz*(W+1.1);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.6,6),poleM);pole.position.set(bx,p.y+1.3,bz);G.add(pole);
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.3),new THREE.MeshBasicMaterial({map:o.t==='hill'?hillT:stopT,transparent:true,side:THREE.DoubleSide}));sg.position.set(bx,p.y+2.6,bz);sg.rotation.y=p.h+Math.PI;G.add(sg);});
+  {const p=P[Math.min(N-1,30)],sd=-1,off=W+26,bx=p.x+p.rx*sd*off,bz=p.z+p.rz*sd*off;const b=new THREE.Mesh(new THREE.BoxGeometry(34,13,14),new THREE.MeshLambertMaterial({color:0x1b2030,emissive:0xffffff,emissiveMap:winTex}));b.position.set(bx,minY+6.5,bz);b.rotation.y=p.h;G.add(b);
+   const tx=canvasTex(512,96,(g,w,h)=>{g.fillStyle='#16407a';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 52px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('DDDV自動車学校',w/2,h/2+2);});
+   const sg=new THREE.Mesh(new THREE.PlaneGeometry(20,3.75),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(bx+p.rx*7.1,minY+11,bz+p.rz*7.1);sg.rotation.y=p.h+Math.PI/2;G.add(sg);}}
 // 下道：歩道・ビル・ネオン看板・街灯・横断歩道・信号
 function buildStreet(G,r,gy){const W=HALF,lo=r.body,hi=Math.min(N-1,r.to),st=i=>P[i]&&P[i].y-gy<1.5;
   [-1,1].forEach(sd=>{const rows=[];for(let i=lo;i<hi;i+=STEP){const p=P[i];if(!st(i)){if(rows.length>1){G.add(new THREE.Mesh(ribbon(rows.splice(0),{}),new THREE.MeshLambertMaterial({color:0x3b3e45,side:THREE.DoubleSide})));}rows.length=0;continue;}
@@ -1076,10 +1110,11 @@ function buildProfiles(){
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
-  {const urban=course.env==='highway'||course.env==='city',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
+  {const urban=course.env==='highway'||course.env==='city'||course.env==='school',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
     lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=course.order[0];}
+  if(course.stops){course.stopI=course.stops.map(o=>({i:genPts(course.segs.slice(0,o.seg),0).length-1+o.at,t:o.t}));}
   computeWidth();buildScenery();buildProfiles();buildMinimap();
   railGroup.visible=spec.type==='train';
   skid.count=0;skidI=0;demo.s=START_I;demo.v=0;
@@ -1101,8 +1136,8 @@ function resetRace(){
     ps=slots(4);
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
-  } else if(mode==='free'){
-    ps={s:START_I,lat:0};
+  } else if(mode==='free'||mode==='school'){
+    ps={s:mode==='school'?START_I-14:START_I,lat:0};
   } else if(mode==='escape'){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
@@ -1120,7 +1155,7 @@ function resetRace(){
   cpus.forEach(c=>{placeCpu(c);c.ahead=c.s>car.idx||!c.def.cop;});
   if(mode==='escape'){game.bust=0;game.reinf=0;startCopSiren();}
   spawnTraffic();if(mode==='collect')spawnSpots();
-  game.kyo=spec.type==='kyoshu'?{score:100,cd:0,aux:0}:null;$('kyo').hidden=!game.kyo;$('meter').hidden=spec.type!=='taxi';game.fareShown=0;
+  game.kyo=spec.type==='kyoshu'||mode==='school'?{score:100,cd:0,aux:0,wallT:0,chat:8,stops:(mode==='school'&&course.stopI||[]).map(o=>({i:o.i,t:o.t,done:false,stopped:false}))}:null;if(mode==='school')setTimeout(()=>say(KYO,schoolGreet(),3.5),700);$('kyo').hidden=!game.kyo;$('meter').hidden=spec.type!=='taxi';game.fareShown=0;
   game.fb=mode==='free'?{phase:'cruise',next:10,rival:null,me:100,riv:100,wins:0,lost:0,earn:0,enc:0,log:[]}:null;$('spBox').hidden=true;$('btnPA').hidden=mode!=='free';
   if(cpus.length){const c=pick(cpus);setTimeout(()=>say(c.def,pick(c.def.pre),3.2),500);}
 }
@@ -1168,7 +1203,7 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
-let mode=['battle','collect','escape','free'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
+let mode=['battle','collect','escape','free','school'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
 const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
@@ -1275,11 +1310,13 @@ function syncStart(){
   else if(mode==='escape')b.textContent='逃走開始（'+courseOf(escCourse).name+'）';
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
   else if(mode==='free')b.textContent='首都高へ出る（夜の環状）';
+  else if(mode==='school')b.textContent='検定を受ける（'+courseOf(schoolStage).name+'）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  ['gp','battle','garage','parts','collect','escape','free'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  ['gp','battle','garage','parts','collect','escape','free','school'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  if(t==='school'){mode='school';store.set('touge_mode','school');if(!course||course.id!==schoolStage)loadCourse(schoolStage);renderSchool();}
   if(t==='free'){mode='free';store.set('touge_mode','free');if(!course||course.id!=='loop')loadCourse('loop');const b=sj('touge_free_best',null);$('freeBest').textContent=b?'BEST '+b.w+'勝 ／ '+b.km.toFixed(1)+' km':'BEST --';}
   if(t==='gp'){mode='cup';store.set('touge_mode','cup');const id=CUPS[cupIdx].courses[cupState&&cupState.race<3?cupState.race:0];if(!course||course.id!==id)loadCourse(id);}
   if(t==='escape'){mode='escape';store.set('touge_mode','escape');if(!course||course.id!==escCourse)loadCourse(escCourse);renderEsc();}
@@ -1295,6 +1332,7 @@ function startFromMenu(){
   else if(mode==='collect'){if(course.id!=='neon')loadCourse('neon');}
   else if(mode==='escape'){if(course.id!==escCourse)loadCourse(escCourse);}
   else if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}
+  else if(mode==='school'){if(course.id!==schoolStage)loadCourse(schoolStage);}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
@@ -1741,7 +1779,7 @@ function frame(now){
       else game.cprog=Math.max(0,game.cprog-dt*2);
       if(game.left<=0){game.left=0;game.timeUp=true;flash('時間切れ！');finish();}
     }
-    if(game.kyo&&game.state==='race')stepKyo(dt,info);
+    if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
     if(mode==='free'&&game.state==='race')stepFree(dt);
     if(game.state==='race'&&mode!=='free'&&car.idx>=GOAL_I)finish();
   }
@@ -1835,6 +1873,7 @@ function frame(now){
       ge.textContent='ゴールまで '+Math.max(0,Math.round(GOAL_I-car.idx))+' m　追跡 '+cpus.filter(c=>c.def.cop).length+'台'+(game.copDist<200?'（'+Math.round(game.copDist)+' m）':'')+'　捕獲 '+'■'.repeat(n)+'□'.repeat(8-n);
       ge.className=b>.5||game.copDist<12?'':'lead';}
     else if(mode==='free')freeHud(ge);
+    else if(mode==='school')schoolHud(ge);
     if(game.kyo){$('kyoPt').textContent=Math.round(game.kyo.score);$('kyoLim').textContent=kyoLimit();$('kyo').className=game.kyo.score<70?'hud bad':'hud';}
     if(spec.type==='taxi'){const f=taxiFare(),m=$('meter');if(f!==game.fareShown){if(game.fareShown&&ac)beep(2300,.03);game.fareShown=f;$('meterV').textContent=f.toLocaleString();m.classList.add('tick');setTimeout(()=>m.classList.remove('tick'),150);}m.classList.toggle('ck',cockpitOn);}
     else if(mode==='collect'){let nx=null;for(const q of spots)if(!q.done&&q.i>=car.idx-6){nx=q;break;}
@@ -1868,17 +1907,48 @@ function quote(d,t){const q=$('resQuote');q.style.setProperty('--rc',hex(d.col))
 function taxiFare(){if(spec.type!=='taxi')return 0;const d=Math.max(0,P[Math.min(N-1,car.idx)].d-(game.startD||0));return 500+Math.floor(d/300)*100;}
 function familyBonus(){if(spec.type!=='noah'||game.retired)return 0;return Math.max(0,900-game.hits*150-Math.min(450,Math.floor((game.dTotal||0)/40)));}
 const KYO={name:'教官',col:0x5dd6ff};
-function kyoLimit(){if(!course)return 50;if(course.env==='city')return 40;if(course.env==='highway')return P[car.idx]&&P[car.idx].blk==='G'?40:80;return 50;}
+function kyoLimit(){if(!course)return 50;if(course.env==='school'){let m=0;for(let j=Math.max(0,car.idx-4);j<=Math.min(N-1,car.idx+10);j++)m=Math.max(m,Math.abs(P[j].k));return m>.15?15:m>.07?20:course.limit;}if(course.env==='city')return 40;if(course.env==='highway')return P[car.idx]&&P[car.idx].blk==='G'?40:80;return 50;}
 function kyoSay(lines,force){if(!force&&radioCd>0)return;say(KYO,pick(lines),2.6);}
 function stepKyo(dt,info){const k=game.kyo,kmh=Math.max(0,info.vf)*3.6,lim=kyoLimit();k.cd-=dt;
   if(kmh>lim+5){k.score=Math.max(0,k.score-dt*(kmh-lim)/18);if(k.cd<=0){k.cd=4;kyoSay(['速度出しすぎです！','制限速度、見えてますか？','はい、スピード落として。','ここ'+lim+'キロですよ！'],true);}}
   if(kmh>lim+45&&!(k.aux>game.t)){k.aux=game.t+3;car.vx*=.8;car.vz*=.8;k.score=Math.max(0,k.score-5);flash('教官の補助ブレーキ！');kyoSay(['危ない！ 補助ブレーキ踏みますよ！','ちょっと！ 止めます！'],true);}
   if(car.drifting&&car.slip>12){k.score=Math.max(0,k.score-dt*3);if(k.cd<=0){k.cd=4;kyoSay(['いま横向いてましたよね？','教習車でドリフトしない！'],true);}}}
-function kyoBonus(){if(!game.kyo||game.retired)return 0;const sc=Math.round(game.kyo.score);return sc>=70?1200+(sc-70)*20:0;}
+function kyoBonus(){if(!game.kyo||game.retired||mode==='school')return 0;const sc=Math.round(game.kyo.score);return sc>=70?1200+(sc-70)*20:0;}
+const SCHOOL_STAGES=[{id:'sc1',t:'第1段階',reward:600},{id:'sc2',t:'第2段階',reward:800},{id:'sc3',t:'第3段階',reward:1000},{id:'sc4',t:'第4段階',reward:1000},{id:'sc5',t:'卒業検定',reward:3000}];
+let schoolStage=store.get('touge_sc_stage')||'sc1';if(!SCHOOL_STAGES.some(x=>x.id===schoolStage))schoolStage='sc1';
+function schoolOpen(i){if(i===0)return true;const st=sj('touge_school',{});return !!st[SCHOOL_STAGES[i-1].id];}
+function renderSchool(){const l=$('schoolList');l.innerHTML='';const st=sj('touge_school',{});
+  SCHOOL_STAGES.forEach((g,k)=>{const c=courseOf(g.id),open=schoolOpen(k),b=document.createElement('button');b.type='button';b.className='courseBtn'+(g.id===schoolStage?' sel':'');b.disabled=!open;
+    b.innerHTML='<b></b><small></small><small></small>';const sm=b.querySelectorAll('small');b.querySelector('b').textContent=g.t+'　'+c.name;sm[0].textContent=c.sub;
+    sm[1].textContent=!open?'前の段階に合格すると受けられる':st[g.id]?'合格（最高 '+st[g.id]+'点）':'まだ合格していない';
+    b.addEventListener('click',()=>{if(!open)return;schoolStage=g.id;store.set('touge_sc_stage',g.id);loadCourse(g.id);renderSchool();syncStart();});l.appendChild(b);});
+  $('schoolLic').textContent=store.get('touge_license')==='1'?'免許 取得済み':'免許 なし';}
+function schoolGreet(){return ({kyoshu:'よろしくお願いします。シートベルトはしましたか？',tank:'……戦車で受けに来た人は初めてです。',roller:'ローラーは…まあ、遅いからいいでしょう。',dashi:'山車は免許いらないと思いますよ…？',bike:'自転車は免許いりません！',train:'電車は…線路の上なら…いや、線路ないです。',sled:'ソリ…？ 雪、降ってませんよ。',packer:'収集車ですか。お仕事おつかれさまです。',fork:'フォークリフトは構内専用ですよ。ここも構内ですけど。',police:'…お巡りさんが受けるんですか？',taxi:'二種免許の検定はやってないんですけどね。',alph:'ローンの車で受験…傷つけないでくださいね。',boss:'その車…ただ者じゃないですね。'})[spec.type]||'自分の車で受けるんですか？ では始めましょう。';}
+const SCHOOL_CHAT=['今日はいい夜ですね。','私も昔は峠を…いや、なんでもないです。','ミラー見てますか？','目線、もっと先です。','肩の力抜いていきましょう。','このあと夜の部の教習もあるんですよ。','ハンドルは送りハンドルで。','焦らなくていいですからね。'];
+function stepSchool(dt,info){const k=game.kyo,sp=Math.max(0,info.vf);
+  if(car.wall&&game.t>k.wallT){k.wallT=game.t+1.5;k.score=Math.max(0,k.score-4);kyoSay(Math.abs(P[car.idx].k)>.07?['縁石に乗りました。減点4。','いま脱輪しましたね。','ポール、気をつけて！']:['左寄りすぎです、縁石当たってますよ。','脱輪。減点4。'],true);}
+  for(const o of k.stops){if(o.done)continue;const g=o.i-car.idx;
+    if(!o.stopped&&g<=6&&g>=-2&&sp<.7){o.stopped=true;o.stopIdx=car.idx;if(o.t==='hill'){flash('停止OK。下がらないように発進');kyoSay(['はい、止まりました。ではゆっくり発進。','いいですね。下がらないように。'],true);}else{flash('一時停止OK');kyoSay(['はい、ちゃんと止まれましたね。','いい停止です。'],true);}}
+    if(o.stopped&&o.t==='hill'&&!o.rolled&&car.idx<o.stopIdx-2){o.rolled=true;k.score=Math.max(0,k.score-10);flash('ずり下がり −10');kyoSay(['下がってます！ 下がってます！','ずり下がりました。減点10。'],true);}
+    if(g<-3){o.done=true;if(!o.stopped){const pen=o.t==='hill'?15:20;k.score=Math.max(0,k.score-pen);flash((o.t==='hill'?'停止せず':'一時不停止')+' −'+pen);kyoSay(['いま止まってませんよね！？','止まれって書いてありましたよ…','一時不停止。これは大きいです。'],true);}}}
+  k.chat-=dt;if(k.chat<=0){k.chat=12+Math.random()*8;if(radioCd<=0)say(KYO,pick(SCHOOL_CHAT),3);}
+  if(k.score<=0&&!game.schoolAbort){game.schoolAbort=true;flash('検定中止');say(KYO,'はい、ここで検定中止です。',3);finish();}}
+function schoolHud(ge){const k=game.kyo;if(!k)return;let nx=null;for(const o of k.stops)if(!o.done){nx=o;break;}
+  const left=Math.max(0,Math.round(GOAL_I-car.idx));ge.textContent=(nx?(nx.stopped?(nx.t==='hill'?'坂道発進中':'停止OK'):(nx.t==='hill'?'坂道の停止線まで ':'止まれ まで ')+Math.max(0,Math.round(nx.i-car.idx))+' m'):'ゴールまで '+left+' m')+'　制限 '+kyoLimit()+' km/h';ge.className=k.score>=70?'lead':'';}
+function finishSchool(){const k=game.kyo||{score:0},sc=Math.round(k.score),abort=!!game.schoolAbort||game.retired,pass=!abort&&sc>=70,g=SCHOOL_STAGES.find(x=>x.id===course.id)||SCHOOL_STAGES[0];
+  const st=sj('touge_school',{}),first=pass&&!st[g.id];if(pass){st[g.id]=Math.max(st[g.id]||0,sc);store.set('touge_school',JSON.stringify(st));}
+  const pPass=pass?g.reward:0,pScore=pass?(sc-70)*15:0,pFirst=first?g.reward:0,earned=Math.max(100,pPass+pScore+pFirst);wallet+=earned;
+  const lic=pass&&g.id==='sc5'&&store.get('touge_license')!=='1';if(lic){store.set('touge_license','1');setTimeout(()=>flash('免許取得！ おめでとうございます'),1900);}
+  $('resKick').textContent='DDDV自動車学校 ／ '+g.t+' '+course.name;
+  $('resHead').textContent=abort?'検定中止':pass?(g.id==='sc5'?'卒業！':'合格'):'不合格';$('resHead').className='res-big '+(pass?'win':'lose');
+  $('resSub').textContent=sc+'点'+(pass?'で合格。':abort?'。途中で検定中止になった。':'。70点に届かなかった。')+(lic?'これで免許取得。もう教習車じゃなくても公道を…いや、もとから走ってた。':pass&&g.id!=='sc5'?'次の段階に進める。':'');
+  quote(KYO,abort?'今日はここまでにしましょう。':pass?(g.id==='sc5'?'卒業おめでとう。安全運転でね。':'はい、合格です。お疲れさまでした。'):'残念ですが、また来週。');
+  addRows([[g.t+' '+(pass?'合格':'不合格')+'（'+sc+'点）',pPass]].concat(pass?[['点数ボーナス',pScore]]:[],first?[['初合格ボーナス',pFirst]]:[]));addTotal(earned);
+  $('btnRetry').textContent=pass&&g.id!=='sc5'?'もう一回':'もう一回受ける';$('btnMenu').hidden=false;game.schoolAbort=false;}
 function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
 function zanCalc(){const ids=zanList();if(!ids.length){game.zanC=null;return null;}const L=zanM[spec.id],lost=1-car.hp/spec.hpMax,sat=L&&L.d>0&&lost>.05?Math.round(lost*(spec.id==='alph'?3000:Math.max(1000,(CARS.find(c=>c.id===spec.id)||{price:0}).price*.2))/100)*100:0;
   const want=ids.reduce((a,k)=>a+Math.min(zanM[k].p,zanM[k].d+(k===spec.id?sat:0)),0);game.zanC={sat,want,n:ids.length};return game.zanC;}
-function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い（'+z.n+'台）',-z.want]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(spec.type==='noah')rows=rows.concat([['家族の笑顔（接触 '+game.hits+'回）',familyBonus()]]);if(game.kyo){const sc=Math.round(game.kyo.score);rows=rows.concat([['検定 '+sc+'点 '+(game.retired?'中止':sc>=70?'合格':'不合格'),kyoBonus()]]);setTimeout(()=>say(KYO,game.retired?'…検定中止です。':sc>=70?'はい、合格です。お疲れさまでした。':'残念ですが、不合格です。また来週。',4),2000);}if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
+function addRows(rows){{const z=zanCalc();if(z){if(z.sat)rows=rows.concat([['査定減額（傷 '+Math.round((1-car.hp/spec.hpMax)*100)+'%）→ 残債に上乗せ','+'+z.sat.toLocaleString()+' P']]);rows=rows.concat([['残クレ 月々のお支払い（'+z.n+'台）',-z.want]]);}}{const f=taxiFare();if(f)rows=rows.concat([['運賃（'+((P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000).toFixed(1)+' km）',f]]);}if(spec.type==='noah')rows=rows.concat([['家族の笑顔（接触 '+game.hits+'回）',familyBonus()]]);if(game.kyo&&mode!=='school'){const sc=Math.round(game.kyo.score);rows=rows.concat([['検定 '+sc+'点 '+(game.retired?'中止':sc>=70?'合格':'不合格'),kyoBonus()]]);setTimeout(()=>say(KYO,game.retired?'…検定中止です。':sc>=70?'はい、合格です。お疲れさまでした。':'残念ですが、不合格です。また来週。',4),2000);}if(soryaBonus())rows=rows.concat([['そーりゃ '+game.soryaN+'回',game.soryaN*12],['最大コンボ ×'+game.maxCombo,game.maxCombo*20]]);const e=$('earn');e.innerHTML='';
   rows.forEach(([l,v])=>{const a=document.createElement('span');a.textContent=l;const b=document.createElement('span');b.textContent=typeof v==='number'?(v<0?'−':'+')+Math.abs(v).toLocaleString():v;e.append(a,b);});}
 function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus()+kyoBonus();if(b){wallet+=b;earned+=b;}}{const z=game.zanC;if(z){if(z.sat&&zanM[spec.id])zanM[spec.id].d+=z.sat;let paid=0,short=false;const done=[];zanList().forEach(k=>{const L=zanM[k],w=Math.min(L.p,L.d),pay=Math.min(w,Math.max(0,wallet));wallet-=pay;paid+=pay;L.d-=pay;if(pay<w)short=true;if(L.d<=0)done.push(k);});earned-=paid;if(short)zanLate++;else zanLate=0;let repo=null;
   if(short&&zanLate>=3){const ids=zanList();const id=ids.includes(spec.id)?spec.id:ids.sort((a,b)=>zanM[b].d-zanM[a].d)[0];if(id){repo=id;delete zanM[id];owned=owned.filter(x=>x!==id);store.set('touge_own',JSON.stringify(owned));zanLate=0;if(id===selId){repoId=id;setTimeout(()=>{if(repoId===id){repoId=null;swapCar(owned.includes('86')?'86':owned[0]);}},0);}}}
@@ -1889,13 +1959,13 @@ function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus()+kyoBonu
 function addTotalRest(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
 function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
   $('btnPA').hidden=true;$('spBox').hidden=true;
   if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
-  if(mode==='free')finishFree();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
+  if(mode==='free')finishFree();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
 }
