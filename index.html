@@ -169,6 +169,19 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .btnRow .go{flex:1}
 .go.sub{background:transparent;color:var(--sodium);border:1px solid var(--sodium);box-shadow:none}
 @media (max-width:520px){.carList{grid-template-columns:repeat(2,minmax(0,1fr))}.carInfo{grid-template-columns:1fr}}
+.gFilter{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.gFilter button{font-family:var(--f-body);font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid rgba(159,182,255,.25);background:transparent;color:var(--dim);cursor:pointer}
+.gFilter button small{font-family:var(--f-num);font-weight:400;margin-left:4px;opacity:.8}
+.gFilter button[aria-pressed="true"]{background:var(--sodium-soft);border-color:var(--sodium);color:var(--ink)}
+.gFilter button:focus-visible{outline:2px solid var(--moon);outline-offset:2px}
+.gBody{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px;align-items:start}
+.gBody .carList{max-height:min(54vh,470px);overflow-y:auto;overscroll-behavior:contain;padding:2px 6px 2px 2px;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));align-content:start;scrollbar-width:thin}
+.gBody .carBtn{padding:6px 7px;gap:4px}.gBody .carBtn .th{height:42px}.gBody .carBtn b{font-size:12.5px;line-height:1.3}.gBody .carBtn small{font-size:11px}.gBody .carBtn .sw{height:5px}
+.gBody .carInfo{grid-template-columns:1fr;position:sticky;top:0;max-height:min(54vh,470px);overflow-y:auto}
+.gBody .carInfo .act{flex-direction:row;flex-wrap:wrap}
+.gEmpty{grid-column:1/-1;font-size:12px;color:var(--dim);padding:12px}
+@media (max-width:700px){.gBody{grid-template-columns:1fr}.gBody .carInfo{order:-1;position:static;max-height:none}.gBody .carList{max-height:42vh;grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:420px){.gBody .carList{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kicker{font-size:12px;letter-spacing:.3em;color:var(--moon)}
 h1{margin:0;font-family:var(--f-disp);font-weight:400;font-size:clamp(40px,11vw,72px);line-height:1;text-wrap:balance;letter-spacing:.02em}
 h1 em{font-style:normal;color:var(--sodium);text-shadow:0 0 26px rgba(255,174,66,.5);font-size:clamp(56px,16vw,104px);letter-spacing:.08em;display:block}
@@ -277,8 +290,11 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     </section>
     <section class="pane" id="pane-garage" role="tabpanel" hidden>
       <div class="garage">
-        <div class="carList" id="carList"></div>
-        <div class="carInfo" id="carInfo"></div>
+        <div class="gFilter" id="gFilter" role="group" aria-label="車の種類"></div>
+        <div class="gBody">
+          <div class="carList" id="carList"></div>
+          <div class="carInfo" id="carInfo"></div>
+        </div>
       </div>
     </section>
     <section class="pane" id="pane-collect" role="tabpanel" hidden>
@@ -1279,9 +1295,17 @@ function renderParts(){
     else{btn.textContent=nx.n+'　あと '+(nx.p-wallet).toLocaleString()+' P';btn.disabled=true;}
     d.querySelector('.act').appendChild(btn);box.appendChild(d);});
 }
+const CAR_CAT={'86':'run',fr:'run',re:'run','4wd':'run',boss:'run',nbox:'town',tanto:'town',alph:'town',noah:'town',taxi:'town',kyoshu:'town',kei:'work',packer:'work',fork:'work',police:'work',roller:'work',train:'neta',bike:'neta',tank:'neta',sled:'neta',dashi:'neta',hokora:'friend',ita86:'friend'};
+const CAT_NAMES=[['all','すべて'],['own','所有'],['run','走り屋'],['town','街の車'],['work','はたらく車'],['neta','ネタ'],['friend','友達']];
+let gFilt=store.get('touge_gfilt')||'all';
 function renderGarage(){
-  const list=$('carList');list.innerHTML='';
-  CARS.forEach(c=>{const b=document.createElement('button');b.type='button';
+  {const f=$('gFilter');if(f){f.innerHTML='';CAT_NAMES.forEach(([k,n])=>{const cnt=k==='all'?CARS.length:k==='own'?owned.filter(id=>CARS.some(c=>c.id===id)).length:CARS.filter(c=>(CAR_CAT[c.id]||'neta')===k).length;if(!cnt&&k!=='own')return;
+    const b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',gFilt===k);b.innerHTML=n+'<small></small>';b.querySelector('small').textContent=k==='own'?cnt+'/'+CARS.length:cnt;
+    b.addEventListener('click',()=>{gFilt=k;store.set('touge_gfilt',k);$('carList').scrollTop=0;renderGarage();});f.appendChild(b);});}}
+  const list=$('carList'),keep=list.scrollTop;list.innerHTML='';
+  const shown=CARS.filter(c=>gFilt==='all'||(gFilt==='own'?owned.includes(c.id):(CAR_CAT[c.id]||'neta')===gFilt));
+  if(!shown.length){const e=document.createElement('div');e.className='gEmpty';e.textContent='この種類の車はまだない';list.appendChild(e);}
+  shown.forEach(c=>{const b=document.createElement('button');b.type='button';
     const own=owned.includes(c.id),sel=c.id===selId;
     b.className='carBtn'+(own?' owned':'')+(sel?' sel':'')+(c.id===focusId?' focus':'');
     b.innerHTML=(c.img?'<img alt="" class="th">':'')+'<span class="sw"><i></i><i></i></span><b></b><small></small>';if(c.img)b.querySelector('.th').src=c.wingAlt&&wingOn(c.id)?'cars/'+c.wingAlt+'-diag.png':c.img;
@@ -1290,6 +1314,7 @@ function renderGarage(){
     b.querySelector('small').textContent=sel?'選択中':own?'所有':c.price.toLocaleString()+' P';
     b.addEventListener('click',()=>{focusId=c.id;if(owned.includes(c.id)&&c.id!==selId)swapCar(c.id);renderGarage();});
     list.appendChild(b);});
+  list.scrollTop=keep;
   const c=CARS.find(x=>x.id===focusId),info=$('carInfo');
   const own=owned.includes(c.id);
   info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div>';
