@@ -285,7 +285,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     </section>
     <section class="pane" id="pane-free" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
-      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに区間が切り替わる。海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>、海の上の<b>レインボーブリッジ</b>、長い<b>山手トンネル</b>、高架が重なる<b>箱崎ジャンクション</b>。区間の順番は走るたびに変わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
+      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに区間が切り替わる。海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>、海の上の<b>レインボーブリッジ</b>、長い<b>山手トンネル</b>、高架が重なる<b>箱崎ジャンクション</b>、出口を降りて夜の街を抜ける<b>一般道</b>。区間の順番は走るたびに変わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
       <p class="lede" style="font-size:12px">バトルはSPゲージの削り合い。前にいれば相手のSPが、後ろにいれば自分のSPが減っていき、離れるほど速く減る。壁にぶつけても自分のSPが減る。相手のSPを0にすれば勝ち。5勝するごとに「首都高の主」が現れる。</p>
       <p class="lede" style="font-size:12px">やめる時は画面上の<b>「PAに入る」</b>（Pキー）。そこまでのバトルの賞金と走行距離ぶんのポイントがもらえる。大破すると稼ぎは半分になる。</p></div>
     </section>
@@ -372,17 +372,19 @@ const LOOP_BODY={
   Y:[['S',250,0],['C',220,-35,0],['S',200,0],['C',160,50,0],['S',260,0],['C',300,-30,0],['S',180,0],['C',140,40,0],['S',220,0],['C',240,-25,0],['S',200,0]],
   B:[['S',300,0],['C',900,8,0],['S',500,0],['C',900,-8,0],['S',600,0],['C',500,-10,0],['S',300,0],['C',500,10,0],['S',200,0]],
   K:[['S',100,0],['S',300,0,'T'],['C',600,20,0,'T'],['S',400,0,'T'],['C',500,-30,0,'T'],['S',350,0,'T'],['C',700,10,0,'T'],['S',200,0,'T'],['S',100,0]],
-  J:[['S',150,0],['C',110,40,0],['S',100,0],['C',90,-65,0],['S',120,0],['C',140,50,0],['S',90,0],['C',100,-25,0],['S',200,0]]};
+  J:[['S',150,0],['C',110,40,0],['S',100,0],['C',90,-65,0],['S',120,0],['C',140,50,0],['S',90,0],['C',100,-25,0],['S',200,0]],
+  G:[['S',80,0],['S',220,.1],['S',60,0],['C',30,90,0],['S',140,0],['C',30,-90,0],['S',200,0],['C',30,-90,0],['S',120,0],['C',30,90,0],['S',60,0],['S',220,-.1],['S',80,0]]};
 const SECT={
   W:{name:'湾岸線',sub:'海沿いの長い直線',signs:['湾岸線 東京港','大井 2km','羽田空港','EXIT 有明','台場 1km'],dens:.3,o0:220,o1:650,h0:20,h1:90,sea:true},
   C:{name:'C1 都心環状',sub:'ビルの谷間とトンネル',signs:['C1 都心環状','銀座 1km','霞が関 出口','EXIT 汐留','江戸橋JCT'],dens:1,o0:14,o1:110,h0:30,h1:170},
   Y:{name:'横羽線',sub:'防音壁の高架',signs:['横羽線','羽田 3km','浜崎橋JCT','EXIT 芝浦','大師 2km'],dens:.55,o0:45,o1:320,h0:15,h1:110,wall:true},
   B:{name:'レインボーブリッジ',sub:'海の上の吊り橋',signs:['レインボーブリッジ','芝浦 2km','台場 出口','EXIT 芝浦ふ頭'],dens:.12,o0:700,o1:1100,h0:30,h1:120,sea:true,sea2:true,bridge:true},
   K:{name:'山手トンネル',sub:'地下を抜ける長いトンネル',signs:['山手トンネル','西新宿JCT 2km','大橋JCT','EXIT 富ヶ谷'],dens:.5,o0:30,o1:250,h0:20,h1:120},
+  G:{name:'一般道（銀座）',sub:'出口を降りて夜の街を抜ける',signs:['EXIT 銀座','銀座四丁目','京橋 0.5km','入口 → 首都高'],dens:0,o0:0,o1:1,h0:0,h1:1,street:true},
   J:{name:'箱崎ジャンクション',sub:'高架が重なり合う分岐',signs:['箱崎JCT','向島線','深川線','EXIT 浜町','両国 1km'],dens:.9,o0:22,o1:160,h0:20,h1:130,jct:true}};
 const LOOP_LEAD=60;
-function makeLoopOrder(){const pick=a=>a[Math.random()*a.length|0],T='WCYBKJ'.split('');for(let tries=0;tries<200;tries++){const o=T.slice().sort(()=>Math.random()-.5).concat([pick(T),pick(T)]).sort(()=>Math.random()-.5);
-    let ok=true;for(let i=1;i<o.length;i++)if(o[i]===o[i-1])ok=false;if(o[o.length-1]===o[0])ok=false;if(ok)return o.join('');}return 'WCYBKJCY';}
+function makeLoopOrder(){const pick=a=>a[Math.random()*a.length|0],T='WCYBKJG'.split('');for(let tries=0;tries<300;tries++){const o=T.slice().sort(()=>Math.random()-.5).concat([pick(T)]).sort(()=>Math.random()-.5);
+    let ok=true;for(let i=1;i<o.length;i++)if(o[i]===o[i-1])ok=false;if(o[o.length-1]===o[0])ok=false;if(ok)return o.join('');}return 'WCYGBKJC';}
 function loopSegs(order){return [['S',LOOP_LEAD,0]].concat(...order.split('').map(k=>LOOP_TUN.concat(LOOP_BODY[k])),LOOP_TUN,[['S',900,0]]);}
 function loopLayout(order){const cnt=x=>genPts(x,0).length-1,tn=cnt(LOOP_TUN);let i=LOOP_LEAD;const r=[];
   for(const k of order){const a=i;i+=tn;const b=i;i+=cnt(LOOP_BODY[k]);r.push({k,from:a,body:b,to:i});}
@@ -616,19 +618,20 @@ function lampRow(G,list,poleH){ // list:[{x,z,y,hx,hz,h}]
     o.position.set(l.hx,l.y+.05,l.hz);o.updateMatrix();pool.setMatrixAt(k,o.matrix);});
   G.add(pole,head,pool);}
 function buildHighway(G){
-  const W=HALF;let minY=1e9,cx=0,cz=0;P.forEach(p=>{minY=Math.min(minY,p.y);cx+=p.x;cz+=p.z;});cx/=N;cz/=N;const gy=minY-22;
+  const W=HALF;let minY=1e9,cx=0,cz=0;P.forEach(p=>{if(p.blk!=='G')minY=Math.min(minY,p.y);cx+=p.x;cz+=p.z;});cx/=N;cz/=N;const gy=minY-22-(course.loop?.06:0);
+  const onSt=p=>p.blk==='G'&&p.y-gy<1.5;
   const conc=new THREE.MeshLambertMaterial({color:0x8a8d93,side:THREE.DoubleSide});
   // 壁と高架の床
   [-1,1].forEach(sd=>{const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i],pt=(a,b)=>[p.x+p.rx*sd*a,p.y+b,p.z+p.rz*sd*a];
-      rows.push([[...pt(W+.2,0),0,0],[...pt(W+.2,1.1),.3,0],[...pt(W+.6,1.1),.4,0],[...pt(W+.6,-1.3),1,0]]);}
+      const wh=onSt(p)?.22:1.1;rows.push([[...pt(W+.2,0),0,0],[...pt(W+.2,wh),.3,0],[...pt(W+.6,wh),.4,0],[...pt(W+.6,-1.3),1,0]]);}
     G.add(new THREE.Mesh(ribbon(rows,{}),conc));
-    const pan=[];for(let i=0;i<N;i+=STEP){const p=P[i];if(p.T){pan.push([[p.x,p.y-50,p.z,0,0],[p.x,p.y-50,p.z,1,0]]);continue;}const a=W+.5,ph=p.blk&&SECT[p.blk].wall?6.2:3.2;pan.push([[p.x+p.rx*sd*a,p.y+1.1,p.z+p.rz*sd*a,0,0],[p.x+p.rx*sd*a,p.y+ph,p.z+p.rz*sd*a,1,0]]);}
+    const pan=[];for(let i=0;i<N;i+=STEP){const p=P[i];if(p.T){pan.push([[p.x,p.y-50,p.z,0,0],[p.x,p.y-50,p.z,1,0]]);continue;}const a=W+.5,ph=onSt(p)||p.blk==='G'&&p.y-gy<8?1.1:p.blk&&SECT[p.blk].wall?6.2:3.2;pan.push([[p.x+p.rx*sd*a,p.y+1.1,p.z+p.rz*sd*a,0,0],[p.x+p.rx*sd*a,p.y+ph,p.z+p.rz*sd*a,1,0]]);}
     G.add(new THREE.Mesh(ribbon(pan,{}),new THREE.MeshLambertMaterial({color:0x3a4a6a,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false})));});
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x-p.rx*(W+.6),p.y-1.3,p.z-p.rz*(W+.6),0,0],[p.x+p.rx*(W+.6),p.y-1.3,p.z+p.rz*(W+.6),1,0]]);}
    G.add(new THREE.Mesh(ribbon(rows,{}),conc));}
   // 柱
   {const idx=[];for(let i=10;i<N;i+=40)if(!P[i].T)idx.push(i);const m=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0x5e6168}),idx.length),o=new THREE.Object3D();
-   idx.forEach((i,k)=>{const p=P[i],h=p.y-1.3-gy;o.position.set(p.x,gy+h/2,p.z);o.rotation.set(0,p.h,0);o.scale.set(3,h,2.4);o.updateMatrix();m.setMatrixAt(k,o.matrix);});G.add(m);}
+   idx.forEach((i,k)=>{const p=P[i],h=Math.max(.01,p.y-1.3-gy);if(h<2.5){o.position.set(0,-999,0);o.scale.set(.01,.01,.01);o.updateMatrix();m.setMatrixAt(k,o.matrix);return;}o.position.set(p.x,gy+h/2,p.z);o.rotation.set(0,p.h,0);o.scale.set(3,h,2.4);o.updateMatrix();m.setMatrixAt(k,o.matrix);});G.add(m);}
   // 地面と街の灯り
   {let ex=0;P.forEach(p=>{ex=Math.max(ex,Math.abs(p.x-cx),Math.abs(p.z-cz));});const gs=Math.max(4000,ex*2+2000);
    const m=new THREE.Mesh(new THREE.PlaneGeometry(gs,gs),new THREE.MeshLambertMaterial({color:0x0b0d14}));m.rotation.x=-Math.PI/2;m.position.set(cx,gy,cz);G.add(m);
@@ -646,7 +649,7 @@ function buildHighway(G){
   if(course.sect){const seaM=new THREE.MeshPhongMaterial({color:0x0a1830,emissive:0x040a16,specular:0x6f86c8,shininess:60,side:THREE.DoubleSide});
    course.sect.forEach(r=>{const cf=SECT[r.k];if(!cf.sea)return;(cf.sea2?[1,-1]:[1]).forEach(sd=>{const rows=[];for(let i=Math.max(0,r.body-40);i<Math.min(N,r.to+40);i+=8){const p=P[i];rows.push([[p.x+p.rx*sd*(W+30),gy+1.5,p.z+p.rz*sd*(W+30),0,0],[p.x+p.rx*sd*(W+1400),gy+1.5,p.z+p.rz*sd*(W+1400),1,0]]);}
      if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),seaM));});});
-   course.sect.forEach(r=>{const cf=SECT[r.k];if(r.to>N)return;if(cf.bridge)buildBridge(G,r,gy);if(cf.jct)buildJct(G,r,gy);});}
+   course.sect.forEach(r=>{const cf=SECT[r.k];if(r.to>N)return;if(cf.bridge)buildBridge(G,r,gy);if(cf.jct)buildJct(G,r,gy);if(cf.street)buildStreet(G,r,gy);});}
   // 照明（左右交互）
   {const L=[];let sd=1;for(let i=20;i<N;i+=40){const p=P[i];sd=-sd;if(p.T)continue;const b=W+.4,hh=W-2.2;L.push({x:p.x+p.rx*sd*b,z:p.z+p.rz*sd*b,y:p.y+1.1,hx:p.x+p.rx*sd*hh,hz:p.z+p.rz*sd*hh,h:p.h});}
    lampRow(G,L,8.4);
@@ -676,6 +679,30 @@ function buildBridge(G,r,gy){const W=HALF,a=r.body+260,b=r.body+1500;if(b>=r.to-
   const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));G.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xb8c4d8})));
   const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));pg.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
   G.add(new THREE.Points(pg,new THREE.PointsMaterial({size:3,sizeAttenuation:false,vertexColors:true})));}
+// 下道：歩道・ビル・ネオン看板・街灯・横断歩道・信号
+function buildStreet(G,r,gy){const W=HALF,lo=r.body,hi=Math.min(N-1,r.to),st=i=>P[i]&&P[i].y-gy<1.5;
+  [-1,1].forEach(sd=>{const rows=[];for(let i=lo;i<hi;i+=STEP){const p=P[i];if(!st(i)){if(rows.length>1){G.add(new THREE.Mesh(ribbon(rows.splice(0),{}),new THREE.MeshLambertMaterial({color:0x3b3e45,side:THREE.DoubleSide})));}rows.length=0;continue;}
+      const pt=a=>[p.x+p.rx*sd*a,p.z+p.rz*sd*a],a=pt(W+.6),b=pt(W+4);rows.push([[a[0],p.y+.15,a[1],0,0],[b[0],p.y+.15,b[1],1,0]]);}
+    if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({color:0x3b3e45,side:THREE.DoubleSide})));});
+  const list=[],signs=[];
+  [-1,1].forEach(sd=>{for(let i=lo+4;i<hi-4;i+=14){if(!st(i))continue;const p=P[i];if(Math.abs(p.k)>.02)continue;
+    const d=10+Math.random()*10,w=11+Math.random()*4,off=W+4.4+d/2,x=p.x+p.rx*sd*off,z=p.z+p.rz*sd*off;
+    if(nearRoad(x,z,W+4+Math.max(d,w)/2,i-9,i+9))continue;list.push({x,z,y:gy,w,d,h:12+Math.random()*Math.random()*60,r:p.h});
+    if(Math.random()<.7){const f=W+4.35,sx=p.x+p.rx*sd*f,sz=p.z+p.rz*sd*f,vert=Math.random()<.3;signs.push({x:sx,z:sz,y:p.y+(vert?6:3.6+Math.random()*4),r:p.h+(sd>0?-Math.PI/2:Math.PI/2),t:Math.random()*neonTex.length|0,vert});}}});
+  cityBlocks(G,list);
+  const glowM=[330,190,50,280,120,15].map(hh=>{const c=new THREE.Color().setHSL(hh/360,1,.6);return new THREE.SpriteMaterial({map:glowTex(`rgba(${c.r*255|0},${c.g*255|0},${c.b*255|0},.6)`),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});});
+  const neonM=neonTex.map(t=>new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide})),signG=new THREE.PlaneGeometry(4.6,1.7);
+  signs.forEach(sg=>{const m=new THREE.Mesh(signG,neonM[sg.t]);m.position.set(sg.x,sg.y,sg.z);m.rotation.set(0,sg.r,sg.vert?Math.PI/2:0);G.add(m);
+    const gl=new THREE.Sprite(glowM[sg.t%6]);gl.scale.set(7,4,1);gl.position.set(sg.x,sg.y,sg.z);G.add(gl);});
+  const cm=new THREE.MeshBasicMaterial({map:crossTex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3});
+  const sigRed=new THREE.SpriteMaterial({map:glowTex('rgba(255,60,50,1)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}),sigGrn=new THREE.SpriteMaterial({map:glowTex('rgba(60,255,170,1)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+  const poleM=new THREE.MeshLambertMaterial({color:0x5b6068});
+  for(let i=lo+2;i<hi-2;i++){if(!st(i))continue;const a=Math.abs(P[i-1].k)>.02,b=Math.abs(P[i].k)>.02;if(a===b)continue;const j=a?Math.min(N-1,i+6):Math.max(0,i-6),p=P[j];
+    const c=new THREE.Mesh(new THREE.PlaneGeometry(W*2,3).rotateX(-Math.PI/2),cm);c.position.set(p.x,p.y+.03,p.z);c.rotation.y=p.h;G.add(c);
+    if(!a){const sd=1,bx=p.x+p.rx*sd*(W+1.2),bz=p.z+p.rz*sd*(W+1.2);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.14,5.6,6),poleM);pole.position.set(bx,p.y+2.8,bz);G.add(pole);
+      const arm=new THREE.Mesh(new THREE.BoxGeometry(W*1.1,.15,.15),poleM);const ax=bx-p.rx*W*.55,az=bz-p.rz*W*.55;arm.position.set(ax,p.y+5.5,az);arm.rotation.y=p.h+Math.PI/2;G.add(arm);
+      const box=new THREE.Mesh(new THREE.BoxGeometry(1.6,.5,.4),new THREE.MeshLambertMaterial({color:0x22252b}));box.position.set(ax,p.y+5.2,az);box.rotation.y=p.h;G.add(box);
+      const l=new THREE.Sprite(Math.random()<.5?sigRed:sigGrn);l.scale.set(1.6,1.6,1);l.position.set(ax-Math.sin(p.h)*.3,p.y+5.2,az-Math.cos(p.h)*.3);G.add(l);}}}
 // ジャンクション：頭上を斜めに横切る高架と、その柱
 function buildJct(G,r,gy){const W=HALF,conc=new THREE.MeshLambertMaterial({color:0x7c8088}),dm=new THREE.MeshLambertMaterial({color:0x5c6068});
   const lampM=new THREE.SpriteMaterial({map:glowTex('rgba(255,200,120,.8)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
