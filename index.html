@@ -1132,6 +1132,16 @@ const FRIEND_RIVALS={
   astarte:{name:'アスターテ',car:'クラシックロードスター',col:0xbfc8ff,bot:0x2a2d33,shape:'coupe',sprite:'astarte',fav:'ridge',
     pre:['星の巡りは…悪くないわね。始めましょうか。','この子、古いけど速いのよ。','今夜の月は、どっちに味方するかしら。'],passed:['…やるわね。','そのライン、覚えておくわ。'],pass:['お先に。','風が、こっちに吹いてる。'],
     win:'星が味方してくれたみたい。',lose:'ふふ、いい走りだったわ。また走りましょう。'}};
+Object.assign(DRIVERS,{
+  packer:{name:'収集車の田中',car:'ゴミ収集車',col:0x1f5fd0,bot:0x22252b,shape:'truck',sprite:'packer',type:'packer',fav:'neon',pre:['朝の回収前にひとっ走りだ。','この街のゴミ置き場は全部頭に入ってる。'],passed:['おっと、速いな！'],pass:['回収車が通りまーす！'],win:'収集完了！',lose:'次の回収日に覚えてろよ。'},
+  fireman:{name:'消防士 赤城',car:'消防車',col:0xd8141c,bot:0xd8dade,shape:'truck',sprite:'fire',type:'fire',fav:'c1',pre:['出動準備よし！','火の用心だ、安全運転でな！'],passed:['なっ、消防車を抜くとは！'],pass:['緊急車両が通るぞ！'],win:'鎮火完了。',lose:'…訓練が足りなかったか。'},
+  medic:{name:'救急隊 白石',car:'救急車',col:0xf4f4f4,bot:0xd8141c,shape:'hatch',sprite:'amb',type:'amb',fav:'lake',pre:['患者さんは乗せてません、今日は本気です。','急ぎつつ、やさしく。'],passed:['くっ…！'],pass:['道をあけてくださーい！'],win:'搬送完了です。',lose:'お見事でした。'},
+  mixerman:{name:'生コンの剛',car:'ミキサー車',col:0x1f4fd8,bot:0xf2f2f2,shape:'truck',sprite:'mixer',type:'mixer',fav:'neon',pre:['生コンは固まる前に運ぶのが勝負よ！','ドラム、回しっぱなしでいくぜ。'],passed:['おいおい、生コン積んでんだぞ！'],pass:['固まる前にどきな！'],win:'打設完了！',lose:'…生コン、固まっちまった。'},
+  tanker:{name:'戦車長',car:'61式戦車',col:0x6b7a3a,bot:0x3a3f2a,shape:'sedan',sprite:'tank',type:'tank',fav:'down',pre:['前進！','履帯の音、聞かせてやる。'],passed:['被弾…いや、抜かれた！'],pass:['戦車前へ！'],win:'作戦完了。',lose:'撤退する…！'},
+  danjiri:{name:'若頭',car:'山車（だんじり）',col:0x8a5a2b,bot:0x3a2a1c,shape:'truck',sprite:'dashi',type:'dashi',fav:'tsuzura',pre:['そーりゃ！ そーりゃ！','やりまわし、見せたるで！'],passed:['なんやて!?'],pass:['どいたどいたー！'],win:'今年の祭りはワシらの勝ちや！',lose:'来年は負けへんで…！'},
+  hearseman:{name:'葬儀社の黒田',car:'宮型霊柩車',col:0x111214,bot:0xc8a030,shape:'sedan',sprite:'hearse',type:'hearse',fav:'down',pre:['…お静かに願います。','本日はお日柄も…いえ。'],passed:['…お見事です。'],pass:['失礼いたします。'],win:'滞りなく。',lose:'…ご愁傷さまでした、私の。'},
+  cartboy:{name:'カートの少年',car:'ショッピングカート',col:0xb8bcc4,bot:0x1f4fd8,shape:'hatch',sprite:'cart',type:'cart',fav:'tsuzura',pre:['お母さんに怒られる前に帰る！','下りなら負けないもん！'],passed:['ずるい〜！'],pass:['いっけー！'],win:'やったー！ アイス買ってもらう！',lose:'うぅ…カートかえしてくる…'}});
+Object.assign(DRIVERS,{shii:FRIEND_RIVALS.shii,umi:FRIEND_RIVALS.umi,astarte:FRIEND_RIVALS.astarte,sensei:SENSEI});
 const BATTLE_RIVALS=[['yellow','イエロー',0],['shii','紫瑞',-.04],['umi','海音',-.02],['astarte','アスターテ',.01]];
 let battleRival=store.get('touge_brival')||'yellow';if(!BATTLE_RIVALS.some(r=>r[0]===battleRival))battleRival='yellow';
 function battleDef(){return battleRival==='yellow'?DRIVERS.yellow:FRIEND_RIVALS[battleRival];}
@@ -1329,6 +1339,9 @@ const CUPS=[
   {id:'C',name:'C級 グランプリ',courses:['tsuzura','lake','ridge'],drivers:['gen','silver','blue','yellow'],skill:[.87,.9,.92,.94],prize:8000,pos:[3000,2000,1400,900,600],req:'D'},
   {id:'B',name:'B級 グランプリ',courses:['ridge','down','tsuzura'],drivers:['gen','silver','blue','kurenai'],skill:[.92,.95,.97,1.0],prize:14000,pos:[4500,3000,2000,1300,800],req:'C'},
   {id:'N',name:'ナイトシティ グランプリ',courses:['wangan','neon','c1'],drivers:['blue','kurenai','silver','yellow'],skill:[.84,.87,.9,.92],prize:10000,pos:[3500,2400,1600,1000,700],req:'D'},
+  {id:'W',name:'はたらく車 グランプリ',courses:['neon','c1','lake'],drivers:['packer','fireman','medic','mixerman'],skill:[.8,.83,.86,.89],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'work',catName:'はたらく車'},
+  {id:'X',name:'ネタ車 グランプリ',courses:['down','tsuzura','lake'],drivers:['cartboy','danjiri','hearseman','tanker'],skill:[.78,.82,.86,.9],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'neta',catName:'ネタ車'},
+  {id:'F',name:'月夜の友達 グランプリ',courses:['ridge','lake','tsuzura'],drivers:['shii','umi','astarte','sensei'],skill:[.92,.95,1.0,1.06],prize:20000,pos:[6000,4000,2600,1600,900],req:'C',cat:'friend',catName:'友達の車',title:'月夜の走り仲間'},
   {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[1.0,1.02,1.05,1.08],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
 ];
 const RACE_PTS=[10,6,4,2,1];
@@ -1356,7 +1369,7 @@ function renderCup(){
     if(!open){st.textContent=CUPS.find(x=>x.id===c.req).name+'で優勝すると開放';d.appendChild(head);box.appendChild(d);return;}
     const done=cleared.includes(c.id);st.textContent=done?'優勝済み'+(c.title?'（称号「'+c.title+'」）':''):'優勝賞金 '+c.prize.toLocaleString()+' P';if(done)st.className='done';
     d.appendChild(head);
-    if(!sel){const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';p.textContent=c.courses.map(id=>courseOf(id).name).join(' → ')+'　／ ライバル：'+c.drivers.map(k=>DRIVERS[k].name).join('・');d.appendChild(p);
+    if(!sel){const p=document.createElement('p');p.className='lede';p.style.fontSize='12px';p.textContent=c.courses.map(id=>courseOf(id).name).join(' → ')+'　／ ライバル：'+c.drivers.map(k=>DRIVERS[k].name+'（'+DRIVERS[k].car+'）').join('・')+(c.cat?'　／ '+c.catName+'で出ると賞金1.5倍':'');d.appendChild(p);
       const b=document.createElement('button');b.type='button';b.className='ghost';b.textContent='この大会に出る'+(stt&&stt.race>0&&stt.race<3?'（第'+(stt.race+1)+'戦から）':'');
       b.addEventListener('click',()=>{selectCup(ci);renderCup();syncStart();});d.appendChild(b);box.appendChild(d);return;}
     const races=document.createElement('div');races.className='races';
@@ -2380,7 +2393,7 @@ function finishCup(){
   order.forEach((o,k)=>{const key=o.you?'you':o.n;cupState.pts[key]=(cupState.pts[key]||0)+RACE_PTS[k];});
   cupState.hist.push(pos);cupState.race++;
   const final=cupState.race>=cup.courses.length,table=standingsRows(),champ=final&&table[0].you;
-  const pPrize=cup.pos[pos-1],pDrift=Math.round(game.dTotal*.25),pHit=game.hits*40,pCup=champ?cup.prize:0;
+  const pCat=cup.cat&&(CAR_CAT[spec.id]||'neta')===cup.cat&&!game.retired?Math.round(cup.pos[pos-1]*.5):0,pPrize=cup.pos[pos-1]+pCat,pDrift=Math.round(game.dTotal*.25),pHit=game.hits*40,pCup=champ?cup.prize:0;
   const gapNext=pos===1&&order[1]?order[1].t-game.t:9,comeback=pos===1&&game.wasBehind&&game.leadSince!=null&&game.t-game.leadSince<10,photo=pos===1&&gapNext<.4;
   const pRev=comeback?Math.round(cup.pos[0]*.4):0,pPhoto=photo?Math.round(cup.pos[0]*.2):0;
   const earned=Math.max(200,pPrize+pDrift-pHit)+pCup+pRev+pPhoto+game.shoved*50;
@@ -2396,7 +2409,7 @@ function finishCup(){
   const st=$('standings');
   st.appendChild(tblHTML(order,[{h:'',f:(r,k)=>(k+1)+'.'},{h:'このレース',f:r=>r.n},{h:'',f:r=>r.ret?'リタイア':fmt(r.t)+(r.est?'*':'')},{h:'pt',num:1,f:(r,k)=>'+'+RACE_PTS[k]}]));
   st.appendChild(tblHTML(table,[{h:'',f:(r,k)=>(k+1)+'.'},{h:final?'最終結果':'合計',f:r=>r.n},{h:'',f:()=>''},{h:'pt',num:1,f:r=>r.p}]));
-  addRows([[pos+'位の賞金',pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],pRev?[['大逆転ボーナス',pRev]]:[],pPhoto?[['僅差ボーナス',pPhoto]]:[],champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
+  addRows([[pos+'位の賞金'+(pCat?'（'+cup.catName+'で出場 ×1.5）':''),pPrize],['ドリフト',pDrift],['接触 '+game.hits+'回',-pHit]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],pRev?[['大逆転ボーナス',pRev]]:[],pPhoto?[['僅差ボーナス',pPhoto]]:[],champ?[['優勝賞金',pCup]]:[]));addTotal(earned);
   {const top=order.find(o=>!o.you);if(top)quote(top.d,pos===1?top.d.lose:(order[0].you?top.d.lose:(order[0].d||top.d).win));if(pos!==1&&order[0].d)quote(order[0].d,order[0].d.win);}
   if(final){$('btnRetry').textContent='メニューへ';$('btnMenu').hidden=true;}
   else{$('btnRetry').textContent='次のレースへ（'+courseOf(cup.courses[cupState.race]).name+'）';$('btnMenu').hidden=false;}
