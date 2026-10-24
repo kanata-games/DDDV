@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='09bf7be22a';
+const VERSION='13a2983898';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -36,6 +36,11 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/boss-diag.png',
   './cars/boss-front.png',
   './cars/boss-side.png',
+  './cars/cart-back.png',
+  './cars/cart-cockpit.png',
+  './cars/cart-diag.png',
+  './cars/cart-front.png',
+  './cars/cart-side.png',
   './cars/dashi-back.png',
   './cars/dashi-cockpit.png',
   './cars/dashi-diag.png',
