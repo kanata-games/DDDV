@@ -845,7 +845,35 @@ function buildPark(G){const W=HALF;let cx=0,cz=0,minY=1e9;P.forEach(p=>{cx+=p.x;
    [-.55,.55].forEach(o=>{const rows=[];path.forEach((q,k)=>{const n=path[Math.min(path.length-1,k+1)],m=path[Math.max(0,k-1)],dx=n.x-m.x,dz=n.z-m.z,l=Math.hypot(dx,dz)||1,rx=-dz/l,rz=dx/l;rows.push([[q.x+rx*o,q.y,q.z+rz*o,0,0],[q.x+rx*o,q.y+.25,q.z+rz*o,1,0]]);});G.add(new THREE.Mesh(ribbon(rows,{}),rm));});
    path.forEach((q,k)=>{if(k%8)return;if(nearRoad(q.x,q.z,W+1,-1,-1))return;const h=q.y-minY,s=new THREE.Mesh(new THREE.BoxGeometry(.5,h,.5),sm);s.position.set(q.x,minY+h/2,q.z);G.add(s);});
    const train=new THREE.Group();for(let k=0;k<4;k++){const c=new THREE.Mesh(new THREE.BoxGeometry(1.4,1,2.2),new THREE.MeshLambertMaterial({color:k?0x2a6fe0:0xf2c200,emissive:0x101830}));c.position.z=-k*2.4;train.add(c);}G.add(train);course.coaster={path,train,t:0};}
-  course.spin=spin;}
+  // 動く仕掛け：パレード車・噴水・ダッシュ板・遮断機
+  const gim=[],W2=W;const at=f=>{let i=Math.round(N*f);while(i<N-30&&Math.abs(P[i].k)>.004)i++;return i;};
+  {const i=at(.18),p=P[i],gr=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(3,2.4,4.5),new THREE.MeshLambertMaterial({color:0xff5aa0,emissive:0x501030}));body.position.y=1.6;gr.add(body);
+   const top=new THREE.Mesh(new THREE.ConeGeometry(1.6,2.2,8),new THREE.MeshLambertMaterial({color:0xffd040,emissive:0x4a3800}));top.position.y=3.9;gr.add(top);
+   for(let k=0;k<6;k++){const l=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(['rgba(255,80,160,1)','rgba(90,200,255,1)','rgba(255,220,80,1)'][k%3]),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));l.scale.set(1.2,1.2,1);l.position.set((k%2?1.6:-1.6),1+k*.4,(k%3-1)*1.8);gr.add(l);}
+   G.add(gr);gim.push({t:'parade',i,obj:gr,p});}
+  {const i=at(.42),p=P[i],gr=new THREE.Group();const bowl=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.6,.4,16),new THREE.MeshLambertMaterial({color:0xd8dade}));gr.add(bowl);
+   const jet=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(150,210,255,.9)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));jet.scale.set(3,1,1);gr.add(jet);
+   gr.position.set(p.x,p.y+.1,p.z);G.add(gr);gim.push({t:'fountain',i,obj:gr,jet});}
+  [.33,.7].forEach(f=>{const i=at(f),p=P[i];const tx=canvasTex(128,256,(g,w,h)=>{g.fillStyle='#0a2a3a';g.fillRect(0,0,w,h);g.fillStyle='#40e0ff';for(let k=0;k<3;k++){g.beginPath();g.moveTo(20,200-k*70);g.lineTo(w/2,140-k*70);g.lineTo(w-20,200-k*70);g.lineTo(w-20,225-k*70);g.lineTo(w/2,165-k*70);g.lineTo(20,225-k*70);g.fill();}});
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(3.2,5).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:tx,transparent:true,polygonOffset:true,polygonOffsetFactor:-3}));m.position.set(p.x,p.y+.04,p.z);m.rotation.y=p.h+Math.PI;G.add(m);gim.push({t:'dash',i,lat:0});});
+  {const i=at(.82),p=P[i],gr=new THREE.Group();const post=new THREE.Mesh(new THREE.BoxGeometry(.5,1.4,.5),new THREE.MeshLambertMaterial({color:0x333333}));post.position.set(W2+.6,.7,0);gr.add(post);
+   const arm=new THREE.Group();arm.position.set(W2+.6,1.2,0);const bar=new THREE.Mesh(new THREE.BoxGeometry(W2*2+1,.25,.25),new THREE.MeshBasicMaterial({color:0xffd040}));bar.position.x=-(W2+.5);arm.add(bar);
+   for(let k=0;k<5;k++){const r=new THREE.Mesh(new THREE.BoxGeometry(.9,.27,.27),new THREE.MeshBasicMaterial({color:0xd8141c}));r.position.x=-(k*2.4+1);arm.add(r);}gr.add(arm);
+   const lamp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(255,40,40,1)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));lamp.scale.set(1.4,1.4,1);lamp.position.set(W2+.6,1.8,0);gr.add(lamp);
+   gr.position.set(p.x,p.y,p.z);gr.rotation.y=p.h;G.add(gr);gim.push({t:'gate',i,arm,lamp});}
+  course.gim=gim;course.spin=spin;}
+function stepGim(dt){const g=course.gim;if(!g)return;const T=performance.now()/1000,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz,sp=Math.hypot(car.vx,car.vz);
+  for(const o of g){if(o.t==='parade'){o.lat=Math.sin(T*.55)*(HALF-1.6);const p=P[o.i];o.obj.position.set(p.x+p.rx*o.lat,p.y,p.z+p.rz*o.lat);o.obj.rotation.y=p.h+Math.PI/2*(Math.cos(T*.55)>0?1:-1);
+      if(Math.abs(car.idx-o.i)<3&&Math.abs(plat-o.lat)<2.6&&!(o.cd>game.t)&&game.state==='race'){o.cd=game.t+1.2;car.vx*=.35;car.vz*=.35;game.hits++;damage(8);hitSound();game.shake=.6;flash('パレードに突っ込んだ！');}
+      cpus.concat(traffic).forEach(c=>{if(Math.abs(c.s-o.i)<3&&Math.abs(c.lat-o.lat)<2.4&&!(c.pcd>game.t)){c.pcd=game.t+1.2;c.v*=.4;c.wob=.5;}});}
+    else if(o.t==='fountain'){const ph=(T%6)/6,on=ph<.38;const hgt=on?Math.sin(ph/.38*Math.PI)*9:0;o.jet.scale.set(on?3:0.01,Math.max(.01,hgt),1);o.jet.position.y=hgt/2;o.on=on&&hgt>1;
+      if(o.on&&Math.abs(car.idx-o.i)<3&&Math.abs(plat)<2.4&&!(o.cd>game.t)&&game.state==='race'){o.cd=game.t+2;car.vx*=.6;car.vz*=.6;car.yr+=(Math.random()-.5)*2;flash('噴水をかぶった！');}
+      cpus.concat(traffic).forEach(c=>{if(o.on&&Math.abs(c.s-o.i)<3&&Math.abs(c.lat)<2.4&&!(c.fcd>game.t)){c.fcd=game.t+2;c.v*=.6;c.wob=.4;}});}
+    else if(o.t==='dash'){if(Math.abs(car.idx-o.i)<3&&Math.abs(plat)<1.8&&!(o.cd>game.t)&&game.state==='race'){o.cd=game.t+1;const f=Math.sin(car.yaw),fz=Math.cos(car.yaw);car.vx+=f*9;car.vz+=fz*9;flash('ダッシュ板！');if(ac)whoosh();}
+      cpus.forEach(c=>{if(Math.abs(c.s-o.i)<2&&Math.abs(c.lat)<1.8&&!(c.dcd>game.t)){c.dcd=game.t+1;c.v+=6;}});}
+    else if(o.t==='gate'){const ph=(T%8)/8,closed=ph>.6;o.ang=(o.ang||0)+((closed?0:1.45)-(o.ang||0))*Math.min(1,dt*4);o.arm.rotation.z=-o.ang;o.lamp.visible=closed&&Math.floor(T*4)%2===0;o.closed=o.ang<.4;
+      if(o.closed&&car.idx>=o.i-2&&car.idx<=o.i+1&&!(o.cd>game.t)&&game.state==='race'){o.cd=game.t+1.5;const pv=P[o.i];car.x-=Math.sin(pv.h)*1.5;car.z-=Math.cos(pv.h)*1.5;car.vx*=.15;car.vz*=.15;game.hits++;damage(6);hitSound();game.shake=.5;flash('遮断機が閉まってる！');}
+      cpus.concat(traffic).forEach(c=>{if(o.closed&&c.s>o.i-14&&c.s<o.i-1)c.v=Math.min(c.v,Math.max(0,(o.i-2-c.s)*1.2));});}}}
 // 大阪の目印：遠くの塔・天守閣・観覧車、道をまたぐ橋、アーケードの門
 function longestStraights(n){const runs=[];let a=0;for(let i=1;i<N;i++){const st=Math.abs(P[i].k)<.002;if(!st||i===N-1){if(i-a>60)runs.push([a,i]);a=i+1;}}return runs.sort((x,y)=>(y[1]-y[0])-(x[1]-x[0])).slice(0,n);}
 function lmTower(G,x,y,z){const gr=new THREE.Group(),m=new THREE.MeshLambertMaterial({color:0x5c6470,emissive:0x101820}),lit=new THREE.MeshBasicMaterial({color:0xfff0c0});
@@ -1385,7 +1413,7 @@ function buildProfiles(){
 }
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
-  course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;course.spin=null;course.coaster=null;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
+  course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;course.spin=null;course.coaster=null;course.gim=null;if(course.loop&&course.reroll){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
   {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
@@ -2127,6 +2155,7 @@ function frame(now){
     if(spec.type==='demae'&&game.state==='race')stepDemae(dt,info);
     if(spec.type==='icecream'&&game.state==='race')stepIce(dt,info);
     if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
+    if(course.gim)stepGim(dt);
     if(mode==='free'&&game.state==='race')stepFree(dt);
     if(mode==='densha'&&game.state==='race')stepDen(dt,info);
     if(game.state==='race'&&mode!=='free'&&mode!=='densha'&&car.idx>=GOAL_I)finish();
