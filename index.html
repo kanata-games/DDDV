@@ -200,6 +200,13 @@ body.is-touch #touch{display:flex}
 body.is-touch #dash{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 @media (max-width:520px){#speed{font-size:48px}#mini{width:96px;height:96px}#btnView{top:calc(116px + env(safe-area-inset-top,0px))}}
+#btnPA{position:fixed;z-index:3;top:calc(176px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));font-family:var(--f-body);font-weight:700;font-size:12px;color:var(--night);background:var(--sodium);border:0;border-radius:4px;padding:6px 10px;cursor:pointer}
+@media (max-width:520px){#btnPA{top:calc(152px + env(safe-area-inset-top,0px))}}
+#spBox{top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;gap:14px;background:var(--panel);padding:6px 12px;border-radius:4px;font-family:var(--f-body);font-size:12px}
+#spBox[hidden]{display:none}
+#spBox .spr{display:flex;align-items:center;gap:6px}#spBox b{min-width:3em;font-weight:700}
+#spBox i{display:block;width:min(120px,22vw);height:8px;background:rgba(233,236,245,.15);border-radius:2px;overflow:hidden}
+#spBox u{display:block;height:100%;width:100%;background:var(--sodium);text-decoration:none}#spBox .spr+.spr u{background:#ff5a5a}
 @media (prefers-reduced-motion:reduce){#drift,#msg{transition:none}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
@@ -214,6 +221,8 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 <div class="hud" id="tl"><div class="lab">TIME</div><div id="time">0:00.00</div><div id="best">BEST --:--.--</div><div id="gap">スタート前</div></div>
 <canvas class="hud" id="mini" width="240" height="240"></canvas>
 <button id="btnView" type="button">視点：後方</button>
+<button id="btnPA" type="button" hidden>PAに入る</button>
+<div class="hud" id="spBox" hidden><div class="spr"><b>YOU</b><i><u id="spMe"></u></i></div><div class="spr"><b id="spName">RIVAL</b><i><u id="spRiv"></u></i></div></div>
 <button id="btnSnd" type="button">♪ 音量</button>
 <div id="snd" hidden>
   <h2>音量・BGM<button type="button" id="sndClose">閉じる</button></h2>
@@ -243,7 +252,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -273,6 +282,12 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <div class="cup"><div class="cupHead"><b>深夜の逃走劇</b><span id="escBest">逃げ切り 0回</span></div>
       <p class="lede" style="font-size:12px">後ろからパトカーが追ってくる。パトカーにくっつかれると捕獲ゲージがたまり、満タンで逮捕。スピードで振り切るか、一般車を盾にしてゴールまで逃げ切ろう。途中で増援も来る。</p>
       <div class="courseList" id="escList"></div></div>
+    </section>
+    <section class="pane" id="pane-free" role="tabpanel" hidden>
+      <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
+      <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
+      <p class="lede" style="font-size:12px">バトルはSPゲージの削り合い。前にいれば相手のSPが、後ろにいれば自分のSPが減っていき、離れるほど速く減る。壁にぶつけても自分のSPが減る。相手のSPを0にすれば勝ち。5勝するごとに「首都高の主」が現れる。</p>
+      <p class="lede" style="font-size:12px">やめる時は画面上の<b>「PAに入る」</b>（Pキー）。そこまでのバトルの賞金と走行距離ぶんのポイントがもらえる。大破すると稼ぎは半分になる。</p></div>
     </section>
     <section class="pane" id="pane-parts" role="tabpanel" hidden>
       <p class="lede" style="font-size:12px">パーツは全部の車で共通です。乗りかえても付いたままになります。</p>
@@ -348,6 +363,9 @@ const C1_SEGS=[['S',150,0],['C',70,60,0],['S',90,0,'T'],['C',90,-45,0,'T'],['S',
  ['C',60,-90,0],['S',80,0,'T'],['C',100,40,0,'T'],['S',100,0],['C',50,75,0],['S',130,0],['C',90,-50,0],['S',160,0]];
 const NEON_SEGS=[['S',110,0],['C',14,90,0],['S',90,0],['C',14,-90,0],['S',130,0],['C',40,25,0],['C',40,-25,0],['S',70,0],['C',14,-90,0],['S',80,0],['C',14,90,0],['S',150,0],
  ['C',14,90,0],['S',70,0],['C',14,-90,0],['S',100,0],['C',30,-40,0],['C',30,40,0],['S',90,0],['C',14,-90,0],['S',90,0],['C',14,90,0],['S',140,0]];
+// 首都高フリー走行：同じ区間（向きの合計0°）を3回つなぎ、曲がったトンネルの中で1区間ぶん前に戻して終わりなく走る
+const LOOP_BLOCK=[['S',60,0,'T'],['C',140,35,0,'T'],['C',140,-35,0,'T'],['S',60,0,'T'],['S',240,0],['C',260,-30,0],['S',200,0],['C',90,55,0],['S',140,0],['C',120,-40,0],['S',300,0],['C',380,20,0],['S',220,0],['C',150,-45,0],['S',160,0],['C',200,45,0],['S',260,0],['C',300,-20,0],['S',180,0],['C',420,15,0],['S',120,0]];
+const LOOP_LEAD=60,LOOP_SEGS=[['S',LOOP_LEAD,0]].concat(LOOP_BLOCK,LOOP_BLOCK,LOOP_BLOCK);
 // コース一覧（区間の並びだけで道・景色・CPUの走り方まで自動で作られる）
 const COURSES=[
   {id:'lake',name:'湖畔ハイウェイ',sub:'湖沿いの高速コーナーが続く',segs:LAKE_SEGS,y0:60,water:true,lampStep:55},
@@ -357,6 +375,7 @@ const COURSES=[
   {id:'ridge',name:'稜線トンネルロード',sub:'長いトンネルを抜ける高速コース',segs:RIDGE_SEGS,y0:140,lampStep:70},
   {id:'wangan',name:'湾岸線',sub:'首都高。長い直線で一般車を縫って走る',segs:WANGAN_SEGS,y0:30,env:'highway',half:8,traffic:16},
   {id:'c1',name:'C1環状',sub:'首都高。壁が迫る連続コーナーとトンネル',segs:C1_SEGS,y0:30,env:'highway',half:6.5,traffic:10},
+  {id:'loop',name:'首都高 夜の環状',sub:'終わりのない首都高。野良バトルの舞台',segs:LOOP_SEGS,y0:30,env:'highway',half:8,traffic:14,loop:true,hidden:true},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
 ];
 const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
@@ -547,7 +566,7 @@ function buildScenery(){
    G.add(pole,arm,head);}
   }
   buildTunnels();
-  gate(START_I,'START',false);gate(GOAL_I,'GOAL',true);
+  if(!course.loop){gate(START_I,'START',false);gate(GOAL_I,'GOAL',true);}
   buildRails();
 }
 // sky: moon + stars
@@ -967,6 +986,7 @@ function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;
   {const urban=course.env==='highway'||course.env==='city',fc=urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:25;scene.fog.far=urban?560:240;}
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
+  if(course.loop){course.loopL=genPts(LOOP_BLOCK,0).length-1;course.loopW=LOOP_LEAD+146;const a=course.loopW;course.loopD={x:P[a].x-P[a+course.loopL].x,y:P[a].y-P[a+course.loopL].y,z:P[a].z-P[a+course.loopL].z};}
   computeWidth();buildScenery();buildProfiles();buildMinimap();
   railGroup.visible=spec.type==='train';
   skid.count=0;skidI=0;demo.s=START_I;demo.v=0;
@@ -988,6 +1008,8 @@ function resetRace(){
     ps=slots(4);
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
+  } else if(mode==='free'){
+    ps={s:START_I,lat:0};
   } else if(mode==='escape'){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
@@ -1005,6 +1027,7 @@ function resetRace(){
   cpus.forEach(c=>{placeCpu(c);c.ahead=c.s>car.idx||!c.def.cop;});
   if(mode==='escape'){game.bust=0;game.reinf=0;startCopSiren();}
   spawnTraffic();if(mode==='collect')spawnSpots();
+  game.fb=mode==='free'?{phase:'cruise',next:10,rival:null,me:100,riv:100,wins:0,lost:0,earn:0,enc:0,log:[]}:null;$('spBox').hidden=true;$('btnPA').hidden=mode!=='free';
   if(cpus.length){const c=pick(cpus);setTimeout(()=>say(c.def,pick(c.def.pre),3.2),500);}
 }
 let rivalDone=0;
@@ -1012,7 +1035,7 @@ let rivalDone=0;
 /* ================= INPUT ================= */
 const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',Space:'hand',ShiftLeft:'hand',KeyN:'nitro',KeyX:'nitro'};
 addEventListener('keydown',e=>{const k=keymap[e.code];if(k){input[k]=1;e.preventDefault();}
-  if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();});
+  if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();if(e.code==='KeyP'&&mode==='free'&&game.state==='race')enterPA();});
 addEventListener('keyup',e=>{const k=keymap[e.code];if(k)input[k]=0;});
 document.querySelectorAll('#touch .tb').forEach(el=>{
   const k=el.dataset.k,on=e=>{e.preventDefault();if(k==='horn'){startAudio();horn();}input[k]=1;el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){}},off=e=>{input[k]=0;el.classList.remove('on');};
@@ -1027,6 +1050,7 @@ $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
   if(mode==='cup'){if(cupState&&cupState.race<CUPS[cupIdx].courses.length){loadCourse(CUPS[cupIdx].courses[cupState.race]);resetRace();}else toMenu();}
   else resetRace();});
 $('btnMenu').addEventListener('click',toMenu);
+$('btnPA').addEventListener('click',()=>{if(mode==='free'&&game.state==='race')enterPA();});
 const DIFF=[{scale:.84,mult:.7},{scale:.9,mult:1},{scale:1.0,mult:1.6}];
 let diff=+(store.get('touge_diff')??1);if(!DIFF[diff])diff=1;
 function syncDiff(){document.querySelectorAll('#dSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===diff));}
@@ -1050,12 +1074,12 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
-let mode=['battle','collect','escape'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
+let mode=['battle','collect','escape','free'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
 const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
 function selectCup(i){cupIdx=i;store.set('touge_cupId',CUPS[i].id);cupState=cupStates[CUPS[i].id]||null;const id=CUPS[i].courses[cupState&&cupState.race<3?cupState.race:0];if(course.id!==id)loadCourse(id);}
-let battleCourse=store.get('touge_course')||'down';if(!COURSES.some(c=>c.id===battleCourse))battleCourse='down';
+let battleCourse=store.get('touge_course')||'down';if(!COURSES.some(c=>c.id===battleCourse&&!c.hidden))battleCourse='down';
 function saveCup(){cupStates[CUPS[cupIdx].id]=cupState;store.set('touge_cups',JSON.stringify(cupStates));}
 function newCup(){cupState={race:0,pts:{you:0},hist:[]};cupDrivers().forEach(d=>cupState.pts[d.name]=0);saveCup();}
 function standingsRows(){const r=[{n:'あなた',p:cupState.pts.you,you:1}];cupDrivers().forEach(d=>r.push({n:d.name,p:cupState.pts[d.name]||0}));return r.sort((a,b)=>b.p-a.p||(b.you||0)-(a.you||0));}
@@ -1090,7 +1114,7 @@ function renderCup(){
 }
 function renderCourses(){
   const l=$('courseList');l.innerHTML='';
-  COURSES.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='courseBtn'+(c.id===battleCourse?' sel':'');
+  COURSES.forEach(c=>{if(c.hidden)return;const b=document.createElement('button');b.type='button';b.className='courseBtn'+(c.id===battleCourse?' sel':'');
     b.innerHTML='<b></b><small></small><small></small>';const sm=b.querySelectorAll('small');
     b.querySelector('b').textContent=c.name;sm[0].textContent=c.sub;const bt=parseFloat(store.get('touge_best_'+c.id));sm[1].textContent='BEST '+(bt?fmt(bt):'--:--.--');
     b.addEventListener('click',()=>{battleCourse=c.id;store.set('touge_course',c.id);loadCourse(c.id);renderCourses();});l.appendChild(b);});
@@ -1156,11 +1180,13 @@ function syncStart(){
   if(mode==='cup'){const c=CUPS[cupIdx];const r=cupState&&cupState.race<c.courses.length?cupState.race:0;b.textContent=(c.name)+'　第'+(r+1)+'戦へ';}
   else if(mode==='escape')b.textContent='逃走開始（'+courseOf(escCourse).name+'）';
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
+  else if(mode==='free')b.textContent='首都高へ出る（夜の環状）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  ['gp','battle','garage','parts','collect','escape'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  ['gp','battle','garage','parts','collect','escape','free'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  if(t==='free'){mode='free';store.set('touge_mode','free');if(!course||course.id!=='loop')loadCourse('loop');const b=sj('touge_free_best',null);$('freeBest').textContent=b?'BEST '+b.w+'勝 ／ '+b.km.toFixed(1)+' km':'BEST --';}
   if(t==='gp'){mode='cup';store.set('touge_mode','cup');const id=CUPS[cupIdx].courses[cupState&&cupState.race<3?cupState.race:0];if(!course||course.id!==id)loadCourse(id);}
   if(t==='escape'){mode='escape';store.set('touge_mode','escape');if(!course||course.id!==escCourse)loadCourse(escCourse);renderEsc();}
   if(t==='collect'){mode='collect';store.set('touge_mode','collect');if(!course||course.id!=='neon')loadCourse('neon');const b=sj('touge_col_best',null);$('colBest').textContent=b?'BEST '+b.n+'個回収':'BEST --';}
@@ -1174,10 +1200,11 @@ function startFromMenu(){
   if(mode==='cup'){if(!cupState||cupState.race>=CUPS[cupIdx].courses.length)newCup();const id=CUPS[cupIdx].courses[cupState.race];if(course.id!==id)loadCourse(id);}
   else if(mode==='collect'){if(course.id!=='neon')loadCourse('neon');}
   else if(mode==='escape'){if(course.id!==escCourse)loadCourse(escCourse);}
+  else if(mode==='free'){if(course.id!=='loop')loadCourse('loop');}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
-function toMenu(){if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -1185,7 +1212,7 @@ function accMul(){return (car.boost?1.7:1)*(car.draft?1.12:1);}
 function topMul(){return (car.boost?1.2:1)*(car.draft?1.06:1);}
 function hpPow(){const f=car.hp/spec.hpMax;return f<.5?.8+.4*f:1;}
 const FAMILY_LINES=['パパ運転こわい…','ちょっと！ 子どもが起きたでしょ！','ジュースこぼれた〜！','まだ着かないの〜？','おばあちゃん酔っちゃったって','いま絶対ぶつけたよね？'];
-function damage(a){if(game.state!=='race'||a<=0)return;if(spec.type==='noah'&&a>=4&&game.t-(game.famT||-9)>2.5){game.famT=game.t;say({name:'後部座席',col:0xffd27a},FAMILY_LINES[Math.floor(Math.random()*FAMILY_LINES.length)]);}a*=spec.armor||1;car.hp=Math.max(0,car.hp-a);if(a>=12)flash('ダメージ −'+Math.round(a));if(car.hp<=0)wreck();}
+function damage(a){if(game.state!=='race'||a<=0)return;if(game.fb&&game.fb.phase==='battle')game.fb.me=Math.max(0,game.fb.me-a*.7);if(spec.type==='noah'&&a>=4&&game.t-(game.famT||-9)>2.5){game.famT=game.t;say({name:'後部座席',col:0xffd27a},FAMILY_LINES[Math.floor(Math.random()*FAMILY_LINES.length)]);}a*=spec.armor||1;car.hp=Math.max(0,car.hp-a);if(a>=12)flash('ダメージ −'+Math.round(a));if(car.hp<=0)wreck();}
 function wreck(){
   if(game.retired)return;game.retired=true;game.state='done';game.shake=1;
   car.vx*=.2;car.vz*=.2;car.v=0;car.derail=false;
@@ -1308,7 +1335,7 @@ function setSiren(on){car.siren=on;
     const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2200;sirenG=ac.createGain();sirenG.gain.value=.07;sirenOsc.connect(lp);lp.connect(sirenG);sirenG.connect(fxOut());sirenOsc.start();lfo.start();sirenOsc.lfo=lfo;
     sirenOsc.onended=()=>{try{lfo.stop();}catch(e){}};}
   if(on){flash('サイレン ON');if(game.state==='race'){const c=cpus.find(x=>x.def);if(c&&radioCd<=0)say(c.def,pick(['パ、パトカー!?','やべっ、警察だ！','…いや、レース中だろ！']));}}else flash('サイレン OFF');}
-function horn(){if(spec.type==='alph'){car.oraT=4;flash('（オラオラ顔の圧）');if(ac){beep(233,.55);setTimeout(()=>beep(294,.5),40);}return;}if(spec.type==='taxi'&&ac){[0,.22].forEach(d=>setTimeout(()=>beep(620,.16),d*1000));return;}if(spec.type==='police'){setSiren(!car.siren);return;}if(!ac)return;if(spec.type==='dashi'){flash('そーりゃ！ そーりゃ！');kane();setTimeout(kane,180);return;}if(spec.type==='tank'){fire();return;}if(spec.type==='packer'){melody();return;}if(spec.type==='bike'){[0,.16].forEach(d=>{const t=ac.currentTime+d;[2350,3520].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(i?.08:.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+.65);});});return;}
+function horn(){if(mode==='free'&&game.state==='race')freeHorn();if(spec.type==='alph'){car.oraT=4;flash('（オラオラ顔の圧）');if(ac){beep(233,.55);setTimeout(()=>beep(294,.5),40);}return;}if(spec.type==='taxi'&&ac){[0,.22].forEach(d=>setTimeout(()=>beep(620,.16),d*1000));return;}if(spec.type==='police'){setSiren(!car.siren);return;}if(!ac)return;if(spec.type==='dashi'){flash('そーりゃ！ そーりゃ！');kane();setTimeout(kane,180);return;}if(spec.type==='tank'){fire();return;}if(spec.type==='packer'){melody();return;}if(spec.type==='bike'){[0,.16].forEach(d=>{const t=ac.currentTime+d;[2350,3520].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(i?.08:.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);o.connect(g);g.connect(fxOut());o.start(t);o.stop(t+.65);});});return;}
   if(spec.type==='fork'){[0,.32,.64].forEach(d=>setTimeout(()=>beep(1046,.18),d*1000));return;}const t=ac.currentTime,g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.75);g.connect(fxOut());
   const hi=spec.type==='train';[hi?330:440,hi?415:554].forEach(f=>{const o=ac.createOscillator();o.type='square';o.frequency.value=f;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;o.connect(lp);lp.connect(g);o.start(t);o.stop(t+.8);});}
 function hitSound(){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.setValueAtTime(140,ac.currentTime);o.frequency.exponentialRampToValueAtTime(40,ac.currentTime+.2);g.gain.setValueAtTime(.5,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.25);o.connect(g);g.connect(fxOut());o.start();o.stop(ac.currentTime+.3);}
@@ -1471,6 +1498,7 @@ function stepCpu(c,dt,traffic){
     if(gap>80)tv=tv0*1.14;else if(gap>30)tv=tv0*1.05;
     if(gap>-6&&gap<18){tl=plat+(gap<3?(c.lat>plat?1.9:-1.9):0);tv=Math.min(tv0*1.08,psp+(gap>3?1.8:-.3));passing=true;}
     else if(gap<=-6)tv=Math.min(tv0,psp*.9);}
+  if(c.cruise)tv=Math.min(tv,c.cruiseV);else if(c.free&&game.state==='race'&&game.fb&&game.fb.phase==='chase'&&game.fb.rival===c)tv*=1.25;else if(c.free&&game.state==='race'){const g=c.s-car.idx;if(g<-70)tv*=1.1;else if(g>140)tv*=.95;}
   tl=Math.max(-lim,Math.min(lim,tl));
   c.v+=Math.sign(tv-c.v)*Math.min(Math.abs(tv-c.v),(tv>c.v?6:10)*dt);
   c.s=Math.min(N-1.01,c.s+c.v*dt);
@@ -1484,14 +1512,14 @@ function spawnTraffic(){
   if(!course.traffic)return;const ln=lanesNow(),city=course.env==='city';
   for(let k=0;k<course.traffic;k++){const sh=pick(['sedan','hatch','sedan','truck']);
     const rr=Math.random(),m=rr<.28?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.38?makeCar({top:0x0d0e11,bot:0x1a1b1f,shape:'hatch',sprite:'alph',len:4.9},false):rr<.48?makeCar({top:0xc9ccd2,bot:0x2a2d33,shape:'hatch',sprite:'noah',len:4.7},false):rr<.64?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):rr<.88?makeCar({top:0x9fd3ea,bot:0x2a2d33,shape:'hatch',sprite:'tanto',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
-    traffic.push({mesh:m,s:START_I+70+k*(N-220)/course.traffic+Math.random()*25,lat:pick(ln),v:city?8+Math.random()*4:12+Math.random()*7,x:0,y:0,z:0,yaw:0,cd:0});}
+    traffic.push({mesh:m,s:START_I+70+k*(course.loop?1300:N-220)/course.traffic+Math.random()*25,lat:pick(ln),v:city?8+Math.random()*4:12+Math.random()*7,x:0,y:0,z:0,yaw:0,cd:0});}
   traffic.forEach(t=>placeCpu(t));}
 function stepTraffic(dt){
   if(car.oraT>0)car.oraT-=dt;const sirenOn=(car.siren||car.oraT>0)&&game.state==='race',pp0=P[car.idx],plat0=pp0?(car.x-pp0.x)*pp0.rx+(car.z-pp0.z)*pp0.rz:0;
   for(const t of traffic){
     if(sirenOn){const ds=t.s-pp0.d;if(ds>0&&ds<75){const tgt=t.lat>=plat0?HALF-1.1:-(HALF-1.1);t.lat+=(tgt-t.lat)*Math.min(1,dt*2.2);t.v=Math.max(6,t.v-dt*2);}}
     if(t.stunT>0){t.stunT-=dt;t.v=Math.max(0,t.v-20*dt);if(t.stunT<=0)t.v=8+Math.random()*6;}if(t.liftT>0){t.liftT-=dt;t.v=Math.max(0,t.v-25*dt);if(t.liftT<=0)t.v=8+Math.random()*6;}t.s+=t.v*dt;
-    if(t.s<car.idx-140&&car.idx+320<N-60){t.s=car.idx+220+Math.random()*120;t.lat=pick(lanesNow());}
+    if(t.s<car.idx-140&&car.idx+320<N-60){t.s=car.idx+220+Math.random()*(course.loop?480:120);t.lat=pick(lanesNow());}
     if(t.s>N-3){t.s=N-3;t.v=0;}
     const a=sampleAt(t.s);t.x=a.x+a.rx*t.lat;t.z=a.z+a.rz*t.lat;t.y=a.y;t.yaw=a.h;}}
 function rankNow(){let ahead=0;cpus.forEach(c=>{if(c.done||c.s>car.idx)ahead++;});return ahead+1;}
@@ -1507,7 +1535,7 @@ const mp=(x,z)=>[240-(mox+(x-mnx)*msc),moz+(z-mnz)*msc];
 function drawMini(){
   mg.clearRect(0,0,240,240);mg.lineWidth=7;mg.lineCap='round';mg.lineJoin='round';mg.strokeStyle='rgba(159,182,255,.35)';
   mg.beginPath();for(let i=0;i<N;i+=6){const [a,b]=mp(P[i].x,P[i].z);i?mg.lineTo(a,b):mg.moveTo(a,b);}mg.stroke();
-  const [gx,gz]=mp(P[GOAL_I].x,P[GOAL_I].z);mg.fillStyle='#e9ecf5';mg.fillRect(gx-5,gz-5,10,10);
+  if(!course.loop){const [gx,gz]=mp(P[GOAL_I].x,P[GOAL_I].z);mg.fillStyle='#e9ecf5';mg.fillRect(gx-5,gz-5,10,10);}
   mg.fillStyle='rgba(233,236,245,.45)';traffic.forEach(t=>{const [tx,tz]=mp(t.x,t.z);mg.fillRect(tx-3,tz-3,6,6);});
   mg.fillStyle='#50ff96';spots.forEach(q=>{if(q.done)return;const [qx,qz]=mp(q.x,q.z);mg.fillRect(qx-5,qz-5,10,10);});
   cpus.forEach(c=>{const [rx,rz]=mp(c.x,c.z);mg.fillStyle=hex(c.def.col);mg.beginPath();mg.arc(rx,rz,7,0,7);mg.fill();});
@@ -1570,6 +1598,7 @@ function frame(now){
   if(game.state!=='title'){
     acc+=dt;const h=1/120;
     while(acc>=h){info=stepVehicle(h,racing);if(racing||game.state==='done'){cpus.forEach(c=>stepCpu(c,h,true));stepTraffic(h);}acc-=h;}
+    if(course.loop&&car.idx>=course.loopW+course.loopL)loopWarp();
     // 車どうしの接触
     {const PK=spec.type==='packer'||spec.type==='tank'||spec.type==='dashi',R=PK?3.3:2.3,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
     cpus.concat(traffic).forEach(c=>{const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz);
@@ -1615,7 +1644,8 @@ function frame(now){
       else game.cprog=Math.max(0,game.cprog-dt*2);
       if(game.left<=0){game.left=0;game.timeUp=true;flash('時間切れ！');finish();}
     }
-    if(game.state==='race'&&car.idx>=GOAL_I)finish();
+    if(mode==='free'&&game.state==='race')stepFree(dt);
+    if(game.state==='race'&&mode!=='free'&&car.idx>=GOAL_I)finish();
   }
   // 耐久が減ると車から煙
   if(game.state!=='title'&&car.hp<spec.hpMax*.5&&Math.random()<dt*(car.hp<=0?30:6+(1-car.hp/spec.hpMax)*18)){
@@ -1705,6 +1735,7 @@ function frame(now){
     else if(mode==='escape'){const b=game.bust||0,n=Math.ceil(b*8);
       ge.textContent='ゴールまで '+Math.max(0,Math.round(GOAL_I-car.idx))+' m　追跡 '+cpus.filter(c=>c.def.cop).length+'台'+(game.copDist<200?'（'+Math.round(game.copDist)+' m）':'')+'　捕獲 '+'■'.repeat(n)+'□'.repeat(8-n);
       ge.className=b>.5||game.copDist<12?'':'lead';}
+    else if(mode==='free')freeHud(ge);
     else if(mode==='collect'){let nx=null;for(const q of spots)if(!q.done&&q.i>=car.idx-6){nx=q;break;}
       ge.textContent=(game.cprog>0?'回収中 '+'■'.repeat(Math.ceil(game.cprog*8))+'□'.repeat(8-Math.ceil(game.cprog*8)):'残り '+Math.max(0,game.left).toFixed(1)+' 秒　回収 '+game.collected+'/'+spots.length+(nx?'　次まで '+Math.max(0,Math.round(nx.i-car.idx))+' m':'　ゴールへ！'));
       ge.className=game.left<10?'':'lead';}
@@ -1749,15 +1780,78 @@ function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus();if(b){w
 function addTotalRest(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
 function finish(){if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&mode!=='escape'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
-  if(!game.retired){game.slowT=1.3;$('count').textContent='GOAL';}
-  if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
+  $('btnPA').hidden=true;$('spBox').hidden=true;
+  if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
+  if(mode==='free')finishFree();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
 }
+// ===== 首都高フリー走行 =====
+const FREE_RIVALS=[
+ {name:'湾岸ブルー',col:0x2a6fe0,bot:0x1a1d24,shape:'sedan',sprite:'4wdw',tier:0,pre:['この時間の湾岸は、オレの通り道だ。','4WDの加速、ついて来れるか？'],passed:['ちっ、抜かれたか！'],pass:['直線ならこっちだ！'],win:'踏めてないな。',lose:'…いい加速だ。'},
+ {name:'深夜の配達人',col:0xe7e9e3,bot:0xd8dad4,shape:'truck',sprite:'kei',tier:-2,pre:['時間指定なんでね、飛ばすよ。','荷台、空っぽだから軽いんだ。'],passed:['おおっと！'],pass:['お先に失礼！'],win:'時間内に配達完了。',lose:'再配達になっちまった…'},
+ {name:'残クレの帝王',col:0x0d0e11,bot:0x1a1b1f,shape:'hatch',sprite:'alph',tier:0,pre:['ローン？ まだ60回残ってるよ。','この車に傷つけたら…わかってるよな？'],passed:['うわっ、こすってないよな!?'],pass:['オラオラ、どけどけ！'],win:'金利より速いぜ。',lose:'査定が…査定が下がる…'},
+ {name:'シルバーの亡霊',col:0xc4c8cf,bot:0x9aa0a8,shape:'coupe',sprite:'fr',tier:1,pre:['首都高のコーナーは、流して抜けるもんだ。','……見ない顔だな。'],passed:['…ほう。'],pass:['インが甘い。'],win:'まだまだだね。',lose:'今夜は譲るよ。'},
+ {name:'白黒の流星',col:0xf2f2f2,bot:0x15161a,shape:'coupe',sprite:'86',tier:1,pre:['軽さは正義。','このハチロク…じゃなかった、パチロクをなめるなよ。'],passed:['重さの差か…！'],pass:['コーナーで刺す！'],win:'軽さの勝ちだ。',lose:'パワーが欲しい…'},
+ {name:'紅',col:0xd41420,bot:0x2a2a2a,shape:'coupe',sprite:'re',tier:2,pre:['首都高で、わたしの前を走る気？','ロータリーは高回転で鳴くのよ。'],passed:['……！'],pass:['遅い。'],win:'当然でしょ。',lose:'…覚えておくわ。'},
+ {name:'イエロー',col:0xf3c613,bot:0x2a2a2a,shape:'coupe',sprite:'reY',tier:2,pre:['峠の次は首都高ってか？ 受けて立つぜ！','ここでも負ける気はねえ！'],passed:['やるじゃねえか！'],pass:['甘いぜ！'],win:'首都高もオレの庭だ。',lose:'…次は負けねえ。'}];
+const FREE_BOSS=Object.assign({},DRIVERS.veil,{name:'首都高の主 ヴェイル',pre:['……この道で、5台も喰ったそうだな。','闇の首都高へ、ようこそ。']});
+function loopWarp(){const L=course.loopL,D=course.loopD;
+  car.x+=D.x;car.y+=D.y;car.z+=D.z;car.idx-=L;car.s-=L;game.startD-=L;
+  trail.forEach(q=>{q.x+=D.x;q.y+=D.y;q.z+=D.z;});camera.position.x+=D.x;camera.position.y+=D.y;camera.position.z+=D.z;
+  cpus.forEach(c=>{if(c.s-L>=2){c.s-=L;placeCpu(c);}});
+  traffic.forEach(t=>{if(t.s-L>=2){t.s-=L;const a=sampleAt(t.s);t.x=a.x+a.rx*t.lat;t.z=a.z+a.rz*t.lat;t.y=a.y;}});
+  smokes.forEach(q=>{q.s.position.x+=D.x;q.s.position.z+=D.z;});}
+function freeSpawn(){const fb=game.fb;fb.enc++;
+  const boss=fb.wins>0&&fb.wins%5===0&&!fb.bossDone,def=boss?FREE_BOSS:pick(FREE_RIVALS),tier=Math.min(6,fb.wins)+(def.tier||0);
+  const skill=boss?1.13:Math.max(.82,Math.min(1.1,.9+tier*.03+Math.random()*.02));
+  const behind=boss||Math.random()<.5,psp=Math.hypot(car.vx,car.vz),lane=pick(lanesNow());
+  const c=makeCpu(def,skill,Math.max(4,car.idx+(behind?-85:170)),lane,behind);c.free=true;c.boss=boss;c.tier=tier;
+  if(behind){c.v=Math.max(20,psp+8);c.cruise=false;}else{c.cruise=true;c.cruiseV=Math.min(24,Math.max(14,psp*.6));c.v=c.cruiseV;}
+  placeCpu(c);c.ahead=c.s>car.idx;cpus.push(c);fb.rival=c;fb.phase=behind?'chase':'wait';fb.waitT=0;
+  if(boss){flash('後ろから異様な気配が…');say(def,pick(def.pre),4);}
+  else if(behind)flash('後ろからライバルが迫ってくる…');
+  else flash('前方に野良ライバル。近づいてホーンで挑戦');}
+function freeStart(why){const fb=game.fb,c=fb.rival;if(!c)return;fb.phase='battle';fb.me=100;fb.riv=100;fb.bt=0;c.cruise=false;
+  $('spName').textContent=c.name.length>6?c.name.slice(0,6)+'…':c.name;$('spBox').hidden=false;
+  flash(why+' BATTLE START!');beep(880,.15);setTimeout(()=>beep(1320,.3),160);if(!c.boss&&radioCd<=0)say(c.def,pick(c.def.pre),3.2);}
+function freeEnd(win){const fb=game.fb,c=fb.rival;fb.phase='after';$('spBox').hidden=true;fb.next=game.t+14+Math.random()*12;
+  if(win){const pr=c.boss?5000:600+Math.max(0,c.tier)*250+Math.round(fb.me*5);fb.wins++;fb.earn+=pr;if(c.boss)fb.bossDone=true;fb.log.push([c.name,pr]);
+    flash('WIN！ '+c.name+'に勝った +'+pr.toLocaleString()+' P');beep(988,.15);setTimeout(()=>beep(1319,.35),150);say(c.def,c.def.lose,3.5);c.cruise=true;c.cruiseV=12;}
+  else{fb.lost++;flash('LOSE… '+c.name+'に置いていかれた');say(c.def,c.def.win,3.5);c.cruise=false;c.skill=Math.max(c.skill,1.12);}
+  if(c.boss&&win)fb.bossDone=true;if(fb.wins%5!==0)fb.bossDone=false;}
+function freeHorn(){const fb=game.fb;if(!fb||fb.phase!=='wait'||!fb.rival)return;const g=fb.rival.s-car.idx;if(g>-40&&g<55)freeStart('パッシング！');else if(g>=55&&g<140)flash('もっと近づいてからパッシング');}
+function stepFree(dt){const fb=game.fb;if(!fb)return;const c=fb.rival;
+  if(fb.phase==='cruise'){if(game.t>=fb.next)freeSpawn();return;}
+  if(!c)return;const g=car.idx-c.s; // + = 自分が前
+  if(fb.phase==='chase'){if(g>-28&&g<10)freeStart('パッシングされた！');else if(g>260){despawnRival();}}
+  else if(fb.phase==='wait'){fb.waitT+=dt;if(g>8)freeStart('追い越して挑発！');else if(g>-30&&g<=8&&(fb.waitT>2)){fb.close=(fb.close||0)+dt;if(fb.close>2.5)freeStart('あおられて受けて立つ！');}
+    if(g<-420||fb.waitT>60)despawnRival();}
+  else if(fb.phase==='battle'){fb.bt+=dt;const ag=Math.abs(g),rate=fb.bt<3?0:(ag>6?1.5:0)+Math.min(20,Math.max(0,ag-12)*.16);
+    if(g>0)fb.riv=Math.max(0,fb.riv-rate*dt);else fb.me=Math.max(0,fb.me-rate*dt);
+    $('spMe').style.width=fb.me+'%';$('spRiv').style.width=fb.riv+'%';
+    if(fb.riv<=0||g>380)freeEnd(true);else if(fb.me<=0||g<-380)freeEnd(false);}
+  else if(fb.phase==='after'){if(Math.abs(g)>260)despawnRival();}}
+function despawnRival(){const fb=game.fb,c=fb.rival;if(c){scene.remove(c.mesh.g);cpus=cpus.filter(x=>x!==c);}fb.rival=null;fb.close=0;if(fb.phase!=='after')fb.next=game.t+10+Math.random()*10;fb.phase='cruise';}
+function freeKm(){return Math.max(0,(P[Math.min(N-1,car.idx)].d-(game.startD||0))/1000);}
+function freeHud(ge){const fb=game.fb;if(!fb)return;const c=fb.rival,km=freeKm().toFixed(1)+' km　'+fb.wins+'勝　賞金 '+fb.earn.toLocaleString()+' P';
+  if(fb.phase==='battle'&&c){const g=car.idx-c.s;ge.textContent='BATTLE vs '+c.name+'　'+(g>=0?'リード ':'離されて ')+Math.round(Math.abs(g))+' m';ge.className=g>=0?'lead':'';}
+  else if(fb.phase==='wait'&&c){ge.textContent='前方に挑戦者 '+Math.max(0,Math.round(c.s-car.idx))+' m（ホーンで勝負）　'+km;ge.className='';}
+  else if(fb.phase==='chase'&&c){ge.textContent='後方からライバル接近 '+Math.round(Math.max(0,car.idx-c.s))+' m　'+km;ge.className='';}
+  else{ge.textContent=(game.state==='count'?'首都高へ合流　':'')+km;ge.className='lead';}}
+function enterPA(){flash('パーキングエリアに入る');finish();}
+function finishFree(){const fb=game.fb||{wins:0,earn:0,lost:0,log:[]},km=freeKm(),pDist=Math.round(km*60),pHit=game.hits*20,half=game.retired;
+  const base=fb.earn+pDist-pHit,earned=Math.max(100,half?Math.round(base/2):base);wallet+=earned;
+  const b=sj('touge_free_best',null);if(!b||fb.wins>b.w||(fb.wins===b.w&&km>b.km))store.set('touge_free_best',JSON.stringify({w:fb.wins,km}));
+  $('resKick').textContent='首都高 野良バトル ／ 夜の環状';
+  $('resHead').textContent=game.retired?'大破':fb.wins?fb.wins+'勝 '+fb.lost+'敗':'ひとっ走り';$('resHead').className='res-big '+(game.retired?'lose':'win');
+  $('resSub').textContent=(game.retired?'車が大破してレッカーで運ばれた。稼ぎは半分。':'パーキングエリアで一息。')+'走った距離は '+km.toFixed(1)+' km。';
+  addRows(fb.log.map(([n,v])=>['勝利：'+n,v]).concat([['走行距離 '+km.toFixed(1)+' km',pDist],['接触 '+game.hits+'回',-pHit]],half?[['大破（レッカー代）','×0.5']]:[]));addTotal(earned);
+  $('btnRetry').textContent='もう一回走る';$('btnMenu').hidden=false;}
 function finishEscape(){
   const ok=!game.busted&&!game.retired,frac=Math.min(1,Math.max(0,(car.idx-START_I)/(GOAL_I-START_I)));
   const pBase=ok?2500:Math.round(frac*1200),pDist=ok&&game.copDist<1e8?Math.round(Math.min(game.copDist,300)*6):0,pClean=ok&&game.bust<.05?1000:0,pShove=game.shoved*50;
