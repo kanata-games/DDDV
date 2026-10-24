@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='97a94fb3e5';
+const VERSION='572849ed04';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -145,7 +145,12 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/train-cockpit.png',
   './cars/train-diag.png',
   './cars/train-front.png',
-  './cars/train-side.png'];
+  './cars/train-side.png',
+  './cars/umicar-back.png',
+  './cars/umicar-cockpit.png',
+  './cars/umicar-diag.png',
+  './cars/umicar-front.png',
+  './cars/umicar-side.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('dddv-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 // 音楽は途中から読む（Range）ので、丸ごと保存してから切り出して返す
