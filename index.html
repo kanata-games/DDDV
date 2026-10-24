@@ -295,7 +295,8 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <div class="cup"><div class="cupHead"><b>DDDV自動車学校 夜間教習</b><span id="schoolLic">免許 なし</span></div>
       <p class="lede" style="font-size:12px">助手席の教官が採点する検定。100点から始まり、制限速度オーバー・縁石に乗る（脱輪）・一時停止で止まらない・坂道でずり下がる・ぶつける・ドリフト・ニトロで減点。<b>70点以上で合格</b>、0点になると検定中止。合格すると次の段階に進める。卒業検定に受かれば免許取得。</p>
       <p class="lede" style="font-size:12px">「止まれ」の線ではいったん完全に止まる。坂道発進は黄色い標識の線で止まってから、下がらないように発進。どの乗り物でも受験できる（教官の反応が変わる）。</p>
-      <div class="courseList" id="schoolList"></div></div>
+      <div class="courseList" id="schoolList"></div>
+      <div id="senseiBox" hidden style="margin-top:10px"><p class="lede" style="font-size:12px">卒業した夜、教官が言った。「…月見峠、走れますか？」　教習車に乗った教官と、峠の下りで1対1。<b>かなり速い。</b></p><button type="button" class="buy" id="senseiBtn">卒業記念　教官と峠でタイマン（月見峠 下り）</button> <small id="senseiRec"></small></div></div>
     </section>
     <section class="pane" id="pane-free" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
@@ -1026,6 +1027,11 @@ const DRIVERS={
     pre:['……闇に、ついて来られるか。','デスドライブの意味を教えてやる。'],passed:['面白い。','その走り、悪くない。'],pass:['ここが限界だ。','夜に呑まれろ。'],win:'夜は、まだ深い。',lose:'……お前が、次の闇だ。'}
 };
 const pick=a=>a[Math.random()*a.length|0];
+const SENSEI={name:'教官',car:'教習車',col:0x5dd6ff,bot:0x2a2d33,shape:'sedan',sprite:'kyoshu',type:'kyoshu',fav:'down',
+  pre:['卒業おめでとう。…さて、ここからは教習じゃない。','この峠、昔は毎晩走ってたんですよ。','札はつけたままですけど、本気でいきます。','シートベルト、締めましたね？ では。'],
+  passed:['…ほう、教えた甲斐がありましたね。','いいライン取りです。','そこで刺してきますか。'],pass:['ブレーキが早いですよ。','目線が近い。','送りハンドルじゃ間に合いませんよ？','はい、お先に。'],
+  win:'まだまだ補習が必要ですね。',lose:'…卒業、本当におめでとう。もう教えることはありません。'};
+let senseiMatch=false;
 const COP={name:'警察',car:'パトカー',col:0x3a7bff,bot:0x15161a,shape:'sedan',sprite:'police',type:'police',cop:true,fav:'',
   pre:['そこの車、止まりなさい！','前の車、左に寄せて止まりなさい！'],passed:['逃がすな！','応援を要請する！'],pass:['確保ーっ！','前に回り込んだぞ！'],win:'確保！',lose:'…見失いました。'};
 function nameTag(text,col){
@@ -1142,7 +1148,7 @@ function resetRace(){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
   } else {
-    cpus.push(makeCpu(DRIVERS.yellow,DIFF[diff].scale,START_I+6,-1.6,true));
+    cpus.push(senseiMatch?makeCpu(SENSEI,1.12,START_I+6,-1.6,true):makeCpu(DRIVERS.yellow,DIFF[diff].scale,START_I+6,-1.6,true));
     ps={s:START_I-10,lat:1.6};
   }
   const p=P[Math.round(ps.s)];
@@ -1179,6 +1185,7 @@ $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
   if(mode==='cup'){if(cupState&&cupState.race<CUPS[cupIdx].courses.length){loadCourse(CUPS[cupIdx].courses[cupState.race]);resetRace();}else toMenu();}
   else{if(mode==='free'){courseOf('loop').reroll=true;loadCourse('loop');}resetRace();}});
 $('btnMenu').addEventListener('click',toMenu);
+$('senseiBtn').addEventListener('click',()=>{senseiMatch=true;mode='battle';$('title').hidden=true;$('snd').hidden=true;startAudio();startBgm();loadCourse('down');resetRace();});
 $('btnPA').addEventListener('click',()=>{if(mode==='free'&&game.state==='race')enterPA();});
 const DIFF=[{scale:.84,mult:.7},{scale:.9,mult:1},{scale:1.0,mult:1.6}];
 let diff=+(store.get('touge_diff')??1);if(!DIFF[diff])diff=1;
@@ -1336,7 +1343,7 @@ function startFromMenu(){
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   resetRace();
 }
-function toMenu(){$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -1922,7 +1929,7 @@ function renderSchool(){const l=$('schoolList');l.innerHTML='';const st=sj('toug
     b.innerHTML='<b></b><small></small><small></small>';const sm=b.querySelectorAll('small');b.querySelector('b').textContent=g.t+'　'+c.name;sm[0].textContent=c.sub;
     sm[1].textContent=!open?'前の段階に合格すると受けられる':st[g.id]?'合格（最高 '+st[g.id]+'点）':'まだ合格していない';
     b.addEventListener('click',()=>{if(!open)return;schoolStage=g.id;store.set('touge_sc_stage',g.id);loadCourse(g.id);renderSchool();syncStart();});l.appendChild(b);});
-  $('schoolLic').textContent=store.get('touge_license')==='1'?'免許 取得済み':'免許 なし';}
+  $('schoolLic').textContent=store.get('touge_license')==='1'?'免許 取得済み':'免許 なし';$('senseiBox').hidden=store.get('touge_license')!=='1';$('senseiRec').textContent=store.get('touge_sensei_win')==='1'?'教官に勝利済み':'まだ勝っていない';}
 function schoolGreet(){return ({kyoshu:'よろしくお願いします。シートベルトはしましたか？',tank:'……戦車で受けに来た人は初めてです。',roller:'ローラーは…まあ、遅いからいいでしょう。',dashi:'山車は免許いらないと思いますよ…？',bike:'自転車は免許いりません！',train:'電車は…線路の上なら…いや、線路ないです。',sled:'ソリ…？ 雪、降ってませんよ。',packer:'収集車ですか。お仕事おつかれさまです。',fork:'フォークリフトは構内専用ですよ。ここも構内ですけど。',police:'…お巡りさんが受けるんですか？',taxi:'二種免許の検定はやってないんですけどね。',alph:'ローンの車で受験…傷つけないでくださいね。',boss:'その車…ただ者じゃないですね。'})[spec.type]||'自分の車で受けるんですか？ では始めましょう。';}
 const SCHOOL_CHAT=['今日はいい夜ですね。','私も昔は峠を…いや、なんでもないです。','ミラー見てますか？','目線、もっと先です。','肩の力抜いていきましょう。','このあと夜の部の教習もあるんですよ。','ハンドルは送りハンドルで。','焦らなくていいですからね。'];
 function stepSchool(dt,info){const k=game.kyo,sp=Math.max(0,info.vf);
@@ -2058,16 +2065,16 @@ function finishCollect(){
   $('btnRetry').textContent='もう一回';$('btnMenu').hidden=false;
 }
 function finishBattle(){
-  const win=!rivalDone&&!game.retired,d=DIFF[diff];
+  const win=!rivalDone&&!game.retired,d=senseiMatch?{mult:2}:DIFF[diff],RV=senseiMatch?SENSEI:DRIVERS.yellow,sFirst=senseiMatch&&win&&store.get('touge_sensei_win')!=='1';if(sFirst){store.set('touge_sensei_win','1');setTimeout(()=>flash('教官に勝った！ 本当の卒業だ'),1900);}
   const pBase=game.retired?300:win?2000:600,pDrift=Math.round(game.dTotal*.25),pTime=game.retired?0:Math.max(0,Math.round((170-game.t)*15)),pHit=game.hits*40,pPass=game.passed?500:0;
   const comeback=win&&game.leadSince!=null&&game.t-game.leadSince<10,pRev=comeback?600:0;if(comeback)setTimeout(()=>flash('大逆転！'),300);
   const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass+pRev+game.shoved*50-pHit)*d.mult));
-  wallet+=earned;
-  $('resKick').textContent='峠バトル ／ '+course.name;
+  const pSen=sFirst?5000:0;wallet+=earned+pSen;
+  $('resKick').textContent=(senseiMatch?'卒業記念タイマン ／ ':'峠バトル ／ ')+course.name;
   $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');
-  $('resSub').textContent=game.retired?'壁にぶつけすぎて車が大破した。耐久はパーツの「ボディ補強」で上げられる。':win?'黄色いロータリーを峠で抜き去った。今夜の'+course.name+'はあなたのものだ。':'ライバルに '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。ヘアピンはサイドで鼻先を早めに入れると縮まる。';
-  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],[['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]]));addTotal(earned);
-  quote(DRIVERS.yellow,win?DRIVERS.yellow.lose:DRIVERS.yellow.win);
+  $('resSub').textContent=game.retired?'壁にぶつけすぎて車が大破した。耐久はパーツの「ボディ補強」で上げられる。':senseiMatch?(win?'教官を峠で抜き去った。「教習中」の札が、バックミラーの中で小さくなっていく。':'教官に '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。教習車とは思えない速さだった。'):win?'黄色いロータリーを峠で抜き去った。今夜の'+course.name+'はあなたのものだ。':'ライバルに '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。ヘアピンはサイドで鼻先を早めに入れると縮まる。';
+  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],[['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]],pSen?[['教官に初勝利',pSen]]:[]));addTotal(earned+pSen);
+  quote(RV,win?RV.lose:RV.win);
   $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;
 }
 function finishCup(){

@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='9f3dfdc30b';
+const VERSION='b5f8a211b1';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
