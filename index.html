@@ -482,6 +482,7 @@ const COURSES=[
   {id:'yamanote',name:'山手線（東京→品川）',sub:'都心の高架をゆく環状線',segs:[['S',260,0],['C',400,-18,0],['S',360,0],['C',300,15,0],['S',420,0],['C',500,-12,0],['S',380,0],['C',260,25,0],['S',400,0],['C',350,-20,0],['S',300,0]],y0:30,env:'highway',half:5.5,signs:['山手線 外回り','有楽町','新橋','浜松町','品川 方面'],hidden:true},
   {id:'kanjo',name:'大阪環状線（大阪→玉造）',sub:'大阪の街を回る環状線',segs:[['S',240,0],['C',300,30,0],['S',380,0],['C',420,-15,0],['S',340,0],['C',260,35,0],['S',420,0],['C',380,-20,0],['S',360,0],['C',300,25,0],['S',260,0]],y0:30,env:'highway',half:5.5,signs:['大阪環状線','天満','京橋','大阪城公園','鶴橋 方面'],hidden:true},
   {id:'hanshin',name:'阪神高速 環状線',sub:'大阪の環状をぐるり。料金所あり',segs:[['S',220,0],['S',200,0],['C',80,90,0],['S',300,0],['C',70,90,0],['S',180,0],['C',90,-40,0],['C',90,40,0],['S',200,0],['C',80,90,0],['S',280,0],['C',80,-30,0],['S',160,0]],y0:30,env:'highway',half:8,traffic:14,toll:110,osakaMark:true,signs:['阪神高速 環状線','本町 1km','湊町','なんば 出口','梅田 方面','信濃橋']},
+  {id:'hanshinReal',name:'阪神高速 環状線（実寸）',sub:'実際の道の形をもとにした約8kmの環状線。地図データ © OpenStreetMap contributors（概形）',geo:[[34.6983054,135.5015758],[34.6974123,135.5034567],[34.6958441,135.5058221],[34.6931124,135.5074129],[34.6895412,135.5078445],[34.6841239,135.5076112],[34.6789451,135.5072314],[34.6721098,135.5065443],[34.6678124,135.5051221],[34.6664551,135.5018442],[34.6669112,135.4965123],[34.6685419,135.4941009],[34.6734123,135.4938221],[34.6801124,135.4942119],[34.6865441,135.4948112],[34.6912339,135.4955114],[34.6954121,135.4968443],[34.6978119,135.4991228]],lap:.97,y0:30,env:'highway',half:8,traffic:22,toll:110,osakaMark:true,signs:['阪神高速 環状線','北浜','本町','長堀','湊町','信濃橋','西本町']},
   {id:'dotonbori',name:'道頓堀ネオン',sub:'大阪ミナミ。たこ焼きと串カツの看板の谷間',segs:[['S',120,0],['C',14,90,0],['S',100,0],['C',30,-30,0],['C',30,30,0],['S',120,0],['C',14,-90,0],['S',90,0],['C',14,-90,0],['S',110,0],['C',14,90,0],['S',160,0]],y0:0,env:'city',half:6,traffic:6,osaka:true,osakaMark:true},
   {id:'arcade',name:'天神橋筋商店街',sub:'日本一長いアーケード。屋根の下の細い道',segs:[['S',260,0],['C',30,14,0],['S',200,0],['C',12,90,0],['S',140,0],['C',12,-90,0],['S',240,0],['C',22,-22,0],['C',22,22,0],['S',260,0]],y0:0,env:'arcade',half:3.4,traffic:3,osakaMark:true},
   {id:'neon',name:'ネオン街',sub:'市街地。ビルの谷間を直角に曲がる',segs:NEON_SEGS,y0:0,env:'city',half:6,traffic:6}
@@ -498,8 +499,20 @@ function genPts(segs,y0){
   for(let pass=0;pass<3;pass++){const ys=pts.map(p=>p.y);for(let i=2;i<pts.length-2;i++)pts[i].y=(ys[i-2]+ys[i-1]+ys[i]+ys[i+1]+ys[i+2])/5;}
   return pts;
 }
+// 緯度経度の折れ線から、なめらかなコースの点列を作る（1 m 間隔）
+function genGeo(geo,y0,lapFrac){const la0=geo.reduce((a,g)=>a+g[0],0)/geo.length,lo0=geo.reduce((a,g)=>a+g[1],0)/geo.length,cl=Math.cos(la0*Math.PI/180);
+  const Q=geo.map(([la,lo])=>({x:(lo-lo0)*cl*111320,z:-(la-la0)*110540})),n=Q.length,dense=[];
+  for(let i=0;i<n;i++){const p0=Q[(i-1+n)%n],p1=Q[i],p2=Q[(i+1)%n],p3=Q[(i+2)%n];for(let t=0;t<1;t+=.01){const t2=t*t;
+    const f=(a,b,c,d)=>.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t*t2);dense.push({x:f(p0.x,p1.x,p2.x,p3.x),z:f(p0.z,p1.z,p2.z,p3.z)});}}
+  const pts=[];let acc=0,last=dense[0];pts.push({x:last.x,z:last.z});
+  for(let i=1;i<dense.length;i++){const q=dense[i];let d=Math.hypot(q.x-last.x,q.z-last.z);while(acc+d>=1){const f=(1-acc)/d,nx=last.x+(q.x-last.x)*f,nz=last.z+(q.z-last.z)*f;pts.push({x:nx,z:nz});last={x:nx,z:nz};d=Math.hypot(q.x-last.x,q.z-last.z);acc=0;}acc+=d;last=q;}
+  const L=Math.floor(pts.length*(lapFrac||1)),out=[];let hs=[];for(let i=0;i<L;i++){const a=pts[Math.max(0,i-3)],b=pts[Math.min(pts.length-1,i+3)];hs.push(Math.atan2(b.x-a.x,b.z-a.z));}
+  for(let i=1;i<L;i++){while(hs[i]-hs[i-1]>Math.PI)hs[i]-=Math.PI*2;while(hs[i]-hs[i-1]<-Math.PI)hs[i]+=Math.PI*2;}
+  const x0=pts[0].x,z0=pts[0].z;for(let i=0;i<L;i++){const k=i>4&&i<L-5?(hs[i+5]-hs[i-5])/10:0;out.push({x:pts[i].x-x0,y:y0,z:pts[i].z-z0,h:hs[i],k:-k,d:i,T:false});}
+  return out;}
 function buildTrack(def){
   let pts,segs;
+  if(def.geo){pts=genGeo(def.geo,def.y0,def.lap);segs=[];for(const p of pts){p.rx=-Math.cos(p.h);p.rz=Math.sin(p.h);}return {pts,hairpins:0};}
   if(def.reverse){const b=courseOf(def.from);segs=b.segs;const base=genPts(b.segs,b.y0),L=base.length-1;
     pts=base.reverse().map((p,i)=>({x:p.x,y:p.y,z:p.z,h:p.h+Math.PI,k:-p.k,d:i,T:p.T}));}
   else{segs=def.segs;pts=genPts(def.segs,def.y0);}
