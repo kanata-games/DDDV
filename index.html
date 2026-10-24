@@ -31,7 +31,7 @@ html,body{height:100%;overflow:hidden;background:var(--night);color:var(--ink);f
 body{touch-action:none;user-select:none;-webkit-user-select:none}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block}
 #speedfx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-#cockpit{position:fixed;left:50%;bottom:0;width:104vw;max-width:none;transform:translateX(-50%);pointer-events:none;z-index:1}
+#cockpit{position:fixed;left:50%;bottom:0;width:calc(var(--W,100vw)*1.04);max-width:none;transform:translateX(-50%);pointer-events:none;z-index:1}
 .hud{position:fixed;pointer-events:none;font-family:var(--f-num);z-index:2}
 #tl{top:calc(12px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px))}
 #tl .lab{font-size:11px;letter-spacing:.18em;color:var(--dim)}
@@ -226,6 +226,9 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 #meter small{color:#ff6a3c;font-family:var(--f-body);font-size:11px;font-weight:700;text-shadow:0 0 6px rgba(255,90,40,.6)}#meter b{font-size:24px;letter-spacing:.06em}
 #meter.ck{left:auto;right:56%;bottom:24%;transform:none;transform-origin:right bottom}
 #meter.tick b{color:#c8ffd8}
+html.rot90 body,html.rot270 body{position:fixed;top:0;left:0;width:var(--W);height:var(--H);transform-origin:top left}
+html.rot90 body{transform:translateX(var(--H)) rotate(90deg)}
+html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
 @media (prefers-reduced-motion:reduce){#drift,#msg{transition:none}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
@@ -337,6 +340,10 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
     </div>
     <div class="opts">画質
       <div class="seg" id="qSeg"><button type="button" data-q="0">軽い</button><button type="button" data-q="1">標準</button><button type="button" data-q="2">きれい</button></div>
+    </div>
+    <div class="opts">スマホの横画面固定
+      <div class="seg" id="rotSeg"><button type="button" data-r="0">オフ</button><button type="button" data-r="1">左に倒して持つ</button><button type="button" data-r="2">右に倒して持つ</button></div>
+      <small style="color:var(--dim);font-size:11px">本体の画面回転をロックしたまま、横持ちで遊べる</small>
       <span id="autoWrap">　<label><input type="checkbox" id="autoGas"> オートアクセル</label></span>
       <button type="button" class="ghost" id="btnSnd2">♪ 音量・BGM</button>
     </div>
@@ -368,6 +375,7 @@ const $=id=>document.getElementById(id);
 const isTouch=matchMedia('(pointer:coarse)').matches||('ontouchstart' in window);
 if(isTouch)document.body.classList.add('is-touch');
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let rotMode=+(store.get('touge_rot')??(isTouch?1:0));if(![0,1,2].includes(rotMode))rotMode=0;
 const canSave=(()=>{try{localStorage.setItem('touge_t','1');const ok=localStorage.getItem('touge_t')==='1';localStorage.removeItem('touge_t');return ok;}catch(e){return false;}})();
 
 /* ================= TRACK ================= */
@@ -506,17 +514,20 @@ scene.fog=new THREE.Fog(FOG,25,240);
 const camera=new THREE.PerspectiveCamera(68,1,.1,1500);
 scene.add(camera);
 let cockpitOn=false;
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);setCam(cockpitOn,camera.userData.fovVis||68);}
+function rotOn(){return rotMode>0&&innerHeight>innerWidth;}
+function vW(){return rotOn()?innerHeight:innerWidth;}function vH(){return rotOn()?innerWidth:innerHeight;}
+function applyRot(){const r=document.documentElement,on=rotOn();if(!r||!r.classList)return;r.classList.toggle('rot90',on&&rotMode===1);r.classList.toggle('rot270',on&&rotMode===2);r.style.setProperty('--W',vW()+'px');r.style.setProperty('--H',vH()+'px');}
+function resize(){applyRot();const w=vW(),h=vH();renderer.setSize(w,h,false);setCam(cockpitOn,camera.userData.fovVis||68);}
 // 運転席の絵を重ねる時は、画面の上の方に地平線が来るように描画範囲をずらす
 function setCam(cp,fovVis){
-  const W=innerWidth,H=innerHeight;camera.userData.fovVis=fovVis;
+  const W=vW(),H=vH();camera.userData.fovVis=fovVis;
   if(cp){const imgH=1.04*W/1.5,shield=(H-imgH+(spec.sprite?SPR[spec.sprite].shield:.5)*imgH)/H;
     const t=Math.max(.18,Math.min(.5,shield*.5)),F=2*H*(1-t);
     camera.aspect=W/F;camera.fov=2*Math.atan(Math.tan(fovVis*Math.PI/360)*F/H)*180/Math.PI;camera.setViewOffset(W,F,0,F-H,W,H);}
   else{if(camera.view)camera.clearViewOffset();camera.aspect=W/H;camera.fov=fovVis;}
   camera.updateProjectionMatrix();
 }
-addEventListener('resize',resize);
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,150));
 
 scene.add(new THREE.HemisphereLight(0x5b6ea8,0x0b0d12,.62));
 const moonL=new THREE.DirectionalLight(0x9fb6ff,.45);moonL.position.set(-200,300,-100);scene.add(moonL);
@@ -1230,6 +1241,7 @@ const VIEW_NAMES=['後方','ハンドル','フロント','サイド'];
 function toggleView(){game.view=(game.view+1)%4;wheelRig.visible=game.view===1;$('btnView').textContent='視点：'+VIEW_NAMES[game.view];}
 $('btnView').addEventListener('click',toggleView);
 document.querySelectorAll('#qSeg button').forEach(b=>b.addEventListener('click',()=>{quality=+b.dataset.q;store.set('touge_q',quality);applyQuality();}));
+{const sr=()=>document.querySelectorAll('#rotSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r===rotMode));document.querySelectorAll('#rotSeg button').forEach(b=>b.addEventListener('click',()=>{rotMode=+b.dataset.r;store.set('touge_rot',rotMode);sr();resize();}));sr();}
 $('autoGas').addEventListener('change',e=>{autoGas=e.target.checked;store.set('touge_auto',autoGas?'1':'0');});
 $('btnStart').addEventListener('click',startFromMenu);
 $('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
