@@ -929,6 +929,7 @@ SPR.roller=sprSet('roller',{back:[3.0*276/392,3.0],diag:[3.0*500/390,3.0],side:[
 SPR.hokora=sprSet('hokora',{back:[1.85*364/337,1.85],diag:[1.9*565/338,1.9],side:[3.5,3.5*316/561],front:[1.85*436/377,1.85]},{back:1.2,diag:1.2,side:.5,front:1.2},.5);['back','diag','side','front'].forEach(v=>{SPR.hokora[v].magFilter=THREE.NearestFilter;});
 SPR.ita86=sprSet('ita86',{back:[1.84,1.84*371/514],diag:[3.24,3.24*275/595],side:[4.25,4.25*214/598],front:[2.16,2.16*375/514]},{back:1.3,diag:1.3,side:.6,front:1.3},.52);
 SPR.hearse=sprSet('hearse',{back:[2.8*362/385,2.8],diag:[2.9*591/366,2.9],side:[5.6,5.6*322/592],front:[2.8*378/387,2.8]},{back:1.6,diag:1.6,side:.7,front:1.6},.5);
+SPR.gtr=sprSet('gtr',{back:[1.95,1.95*348/524],diag:[3.4,3.4*276/593],side:[4.6,4.6*197/593],front:[2.05,2.05*349/566]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
 SPR.train=sprSet('train',{back:[3.9*404/523,3.9],diag:[5*545/252,5],side:[18,18*151/570],front:[3.9*406/526,3.9]},{back:8.6,diag:4.6,side:1.4,front:8.6},.49);
 const _cp=new THREE.Vector3();
 function updateSprite(obj,yaw,hide){
@@ -977,6 +978,7 @@ const CARS=[
   {id:'hokora',dur:130,armor:.8,name:'祠（紫瑞）',note:'のじゃロリな紫瑞（しい）ちゃんが運転するピンクの軽ワゴン。車なのに名前は「祠」。この祠にぶつかってきた車・ぶつけられた車には祟りがあって、スピンして止まる。ホーン（H）は鈴：お参りすると御利益（ニトロ満タン・耐久回復・狐火で前の車を化かす）がランダムで授かる（20秒に1回）。レースが終わるとおみくじが引ける。',price:2000,top:0xf3a6b8,bot:0x2a2d33,pow:.84,grip:1.05,drift:.95,shape:'hatch',sprite:'hokora',img:'cars/hokora-diag.png',type:'hokora',steerMul:1.2,len:3.4,halfW:.78},
   {id:'ita86',dur:100,name:'海音の痛パチロク',note:'旅好きの魔女・海音（うみね）ちゃんの痛車仕様パチロク。走りは白黒パチロクと同じく軽くて素直。目立つのでドリフトポイントが1.25倍、レース後に「ファンの声援」ボーナス。ホーン（H）は水魔法「アクアブースト」：ニトロを使わずに一瞬加速（18秒に1回）。海音ちゃんが無線でしゃべる。',price:3000,top:0xf2f2ee,bot:0x15161a,pow:1.02,grip:1,drift:1.02,shape:'hatch',sprite:'ita86',img:'cars/ita86-diag.png',type:'ita'},
   {id:'hearse',dur:170,armor:.8,name:'宮型霊柩車',note:'金色のお宮を背負った黒い霊柩車。前を走る一般車は、何も言わなくても自然と道をあけてくれる。ぶつけず・ドリフトせず・クラクションを鳴らさずに静かに走りきると「静粛走行」ボーナス。ただしスタート直後の1回だけは「出棺のクラクション」として鳴らしてよい（ボーナス）。長くて重い。',price:5000,top:0x111214,bot:0xc8a030,pow:.9,grip:.9,drift:.75,shape:'sedan',sprite:'hearse',img:'cars/hearse-diag.png',type:'hearse',steerMul:.85,len:5.6,halfW:.95,cam:[7,3.9,0,4.5,1.4]},
+  {id:'gtr',dur:130,name:'スカイランGT-R（R34）',note:'ベイサイドブルーの4WDターボ。低回転ではターボが効くまで少しもたつくが、アクセルを踏み続けるとブースト圧が上がり、全開になると一気に伸びる。首都高の直線で真価を発揮。アクセルを戻すとブローオフの「プシュー」。',price:13000,top:0x1f4fd8,bot:0x1a1d24,pow:1.4,grip:1.2,drift:.82,vmax:1.06,shape:'coupe',sprite:'gtr',img:'cars/gtr-diag.png',type:'gtr'},
   {id:'boss',dur:140,name:'黒いモンスター',note:'峠の主。最高速もグリップも別格。',price:16000,top:0x17181c,bot:0x30333a,pow:1.5,grip:1.3,drift:.92,shape:'coupe',sprite:'boss',img:'cars/boss-diag.png'}
 ];
 let wallet=+(store.get('touge_p')||0);
@@ -1175,7 +1177,7 @@ function resetRace(){
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.oraT=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if(spec.type==='sled'&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash('上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';car.gunCd=0;car.oraT=0;car.turbo=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   game.startD=P[car.idx].d;car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1297,7 +1299,7 @@ function renderParts(){
     else{btn.textContent=nx.n+'　あと '+(nx.p-wallet).toLocaleString()+' P';btn.disabled=true;}
     d.querySelector('.act').appendChild(btn);box.appendChild(d);});
 }
-const CAR_CAT={'86':'run',fr:'run',re:'run','4wd':'run',boss:'run',nbox:'town',tanto:'town',alph:'town',noah:'town',taxi:'town',kyoshu:'town',kei:'work',packer:'work',fork:'work',police:'work',roller:'work',train:'neta',bike:'neta',tank:'neta',sled:'neta',dashi:'neta',hokora:'friend',ita86:'friend',hearse:'work'};
+const CAR_CAT={'86':'run',fr:'run',re:'run','4wd':'run',boss:'run',nbox:'town',tanto:'town',alph:'town',noah:'town',taxi:'town',kyoshu:'town',kei:'work',packer:'work',fork:'work',police:'work',roller:'work',train:'neta',bike:'neta',tank:'neta',sled:'neta',dashi:'neta',hokora:'friend',ita86:'friend',hearse:'work',gtr:'run'};
 const CAT_NAMES=[['all','すべて'],['own','所有'],['run','走り屋'],['town','街の車'],['work','はたらく車'],['neta','ネタ'],['friend','友達']];
 let gFilt=store.get('touge_gfilt')||'all';
 function renderGarage(){
@@ -1381,8 +1383,8 @@ function toMenu(){if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('met
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
-function accMul(){return (car.boost||game.aquaOn>game.t?1.7:1)*(car.draft?1.12:1);}
-function topMul(){return (car.boost||game.aquaOn>game.t?1.2:1)*(car.draft?1.06:1);}
+function accMul(){return (car.boost||game.aquaOn>game.t?1.7:1)*(car.draft?1.12:1)*(spec.type==='gtr'?.82+.38*(car.turbo||0):1);}
+function topMul(){return (car.boost||game.aquaOn>game.t?1.2:1)*(car.draft?1.06:1)*(spec.type==='gtr'?1+.06*(car.turbo||0):1);}
 function hpPow(){const f=car.hp/spec.hpMax;return f<.5?.8+.4*f:1;}
 const FAMILY_LINES=['パパ運転こわい…','ちょっと！ 子どもが起きたでしょ！','ジュースこぼれた〜！','まだ着かないの〜？','おばあちゃん酔っちゃったって','いま絶対ぶつけたよね？'];
 function damage(a){if(game.state!=='race'||a<=0)return;if(game.kyo&&a>=3){game.kyo.score=Math.max(0,game.kyo.score-8);kyoSay(['ぶつけたら検定中止ですよ…','いま当たりましたね。減点です。','はい、接触。減点8。'],true);}if(game.fb&&game.fb.phase==='battle')game.fb.me=Math.max(0,game.fb.me-a*.7);if(spec.type==='noah'&&a>=4&&game.t-(game.famT||-9)>2.5){game.famT=game.t;say({name:'後部座席',col:0xffd27a},FAMILY_LINES[Math.floor(Math.random()*FAMILY_LINES.length)]);}a*=spec.armor||1;car.hp=Math.max(0,car.hp-a);if(a>=12){flash('ダメージ −'+Math.round(a));umi(['きゃっ！ ご、ごめんなさい！','痛車に傷が…！','うぅ、ぶつけちゃいました…'],false);shii(['いたいのじゃ〜！','わ、わらわの祠がぁ…！','こらー！ 祠は大事にするのじゃ！'],false);}if(car.hp<=0)wreck();}
@@ -1821,6 +1823,7 @@ function frame(now){
       else game.cprog=Math.max(0,game.cprog-dt*2);
       if(game.left<=0){game.left=0;game.timeUp=true;flash('時間切れ！');finish();}
     }
+    if(spec.type==='gtr'){const g=(input.gas||autoGas)&&!input.brake,sp=Math.max(0,info.vf),prev=car.turbo||0;car.turbo=g&&sp>8?Math.min(1,prev+dt*(.18+sp*.006)):Math.max(0,prev-dt*1.6);if(prev<1&&car.turbo>=1)flash('ブースト全開！');if(prev>.6&&!g){if(ac)whoosh();car.turbo=Math.min(car.turbo,.3);}}
     if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
     if(mode==='free'&&game.state==='race')stepFree(dt);
     if(game.state==='race'&&mode!=='free'&&car.idx>=GOAL_I)finish();
