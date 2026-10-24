@@ -157,7 +157,7 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .carInfo .act{display:flex;flex-direction:column;gap:6px}
 .carInfo .nm{font-family:var(--f-disp);font-size:18px}
 .carInfo p{margin:2px 0 0;font-size:12px;color:var(--dim);line-height:1.6}
-.bars{grid-column:1/-1;display:grid;grid-template-columns:5em 1fr;gap:5px 10px;font-size:12px;color:var(--dim)}
+.bars{grid-column:1/-1;display:grid;grid-template-columns:5em minmax(0,1fr);gap:5px 10px;font-size:12px;color:var(--dim)}
 .bar{height:8px;background:rgba(255,255,255,.08);border-radius:2px;align-self:center;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--sodium)}
 .buy{font-family:var(--f-body);font-weight:700;font-size:13px;border-radius:4px;padding:8px 14px;cursor:pointer;border:1px solid var(--sodium);background:var(--sodium);color:var(--night);white-space:nowrap}
@@ -171,7 +171,7 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .btnRow{display:flex;gap:10px;flex-wrap:wrap}
 .btnRow .go{flex:1}
 .go.sub{background:transparent;color:var(--sodium);border:1px solid var(--sodium);box-shadow:none}
-@media (max-width:520px){.carList{grid-template-columns:repeat(2,minmax(0,1fr))}.carInfo{grid-template-columns:1fr}}
+@media (max-width:520px){.carList{grid-template-columns:repeat(2,minmax(0,1fr))}.carInfo{grid-template-columns:minmax(0,1fr)}}
 .gFilter{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .gFilter button{font-family:var(--f-body);font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid rgba(159,182,255,.25);background:transparent;color:var(--dim);cursor:pointer}
 .gFilter button small{font-family:var(--f-num);font-weight:400;margin-left:4px;opacity:.8}
@@ -180,7 +180,7 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .gBody{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px;align-items:start}
 .gBody .carList{max-height:min(54vh,470px);overflow-y:auto;overscroll-behavior:contain;padding:2px 6px 2px 2px;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));align-content:start;scrollbar-width:thin}
 .gBody .carBtn{padding:6px 7px;gap:4px}.gBody .carBtn .th{height:42px}.gBody .carBtn b{font-size:12.5px;line-height:1.3}.gBody .carBtn small{font-size:11px}.gBody .carBtn .sw{height:5px}
-.gBody .carInfo{grid-template-columns:1fr;position:sticky;top:0;max-height:min(54vh,470px);overflow-y:auto}
+.gBody .carInfo{grid-template-columns:minmax(0,1fr);position:sticky;top:0;max-height:min(54vh,470px);overflow-y:auto}
 .gBody .carInfo .act{flex-direction:row;flex-wrap:wrap}
 .gEmpty{grid-column:1/-1;font-size:12px;color:var(--dim);padding:12px}
 @media (max-width:700px){.gBody{grid-template-columns:1fr}.gBody .carInfo{order:-1;position:static;max-height:none}.gBody .carList{max-height:42vh;grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -232,6 +232,13 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 html.rot90 body,html.rot270 body{position:fixed;top:0;left:0;width:var(--W);height:var(--H);transform-origin:top left}
 html.rot90 body{transform:translateX(var(--H)) rotate(90deg)}
 html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
+.tune{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(159,182,255,.15);padding-top:8px}
+.tune:empty{display:none}
+.tuneHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.tuneHead b{font-size:13px}.tuneHead small{font-size:11px;color:var(--dim)}
+.tuneRow{display:grid;grid-template-columns:5.5em 26px minmax(0,1fr) auto;align-items:center;gap:6px;font-size:12px}
+.tuneRow .pips{display:flex;gap:2px}.tuneRow .pips i{flex:1;height:8px;border-radius:1px;background:rgba(233,236,245,.12)}.tuneRow .pips i.on{background:var(--sodium)}
+.tb2{font-family:var(--f-num);font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid rgba(159,182,255,.3);background:transparent;color:var(--ink);cursor:pointer;min-width:26px;white-space:nowrap}
+.tb2:disabled{opacity:.35;cursor:default}
 @media (prefers-reduced-motion:reduce){#drift,#msg{transition:none}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
@@ -1029,7 +1036,12 @@ const PARTS={
 };
 let parts=Object.assign({engine:0,tire:0,body:0},(()=>{try{return JSON.parse(store.get('touge_parts')||'{}')}catch(e){return{}}})());
 const wingOn=id=>store.get('touge_wing_'+id)==='1';
-function buildSpec(id){const b=CARS.find(c=>c.id===id)||CARS[0];return Object.assign({},b,{sprite:b.wingAlt&&wingOn(b.id)?b.wingAlt:b.sprite,pow:b.pow*PARTS.engine.lv[parts.engine].m,grip:b.grip*PARTS.tire.lv[parts.tire].m,hpMax:Math.round((b.dur||100)*PARTS.body.lv[parts.body].m)});}
+// 車ごとのチューニング（Pで上げ下げ。下げると全額戻る）
+const TUNE=[{k:'spd',n:'最高速',d:'最高速 +10%／段'},{k:'acc',n:'加速',d:'加速 +10%／段'},{k:'hnd',n:'ハンドリング',d:'グリップ +6%・曲がり +5%／段'},{k:'dur',n:'耐久',d:'耐久 +15%／段'}],TUNE_MAX=10;
+let tuneM=(()=>{try{const o=JSON.parse(store.get('touge_tune')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
+function tuneOf(id){return Object.assign({spd:0,acc:0,hnd:0,dur:0},tuneM[id]||{});}
+function tuneCost(n){return Math.round(120*Math.pow(n,1.6)/10)*10;}
+function buildSpec(id){const b=CARS.find(c=>c.id===id)||CARS[0],t=tuneOf(b.id);return Object.assign({},b,{sprite:b.wingAlt&&wingOn(b.id)?b.wingAlt:b.sprite,pow:b.pow*PARTS.engine.lv[parts.engine].m*(1+.1*t.acc),grip:b.grip*PARTS.tire.lv[parts.tire].m*(1+.06*t.hnd),steerMul:(b.steerMul||1)*(1+.05*t.hnd),vmax:(b.vmax||1)*(1+.1*t.spd),hpMax:Math.round((b.dur||100)*PARTS.body.lv[parts.body].m*(1+.15*t.dur))});}
 let spec=buildSpec(selId);
 let pc=makeCar(spec,true);
 let tailCar=null;const trail=[];
@@ -1370,10 +1382,10 @@ function renderGarage(){
   list.scrollTop=keep;
   const c=CARS.find(x=>x.id===focusId),info=$('carInfo');
   const own=owned.includes(c.id);
-  info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div>';
+  info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div><div class="tune"></div>';
   info.querySelector('.nm').textContent=c.name;{const L=zanM[c.id];info.querySelector('p').textContent=c.note+(own&&L&&L.d>0?'　【残クレ返済中：残債 '+L.d.toLocaleString()+' P／毎レース '+L.p.toLocaleString()+' P】':own&&L?'　【完済済み — 本当にあなたの車】':'');}
   const bars=info.querySelector('.bars');
-  [['パワー',c.pow/1.5],['グリップ',c.grip/1.3],['ドリフト',c.drift/1.35],['耐久',(c.dur||100)/220]].forEach(([l,v])=>{const sp=document.createElement('span');sp.textContent=l;const bar=document.createElement('span');bar.className='bar';bar.innerHTML='<i></i>';bar.firstChild.style.width=Math.round(v*100)+'%';bars.append(sp,bar);});
+  {const t=tuneOf(c.id);[['パワー',c.pow*(1+.1*t.acc)/1.5],['最高速',(c.vmax||1)*(1+.1*t.spd)/1.4],['グリップ',c.grip*(1+.06*t.hnd)/1.3],['ドリフト',c.drift/1.35],['耐久',(c.dur||100)*(1+.15*t.dur)/220]].forEach(([l,v])=>{const sp=document.createElement('span');sp.textContent=l;const bar=document.createElement('span');bar.className='bar';bar.innerHTML='<i></i>';bar.firstChild.style.width=Math.round(v*100)+'%';bars.append(sp,bar);});}
   const act=info.querySelector('.act'),btn=document.createElement('button');btn.type='button';btn.className='buy';
   if(own){btn.textContent=c.id===selId?'この車で走る':'乗りかえる';btn.classList.add('ghosty');btn.disabled=c.id===selId;
     btn.addEventListener('click',()=>{swapCar(c.id);renderGarage();});}
@@ -1388,6 +1400,16 @@ function renderGarage(){
     pb.addEventListener('click',()=>{wallet-=L.d;L.d=0;zanSave();store.set('touge_p',wallet);renderAll();flash('完済！ '+c.name+'は本当にあなたのものになった');});act.appendChild(pb);}}
   if(own&&c.wingAlt){const wb=document.createElement('button');wb.type='button';wb.className='buy ghosty';wb.textContent=wingOn(c.id)?'リアウイングを外す':'リアウイングを付ける';
     wb.addEventListener('click',()=>{store.set('touge_wing_'+c.id,wingOn(c.id)?'0':'1');if(selId===c.id)swapCar(c.id);renderGarage();});act.appendChild(wb);}
+  const tb=info.querySelector('.tune');
+  if(own){const t=tuneOf(c.id);const h=document.createElement('div');h.className='tuneHead';h.innerHTML='<b>チューニング</b><small>この車だけ。下げるとPは全額戻る</small>';tb.appendChild(h);
+    TUNE.forEach(T=>{const lv=t[T.k],row=document.createElement('div');row.className='tuneRow';row.title=T.d;
+      const nm=document.createElement('span');nm.className='tn';nm.textContent=T.n;
+      const pips=document.createElement('span');pips.className='pips';for(let i=0;i<TUNE_MAX;i++){const q=document.createElement('i');if(i<lv)q.className='on';pips.appendChild(q);}
+      const mi=document.createElement('button');mi.type='button';mi.className='tb2';mi.textContent='−';mi.disabled=lv<=0;mi.setAttribute('aria-label',T.n+'を下げる');
+      const pl=document.createElement('button');pl.type='button';pl.className='tb2';const cost=tuneCost(lv+1);pl.textContent=lv>=TUNE_MAX?'MAX':'＋ '+cost.toLocaleString();pl.disabled=lv>=TUNE_MAX||wallet<cost;pl.setAttribute('aria-label',T.n+'を上げる');
+      mi.addEventListener('click',()=>{const o=tuneOf(c.id);if(o[T.k]<=0)return;wallet+=tuneCost(o[T.k]);o[T.k]--;tuneM[c.id]=o;store.set('touge_tune',JSON.stringify(tuneM));store.set('touge_p',wallet);if(selId===c.id)swapCar(c.id);renderAll();});
+      pl.addEventListener('click',()=>{const o=tuneOf(c.id),cs=tuneCost(o[T.k]+1);if(o[T.k]>=TUNE_MAX||wallet<cs)return;wallet-=cs;o[T.k]++;tuneM[c.id]=o;store.set('touge_tune',JSON.stringify(tuneM));store.set('touge_p',wallet);if(selId===c.id)swapCar(c.id);renderAll();});
+      row.append(nm,mi,pips,pl);tb.appendChild(row);});}
 }
 const ESC_COURSES=['wangan','c1','neon','down'];
 let escCourse=store.get('touge_esc_course')||'wangan';if(!ESC_COURSES.includes(escCourse))escCourse='wangan';
