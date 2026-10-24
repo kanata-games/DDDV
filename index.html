@@ -1274,7 +1274,7 @@ function resetRace(){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
   } else {
-    cpus.push(senseiMatch?makeCpu(SENSEI,1.12,START_I+6,-1.6,true):makeCpu(battleDef(),battleSkill(),START_I+6,-1.6,true));
+    cpus.push(senseiMatch?makeCpu(SENSEI,1.27,START_I+6,-1.6,true):makeCpu(battleDef(),battleSkill(),START_I+6,-1.6,true));
     ps={s:START_I-10,lat:1.6};
   }
   const p=P[Math.round(ps.s)];
@@ -1352,7 +1352,7 @@ const CUPS=[
   {id:'W',name:'はたらく車 グランプリ',courses:['neon','c1','lake'],drivers:['packer','fireman','medic','mixerman'],skill:[.8,.83,.86,.89],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'work',catName:'はたらく車'},
   {id:'X',name:'ネタ車 グランプリ',courses:['down','tsuzura','lake'],drivers:['cartboy','danjiri','hearseman','tanker'],skill:[.78,.82,.86,.9],prize:9000,pos:[3200,2200,1500,900,600],req:'D',cat:'neta',catName:'ネタ車'},
   {id:'F',name:'月夜の友達 グランプリ',courses:['ridge','lake','tsuzura'],drivers:['shii','umi','astarte','sensei'],skill:[.92,.95,1.0,1.06],prize:20000,pos:[6000,4000,2600,1600,900],req:'C',cat:'friend',catName:'友達の車',title:'月夜の走り仲間'},
-  {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[1.0,1.02,1.05,1.08],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
+  {id:'A',name:'A級 グランプリ',courses:['tsuzura','ridge','down'],drivers:['blue','yellow','kurenai','veil'],skill:[1.14,1.18,1.22,1.28],prize:25000,pos:[7000,4500,3000,1800,1000],req:'B',title:'峠の王'}
 ];
 const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
