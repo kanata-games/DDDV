@@ -299,7 +299,7 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
       <li><kbd>Space</kbd>サイドブレーキ（ドリフト）　<kbd>N</kbd>ニトロ　<kbd>C</kbd>視点切替　<kbd>R</kbd>コースに戻る　<kbd>M</kbd>消音　<kbd>B</kbd>次の曲　<kbd>H</kbd>ホーン</li>
     </ul>
     <div class="opts">視点の距離
-      <div class="seg" id="camSeg"><button type="button" data-c="0">近い</button><button type="button" data-c="1">ふつう</button><button type="button" data-c="2">遠い</button></div>
+      <div class="seg" id="camSeg"><button type="button" data-c="3">すぐ後ろ</button><button type="button" data-c="0">近い</button><button type="button" data-c="1">ふつう</button><button type="button" data-c="2">遠い</button></div>
     </div>
     <div class="opts">画質
       <div class="seg" id="qSeg"><button type="button" data-q="0">軽い</button><button type="button" data-q="1">標準</button><button type="button" data-q="2">きれい</button></div>
@@ -1056,7 +1056,7 @@ let diff=+(store.get('touge_diff')??1);if(!DIFF[diff])diff=1;
 function syncDiff(){document.querySelectorAll('#dSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===diff));}
 document.querySelectorAll('#dSeg button').forEach(b=>b.addEventListener('click',()=>{diff=+b.dataset.d;store.set('touge_diff',diff);syncDiff();}));
 syncDiff();
-const CAMD=[.78,1,1.3];let camDist=+(store.get('touge_camd')??1);if(!CAMD[camDist])camDist=1;
+const CAMD=[.78,1,1.3,.52];let camDist=+(store.get('touge_camd')??1);if(!CAMD[camDist])camDist=1;
 function syncCam(){document.querySelectorAll('#camSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.c===camDist));}
 document.querySelectorAll('#camSeg button').forEach(b=>b.addEventListener('click',()=>{camDist=+b.dataset.c;store.set('touge_camd',camDist);syncCam();}));syncCam();
 let focusId=selId;
@@ -1691,7 +1691,7 @@ function frame(now){
     camera.position.lerp(camPos,Math.min(1,dt*2));camera.lookAt(camLook);wheelRig.visible=false;
   } else if(game.view===0){
     const vy=info.sp>4?Math.atan2(car.vx,car.vz):car.yaw;const cy=car.yaw+((vy-car.yaw+Math.PI*3)%(Math.PI*2)-Math.PI)*.35;
-    const cm=CAMD[camDist],cd=(spec.cam?spec.cam[0]:5.2)*cm,ch=(spec.cam?spec.cam[1]:3.1)*(.6+.4*cm),cl=spec.cam?spec.cam[2]||0:0;
+    const cm=CAMD[camDist],cd=(spec.cam?spec.cam[0]:5.2)*cm,ch=(spec.cam?spec.cam[1]:3.1)*(cm<.7?.3+.7*cm:.6+.4*cm),cl=spec.cam?spec.cam[2]||0:0;
     camPos.set(car.x-Math.sin(cy)*cd-Math.cos(cy)*cl,car.y+ch,car.z-Math.cos(cy)*cd+Math.sin(cy)*cl);
     if(!camInit){camera.position.copy(camPos);camInit=true;}
     camera.position.lerp(camPos,Math.min(1,dt*4.2));
