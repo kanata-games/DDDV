@@ -1266,7 +1266,7 @@ function updateSprite(obj,yaw,hide){
   const A=Math.abs(ang);let view,mirror;
   if(A<24){view='back';mirror=false;}
   else if(A<66){view='diag';mirror=ang<0;}
-  else if(A<145||!sp.set.front){view='side';mirror=ang>0;}
+  else if(A<145||!sp.set.front){view='side';mirror=ang<0;} // 横の絵は全部「前が右」。斜めと同じ向きで反転する
   else {view='front';mirror=false;}
   if(sp.mat.map!==sp.set[view]){sp.mat.map=sp.set[view];sp.mat.needsUpdate=true;}
   const [w,h]=sp.set.size[view];
