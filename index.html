@@ -365,7 +365,6 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
       <div class="cup"><div class="cupHead"><b>首都高 野良バトル</b><span id="freeBest">BEST --</span></div>
       <div id="freeMap" style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0"><button data-m="loop" style="flex:1;padding:8px;border:1px solid #3d4a66;border-radius:8px;font-weight:bold">夜の環状（区間ランダム）</button><button data-m="c1ring" style="flex:1;padding:8px;border:1px solid #3d4a66;border-radius:8px;font-weight:bold">C1 実寸（本物の形）</button><button data-m="bigring" style="flex:1;padding:8px;border:1px solid #3d4a66;border-radius:8px;font-weight:bold">湾岸ループ 実寸（レインボーブリッジ）</button><button data-m="bayring" style="flex:1;padding:8px;border:1px solid #3d4a66;border-radius:8px;font-weight:bold">東京ベイ大周回 実寸（約46km）</button></div>
       <p class="lede" style="font-size:12px">ゴールのない夜の首都高を、一般車にまざって好きなだけ走れる。トンネルを抜けるたびに区間が切り替わる。海沿いの<b>湾岸線</b>、ビルの谷間の<b>C1 都心環状</b>、防音壁の<b>横羽線</b>、海の上の<b>レインボーブリッジ</b>、長い<b>山手トンネル</b>、高架が重なる<b>箱崎ジャンクション</b>、出口を降りて夜の街を抜ける<b>一般道</b>。区間の順番は走るたびに変わる。走っていると野良のライバルが現れる。<b>後ろからパッシングされたら</b>勝負開始。<b>前を流しているライバル</b>には、近づいてホーン（H）で挑戦できる（追い越しても勝負になる）。</p>
-      <p class="lede" style="font-size:12px"><b>実寸の3コースはJCTでつながっている。</b>江戸橋JCTや箱崎JCTの手前で案内が出たら、<b>右か左の車線に寄ったまま</b>分かれ道を通ると、別の周回（C1・湾岸ループ・東京ベイ大周回）へ乗り換えられる。乗り換えの瞬間、少しだけ画面が止まることがある。</p>
       <p class="lede" style="font-size:12px">バトルはSPゲージの削り合い。前にいれば相手のSPが、後ろにいれば自分のSPが減っていき、離れるほど速く減る。壁にぶつけても自分のSPが減る。相手のSPを0にすれば勝ち。5勝するごとに「首都高の主」が現れる。</p>
       <p class="lede" style="font-size:12px">やめる時は画面上の<b>「PAに入る」</b>（Pキー）。そこまでのバトルの賞金と走行距離ぶんのポイントがもらえる。大破すると稼ぎは半分になる。</p></div>
     </section>
@@ -1535,7 +1534,7 @@ function loadCourse(id){
   snowFx.visible=!!course.snow;
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.ring){const w0=200;let best=1e18,j0=0;for(let j=Math.floor(N*.6);j<N-300;j++){const d=(P[j].x-P[w0].x)**2+(P[j].z-P[w0].z)**2;if(d<best){best=d;j0=j;}} // 1周ぶん先の同じ地点へワープ
-    course.loopW=w0;course.loopF=j0;course.loopL=j0-w0;course.loopD={x:P[w0].x-P[j0].x,y:P[w0].y-P[j0].y,z:P[w0].z-P[j0].z};course.sect=null;course.net=NET[course.id]?netSplits():null;}
+    course.loopW=w0;course.loopF=j0;course.loopL=j0-w0;course.loopD={x:P[w0].x-P[j0].x,y:P[w0].y-P[j0].y,z:P[w0].z-P[j0].z};course.sect=null;course.net=NET_ON&&NET[course.id]?netSplits():null;}
   else if(course.loop){const lo=loopLayout(course.order);course.sect=lo.ranges;course.loopW=lo.w0;course.loopF=lo.wF;course.loopL=lo.wF-lo.w0;const a=lo.w0,b=lo.wF;course.loopD={x:P[a].x-P[b].x,y:P[a].y-P[b].y,z:P[a].z-P[b].z};
     lo.ranges.forEach(r=>{for(let i=r.from;i<Math.min(N,r.to);i++)P[i].blk=r.k;});for(let i=0;i<LOOP_LEAD;i++)P[i].blk=course.order[0];}
   if(course.stops){course.stopI=course.stops.map(o=>({i:genPts(course.segs.slice(0,o.seg),0).length-1+o.at,t:o.t}));}
@@ -2237,7 +2236,7 @@ function frame(now){
     acc+=dt;const h=1/120;
     while(acc>=h){info=stepVehicle(h,racing);if(racing||game.state==='done'){cpus.forEach(c=>stepCpu(c,h,true));stepTraffic(h);}acc-=h;}
     if(course.loop&&car.idx>=course.loopF)loopWarp();
-    if(course.net&&mode==='free'&&game.state==='race')stepNet();
+    if(NET_ON&&course.net&&mode==='free'&&game.state==='race')stepNet();
     // 車どうしの接触
     {const PK=spec.type==='packer'||spec.type==='tug'||spec.type==='tank'||spec.type==='dashi'||spec.type==='roller'||spec.type==='mixer'||spec.type==='deco',R=PK?3.3:2.3,pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
     cpus.concat(traffic).forEach(c=>{const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz);
@@ -2688,6 +2687,7 @@ function loopWarp(){const L=course.loopL,D=course.loopD;
   traffic.forEach(t=>{if(near(t.s))t.s-=L;else{t.s=car.idx+250+Math.random()*480;t.lat=pick(lanesNow());}const a=sampleAt(t.s);t.x=a.x+a.rx*t.lat;t.z=a.z+a.rz*t.lat;t.y=a.y;});
   smokes.forEach(q=>{q.s.position.x+=D.x;q.s.position.z+=D.z;});}
 /* ===== 首都高ネットワーク：JCTで車線を選ぶと別の実寸周回へ乗り換え ===== */
+const NET_ON=false; // JCT乗り換え（試作）は停止中
 const NET={c1ring:'C1 都心環状',bigring:'深川線・湾岸線 方面',bayring:'7号小松川線・京葉道路 方面'},NETP={};
 function netPts(id){if(!NETP[id]){const c=courseOf(id),pts=genGeo(c.geo,c.y0,c.lap,c.open,c.origin);for(const p of pts){p.rx=-Math.cos(p.h);p.rz=Math.sin(p.h);}
   const w0=200;let best=1e18,j0=0;for(let j=Math.floor(pts.length*.6);j<pts.length-300;j++){const d=(pts[j].x-pts[w0].x)**2+(pts[j].z-pts[w0].z)**2;if(d<best){best=d;j0=j;}}
