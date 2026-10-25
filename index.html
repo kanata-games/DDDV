@@ -1284,7 +1284,7 @@ SPR.trolley=sprSet('trolley',{back:[1.25*1.0785,1.25],diag:[1.35*1.4428,1.35],si
 SPR.handcar=sprSet('handcar',{back:[1.45*1.036,1.45],diag:[1.6*1.4053,1.6],side:[2.7,2.7/2.0176],front:[1.45*1.0112,1.45]},{back:.8,diag:.8,side:.4,front:.8},.3);
 SPR.sweeper=sprSet('sweeper',{back:[2.6*1.1933,2.6],diag:[2.8*1.8139,2.8],side:[5.2,5.2/1.8734],front:[2.6*1.3403,2.6]},{back:2.2,diag:1.9,side:.6,front:2.2},.47);
 SPR.tf=sprSet('tf',{back:[1.2*1.7841,1.2],diag:[1.9*1.8861,1.9],side:[4.5,4.5/2.8647],front:[1.2*1.7515,1.2]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
-SPR.tfr=sprSet('tfr',{back:[4.6*.7475,4.6],diag:[4.6*.6548,4.6],side:[4.6*.8847,4.6],front:[4.6*.7392,4.6]},{back:1.0,diag:1.0,side:.6,front:1.0},.52);SPR.tfr.cockpit='cars/tf-cockpit.webp';SPR.tfrWalk=[0,1,2,3].map(k=>sprTex('cars/tfr-walk'+k+'.webp'));SPR.tfrWalkSize=[4.6*.8275,4.6];
+SPR.tfr=sprSet('tfr',{back:[4.6*.7475,4.6],diag:[4.6*.6548,4.6],side:[4.6*.8847,4.6],front:[4.6*.7392,4.6]},{back:1.0,diag:1.0,side:.6,front:1.0},.52);SPR.tfr.cockpit='cars/tf-cockpit.webp';SPR.tfrWalk={back:[0,1,2,3].map(k=>sprTex('cars/tfr-walk'+k+'.webp')),diag:[0,1,2,3].map(k=>sprTex('cars/tfr-walk-diag'+k+'.webp')),side:[0,1,2,3].map(k=>sprTex('cars/tfr-walk-side'+k+'.webp'))};SPR.tfrWalkSize={back:[4.6*.8275,4.6],diag:[5.328,4.623],side:[5.097,4.45]};
 SPR.parade=sprSet('parade',{back:[2.9*1.2734,2.9],diag:[3.1*1.4293,3.1],side:[5.0,5.0/1.5756],front:[2.9*1.0203,2.9]},{back:2.0,diag:1.8,side:.6,front:2.0},.5);
 SPR.junk=sprSet('junk',{back:[2.15*.9235,2.15],diag:[2.4*1.3798,2.4],side:[3.5,3.5/1.5933],front:[2.15*.9666,2.15]},{back:1.2,diag:1.2,side:.5,front:1.2},.51);
 SPR.sl=sprSet('sl',{back:[3.6*1.1221,3.6],diag:[4.1*1.5234,4.1],side:[8.0,8.0/1.8018],front:[3.6*.886,3.6]},{back:3.6,diag:2.8,side:.8,front:3.6},.55);
@@ -1309,7 +1309,7 @@ function updateSprite(obj,yaw,hide){
   else if(A<145||!sp.set.front){view='side';mirror=ang<0;} // 横の絵は全部「前が右」。斜めと同じ向きで反転する
   else {view='front';mirror=false;}
   let tex=sp.set[view],wh=sp.set.size[view];
-  if(obj===pc&&sp.set===SPR.tfr&&view==='back'&&Math.hypot(car.vx,car.vz)>1){tex=SPR.tfrWalk[Math.floor((car.walkD||0)/1.8)%4];wh=SPR.tfrWalkSize;} // ロボの歩きアニメ（後ろ姿）
+  if(obj===pc&&sp.set===SPR.tfr&&SPR.tfrWalk[view]&&Math.hypot(car.vx,car.vz)>1){tex=SPR.tfrWalk[view][Math.floor((car.walkD||0)/1.8)%4];wh=SPR.tfrWalkSize[view];} // ロボの歩きアニメ（後ろ・斜め・横）
   if(sp.mat.map!==tex){sp.mat.map=tex;sp.mat.needsUpdate=true;}
   const [w,h]=wh;
   sp.plane.scale.set(mirror?-w:w,h,1);
