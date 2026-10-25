@@ -139,6 +139,12 @@ body.is-touch #radio{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 #resQuote b{font-size:12px;color:var(--rc,var(--sodium))}#resQuote span{font-weight:700}
 #standings{display:flex;flex-direction:column;gap:10px}
 @media (max-width:520px){.courseList,.races{grid-template-columns:1fr}}
+.cTabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.cTabs button{flex:1;min-width:0;padding:7px 4px;border-radius:999px;border:1px solid rgba(159,182,255,.25);background:rgba(159,182,255,.05);color:var(--dim);font-family:var(--f-body);font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap}.cTabs button.on{background:var(--sodium-soft);border-color:var(--sodium);color:var(--ink)}
+.courseList.cCompact{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.cCompact .courseBtn{padding:7px 9px;gap:2px}.cCompact .courseBtn b{font-size:13px;line-height:1.25;overflow-wrap:anywhere}.cCompact .courseBtn small{font-size:10px}
+@media (max-width:520px){.courseList.cCompact{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#rvSeg{flex-wrap:wrap;border:0;gap:5px;overflow:visible;width:100%}#rvSeg button{border:1px solid rgba(159,182,255,.3);border-radius:999px;padding:5px 10px;white-space:nowrap;font-size:12px}
+#pane-battle .spec{margin:6px 0}#pane-battle .spec>div{padding:5px 10px}#pane-battle .spec b{font-size:16px}#pane-battle .spec small{font-size:10px}#pane-battle .opts{margin-top:6px}
+.cDesc{font-size:11px;color:var(--dim);margin:6px 2px 0;min-height:1.4em;line-height:1.5}
 .gHead{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;letter-spacing:.2em;color:var(--dim)}
 .wallet{letter-spacing:0;font-size:13px;color:var(--ink)}
 .wallet b{font-family:var(--f-num);font-size:22px;color:var(--sodium);font-variant-numeric:tabular-nums}
@@ -308,7 +314,9 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
     <section class="pane" id="pane-battle" role="tabpanel" hidden>
-      <div class="courseList" id="courseList"></div>
+      <div class="cTabs" id="courseTabs"></div>
+      <div class="courseList cCompact" id="courseList"></div>
+      <p class="cDesc" id="courseDesc"></p>
       <div class="spec">
         <div><small>全長</small><b id="spLen">2.2 km</b></div>
         <div><small>高低差</small><b id="spDrop">130 m</b></div>
@@ -1686,11 +1694,16 @@ function renderCup(){
   if(cupState&&cupState.race>0){const rs=document.createElement('button');rs.type='button';rs.className='ghost';rs.textContent='最初からやり直す';rs.addEventListener('click',()=>{newCup();renderCup();syncStart();});foot.appendChild(rs);}
   d.appendChild(foot);box.appendChild(d);
 }
+function courseCat(c){return c.geo?'real':c.env==='highway'?'hwy':(c.env||c.snow)?'theme':'touge';}
+const CCATS=[['touge','峠'],['hwy','首都高'],['real','実寸の首都高'],['theme','テーマ']];
+let courseTab=null;
 function renderCourses(){
-  const l=$('courseList');l.innerHTML='';
-  COURSES.forEach(c=>{if(c.hidden)return;const b=document.createElement('button');b.type='button';b.className='courseBtn'+(c.id===battleCourse?' sel':'');
-    b.innerHTML='<b></b><small></small><small></small>';const sm=b.querySelectorAll('small');
-    b.querySelector('b').textContent=c.name;sm[0].textContent=c.sub;const bt=parseFloat(store.get('touge_best_'+c.id));sm[1].textContent='BEST '+(bt?fmt(bt):'--:--.--');
+  const l=$('courseList');l.innerHTML='';const cur=COURSES.find(c=>c.id===battleCourse);if(!courseTab)courseTab=cur&&!cur.hidden?courseCat(cur):'touge';
+  const tb=$('courseTabs');tb.innerHTML='';CCATS.forEach(([k,n])=>{const b=document.createElement('button');b.type='button';b.textContent=n;if(k===courseTab)b.className='on';b.addEventListener('click',()=>{courseTab=k;renderCourses();});tb.appendChild(b);});
+  $('courseDesc').textContent=cur?cur.name+'：'+cur.sub:'';
+  COURSES.forEach(c=>{if(c.hidden||courseCat(c)!==courseTab)return;const b=document.createElement('button');b.type='button';b.className='courseBtn'+(c.id===battleCourse?' sel':'');
+    b.innerHTML='<b></b><small></small>';const sm=b.querySelectorAll('small');
+    b.querySelector('b').textContent=c.name.replace('（実寸）','');const bt=parseFloat(store.get('touge_best_'+c.id));sm[0].textContent='BEST '+(bt?fmt(bt):'--:--.--');
     b.addEventListener('click',()=>{battleCourse=c.id;store.set('touge_course',c.id);loadCourse(c.id);renderCourses();});l.appendChild(b);});
   $('spLen').textContent=(TOTAL/1000).toFixed(1)+' km';
   $('spDrop').textContent=Math.round(Math.abs(P[0].y-P[N-1].y))+' m';
