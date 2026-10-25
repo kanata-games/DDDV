@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='68e830ecb5';
+const VERSION='f7e109140c';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -306,11 +306,21 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/senkyo-diag.webp',
   './cars/senkyo-front.webp',
   './cars/senkyo-side.webp',
+  './cars/shovel-back.webp',
+  './cars/shovel-cockpit.webp',
+  './cars/shovel-diag.webp',
+  './cars/shovel-front.webp',
+  './cars/shovel-side.webp',
   './cars/sled-back.webp',
   './cars/sled-cockpit.webp',
   './cars/sled-diag.webp',
   './cars/sled-front.webp',
   './cars/sled-side.webp',
+  './cars/snowmo-back.webp',
+  './cars/snowmo-cockpit.webp',
+  './cars/snowmo-diag.webp',
+  './cars/snowmo-front.webp',
+  './cars/snowmo-side.webp',
   './cars/stretcher-back.webp',
   './cars/stretcher-cockpit.webp',
   './cars/stretcher-diag.webp',
