@@ -12,7 +12,7 @@ pwa='<link rel="manifest" href="manifest.webmanifest">\n<meta name="theme-color"
 out='<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">\n'+pwa+src[:i]+'\n<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>\n</head>\n<body>\n'+src[i:]+'\n<script>if(\'serviceWorker\' in navigator)addEventListener(\'load\',()=>navigator.serviceWorker.register(\'sw.js\').catch(()=>{}));</script>\n</body>\n</html>\n'
 open('/home/claude/dddv/index.html','w').write(out)
 import os,hashlib,time
-cars=sorted(f for f in os.listdir('/home/claude/touge/cars') if f.endswith('.png'))
+cars=sorted(f for f in os.listdir('/home/claude/touge/cars') if f.endswith('.webp'))
 sw=open('/home/claude/pwa/sw.js.tmpl').read().replace('__CARS__',',\n'.join("  './cars/%s'"%f for f in cars))
 ver=hashlib.sha1((out+''.join(cars)).encode()).hexdigest()[:10]
 open('/home/claude/dddv/sw.js','w').write(sw.replace('__VERSION__',ver))
