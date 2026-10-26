@@ -1511,7 +1511,7 @@ function buildSpec(id){const b=CARS.find(c=>c.id===id)||CARS[0],t=tuneOf(b.id);r
 let spec=buildSpec(selId);
 let pc=makeCar(spec,true);
 let tailCar=null;const trail=[];
-function swapCar(id){scene.remove(pc.g);if(tailCar){scene.remove(tailCar.g);tailCar=null;}spec=buildSpec(id);pc=makeCar(spec,true);selId=id;store.set('touge_car',id);
+function swapCar(id){if(typeof ONLINE!=='undefined'&&ONLINE&&!ONLINE.racing)setTimeout(olJoin,0);scene.remove(pc.g);if(tailCar){scene.remove(tailCar.g);tailCar=null;}spec=buildSpec(id);pc=makeCar(spec,true);selId=id;store.set('touge_car',id);
   if(spec.type==='train')tailCar=makeCar(Object.assign({},spec,{len:0}),false);
   railGroup.visible=RAIL(spec.type);$('derailBox').hidden=!RAIL(spec.type)&&spec.type!=='celsior'&&spec.type!=='kotatsu'&&spec.type!=='combine';$('derailBox').firstChild.textContent=spec.type==='celsior'?'シャンパンタワー':spec.type==='kotatsu'?'眠気':spec.type==='combine'?'グレンタンク':'脱線ゲージ';trail.length=0;}
 if(spec.type==='train')tailCar=makeCar(Object.assign({},spec,{len:0}),false);
@@ -1771,11 +1771,13 @@ function resetRace(){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
   } else {
+    if(ONLINE&&ONLINE.racing){const g=ONLINE.st,k=g?Math.max(0,g.order.filter(id=>g.players[id].inRace).indexOf(ONLINE.you)):0;ps={s:START_I-k*7,lat:k%2?1.6:-1.6};}
+    else{
     const F=senseiMatch?'race':curFmt();
     if(F==='cat'||F==='tsui'){const youLead=F==='cat'&&bHeat===2,lead=START_I+10,follow=START_I-12;
       cpus.push(makeCpu(battleDef(),battleSkill()*(F==='tsui'?.9:1),youLead?follow:lead,0,true));ps={s:youLead?lead:follow,lat:0};}
     else{cpus.push(senseiMatch?makeCpu(SENSEI,1.27,START_I+6,-1.6,true):makeCpu(battleDef(),battleSkill(),START_I+(F==='clean'?16:6),-1.6,true));
-    ps={s:START_I-10,lat:1.6};}
+    ps={s:START_I-10,lat:1.6};}}
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
@@ -1823,8 +1825,8 @@ document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.pre
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 {const vp=document.querySelector('meta[name="viewport"]');if(vp)vp.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover');else{const m=document.createElement('meta');m.name='viewport';m.content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';document.head&&document.head.appendChild(m);}}}catch(e){}
 $('autoGas').addEventListener('change',e=>{autoGas=e.target.checked;store.set('touge_auto',autoGas?'1':'0');});
-$('btnStart').addEventListener('click',startFromMenu);
-$('btnRetry').addEventListener('click',()=>{$('result').hidden=true;
+$('btnStart').addEventListener('click',()=>{if(ONLINE&&ONLINE.st){if(ONLINE.host)olAct({type:'go'});else flash('ホストのスタートを待っています');return;}startFromMenu();});
+$('btnRetry').addEventListener('click',()=>{$('result').hidden=true;if(ONLINE&&ONLINE.racing){olBackToRoom();return;}
   if(mode==='cup'){if(cupState&&cupState.race<CUPS[cupIdx].courses.length){loadCourse(CUPS[cupIdx].courses[cupState.race]);resetRace();}else toMenu();}
   else{if(mode==='free'){courseOf('loop').reroll=true;loadCourse(freeMap());}resetRace();}});
 $('btnMenu').addEventListener('click',toMenu);
@@ -1986,7 +1988,7 @@ function renderGarage(){
       b.textContent=cur?'✓ '+p.n:has?p.n:p.n+' '+p.price.toLocaleString()+'P';b.disabled=cur||(!has&&wallet<p.price);
       b.addEventListener('mouseenter',()=>show(p.k));b.addEventListener('mouseleave',()=>show(paintSel[c.id]||''));b.addEventListener('focus',()=>show(p.k));
       b.addEventListener('click',()=>{if(!has){wallet-=p.price;paintOwn[c.id]=mine.concat([p.k]);store.set('touge_paintown',JSON.stringify(paintOwn));store.set('touge_p',wallet);flash(c.name+'に「'+p.n+'」を塗った！');}
-        if(p.k)paintSel[c.id]=p.k;else delete paintSel[c.id];store.set('touge_paint',JSON.stringify(paintSel));renderAll();});row.appendChild(b);});}
+        if(p.k)paintSel[c.id]=p.k;else delete paintSel[c.id];store.set('touge_paint',JSON.stringify(paintSel));renderAll();if(ONLINE&&!ONLINE.racing)olJoin();});row.appendChild(b);});}
   const tb=info.querySelector('.tune');
   if(own){const t=tuneOf(c.id);const h=document.createElement('div');h.className='tuneHead';h.innerHTML='<b>チューニング</b><small>この車だけ。下げるとPは全額戻る</small>';tb.appendChild(h);
     TUNE.forEach(T=>{const lv=t[T.k],row=document.createElement('div');row.className='tuneRow';row.title=T.d;
@@ -2007,6 +2009,8 @@ function renderEsc(){const l=$('escList');l.innerHTML='';const st=sj('touge_esc'
   const tot=Object.values(st).reduce((a,b)=>a+b,0);$('escBest').textContent='逃げ切り 合計 '+tot+'回';}
 function syncStart(){
   const b=$('btnStart');
+  if(typeof ONLINE!=='undefined'&&ONLINE&&ONLINE.st){const g=ONLINE.st,n=g.order.filter(id=>g.players[id].car).length;b.textContent=ONLINE.host?'スタート（'+n+'台・'+g.courseName+'）':'ホストのスタート待ち';b.disabled=!ONLINE.host;return;}
+  b.disabled=false;
   if(mode==='cup'){const c=CUPS[cupIdx];const r=cupState&&cupState.race<c.courses.length?cupState.race:0;b.textContent=(c.name)+'　第'+(r+1)+'戦へ';}
   else if(mode==='escape')b.textContent='逃走開始（'+courseOf(escCourse).name+'）';
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
@@ -2042,7 +2046,7 @@ function startFromMenu(){
   bHeat=1;catRes=null;tsuiPts=0;catNext=0;
   resetRace();
 }
-function toMenu(){clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){if(ONLINE&&ONLINE.racing&&!ONLINE.finished&&game.state!=='title'){olAct({type:'leave'});ONLINE.racing=false;olClearGhosts();if(ONLINE.prevMode!=null){mode=ONLINE.prevMode;ONLINE.prevMode=null;}}clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -2431,7 +2435,7 @@ function stepCpu(c,dt,traffic){
 const TRAFFIC_COLS=[0xd8dade,0x2a2d33,0x8a1f24,0x1f3a6e,0x6c6f75,0xe2d3a8,0x2f5d3a];
 function lanesNow(){if(course&&course.env==='arcade')return[-1.4,1.4];const n=HALF>=7?3:2;return n===3?[-HALF*2/3,0,HALF*2/3]:[-HALF/2,HALF/2];}
 function spawnTraffic(){
-  if(!course.traffic)return;const ln=lanesNow(),city=course.env==='city';
+  if(!course.traffic||(ONLINE&&ONLINE.racing))return;const ln=lanesNow(),city=course.env==='city';
   for(let k=0;k<course.traffic;k++){const sh=pick(['sedan','hatch','sedan','truck']);
     const OS=course.env==='airport'?pick([['tug',5],['loader',6.5],['cart',1],['hiace',4.8]]):course.env==='park'?pick([['icecream',4.3],['cart',1],['demae',2]]):course.osakaMark?pick([['taxi',4.4],['demae',2],['icecream',4.3],['deco',7.2],['nbox',3.4],['cart',1],['amb',5]]):null;
     const rr=Math.random(),m=OS&&Math.random()<.75?makeCar({top:0xcccccc,bot:0x222222,shape:'hatch',sprite:OS[0],len:OS[1]},false):rr<.28?makeCar({top:0x1c2a55,bot:0x15161a,shape:'sedan',sprite:'taxi'},false):rr<.38?makeCar({top:0x0d0e11,bot:0x1a1b1f,shape:'hatch',sprite:Math.random()<.5?'hiace':'alph',len:4.9},false):rr<.48?makeCar({top:0xc9ccd2,bot:0x2a2d33,shape:'hatch',sprite:'noah',len:4.7},false):rr<.64?makeCar({top:0xf2f2f2,bot:0x2a2d33,shape:'hatch',sprite:'nbox',len:3.4},false):rr<.88?makeCar({top:0x9fd3ea,bot:0x2a2d33,shape:'hatch',sprite:'tanto',len:3.4},false):makeCar({top:pick(TRAFFIC_COLS),bot:0x22252b,shape:sh},false);
@@ -2745,6 +2749,7 @@ function frame(now){
   updateSprite(pc,pc.g.rotation.y,game.view===1&&(game.state==='race'||game.state==='count'));
   if(tailCar){tailCar.g.visible=game.state!=='title';updateSprite(tailCar,tailCar.g.rotation.y,false);}
   cpus.forEach(c=>updateSprite(c.mesh,c.yaw,false));
+  if(ONLINE)olStep(dt,now);
   renderer.render(scene,camera);
 }
 
@@ -3026,7 +3031,8 @@ function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus()+kyoBonu
     setTimeout(()=>{flash('差し押さえ！ '+nm+'は回収業者に引き取られていった…');say(SHINPAN,'お車、確かに引き取らせていただきました。またのご利用をお待ちしております。',6);},1000);return addTotalRest(earned);}
   const left=zanList().reduce((a,k)=>a+zanM[k].d,0),nm=k=>(CARS.find(c=>c.id===k)||{name:k}).name;setTimeout(()=>flash(done.length?'完済！ '+done.map(nm).join('・')+'は本当にあなたのものになった':short?'支払いが足りない… 延滞 '+zanLate+'回目（3回で差し押さえ）':'残債 あと '+left.toLocaleString()+' P'),1900);}}return addTotalRest(earned);}
 function addTotalRest(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
-function finish(){if(mode==='battle'&&!senseiMatch&&curFmt()==='cat'&&!game.retired&&game.state==='race'){const c=cpus[0],g=c?GOAL_I-c.s:0;if(bHeat===1){catHeatEnd(g);return;}if(catRes&&catRes.g2==null)catRes.g2=g;}
+function finish(){if(ONLINE&&ONLINE.racing&&!ONLINE.finished){if(car.siren)setSiren(false);game.state='done';endChain(true);$('drift').classList.remove('show');$('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits;$('standings').innerHTML='';$('resQuote').hidden=true;$('btnQuit').hidden=true;if(!game.retired){game.slowT=1.3;$('count').textContent='GOAL';}olFinish();store.set('touge_p',wallet);setTimeout(()=>{$('result').hidden=false;$('count').textContent='';olResultTable();},game.retired?900:1700);return;}
+  if(mode==='battle'&&!senseiMatch&&curFmt()==='cat'&&!game.retired&&game.state==='race'){const c=cpus[0],g=c?GOAL_I-c.s:0;if(bHeat===1){catHeatEnd(g);return;}if(catRes&&catRes.g2==null)catRes.g2=g;}
   if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
   if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&!(mode==='battle'&&curFmt()!=='race'&&!senseiMatch)&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
@@ -3232,6 +3238,75 @@ applyQuality();
 loadCourse(mode==='cup'?CUPS[cupIdx].courses[cupState&&cupState.race<3?cupState.race:0]:battleCourse);
 setTab(tab);renderAll();if(!canSave)$('saveWarn').hidden=false;
 requestAnimationFrame(frame);
+// ===== オンライン（あそび場の部屋につないで、みんなで同じ峠を走る） =====
+// URL に ?online=部屋&key=鍵&tok=席の札&name=名前&srv=あそび場のホスト がある時だけ動く
+var ONLINE=(()=>{try{const q=new URLSearchParams(location.search),room=(q.get('online')||'').toUpperCase().replace(/[^A-Z0-9]/g,''),srv=q.get('srv')||'';
+  if(!room||!/^[a-z0-9.-]+\.workers\.dev$|^localhost(:\d+)?$|^127\.0\.0\.1(:\d+)?$/.test(srv))return null;
+  return {room,key:q.get('key')||'',tok:q.get('tok')||'',name:(q.get('name')||'').slice(0,12),srv,ws:null,st:null,you:null,host:false,members:[],racing:false,round:0,ghosts:{},lastSend:0,retry:0,fatal:false,clock:0,finished:false,prevMode:null};}catch(e){return null;}})();
+function olSend(o){const O=ONLINE;if(O&&O.ws&&O.ws.readyState===1)O.ws.send(JSON.stringify(o));}
+function olAct(a){olSend({t:'act',action:a});}
+function olJoin(){if(!ONLINE)return;ONLINE.lastJoin=selId+'|'+(paintSel[selId]||'');olAct({type:'join',car:selId,paint:paintSel[selId]||null,name:ONLINE.name});}
+function olConnect(){const O=ONLINE;if(!O)return;const proto=O.srv.startsWith('localhost')||O.srv.startsWith('127.')?'ws':'wss';
+  O.ws=new WebSocket(proto+'://'+O.srv+'/ws/'+O.room);
+  O.ws.onopen=()=>{O.retry=0;O.ws.send(JSON.stringify({t:'hello',key:O.key,token:O.tok||null,name:O.name||'ななし'}));olPanel();};
+  O.ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(err){return;}olMsg(m);};
+  O.ws.onclose=()=>{olPanel();if(O.fatal)return;setTimeout(olConnect,Math.min(10000,800*2**O.retry++));};}
+function olMsg(m){const O=ONLINE;
+  if(m.t==='welcome'){O.tok=m.token;O.you=m.you;olJoin();}
+  else if(m.t==='error'){flash(m.msg||'エラー');if(m.fatal){O.fatal=true;olPanel();}}
+  else if(m.t==='live'){const d=m.data;if(d&&d.p&&d.p!==O.you)olGhostPos(d.p,d.d);}
+  else if(m.t==='state'){O.you=m.you;O.members=m.room.members;O.host=!!(m.room.members.find(p=>p.id===m.you)||{}).host;
+    const g=m.room.playing==='dddv'?m.game:null,prev=O.st;O.st=g;
+    if(g){O.clock=g.now-Date.now();if(prev&&prev.phase!==g.phase)O.lastJoin=null;const me=g.players[O.you],cur=selId+'|'+(paintSel[selId]||'');if(!me||(me.car!==selId||(me.paint||'')!==(paintSel[selId]||''))&&!O.racing&&(g.phase==='ready'||g.phase==='done')&&O.lastJoin!==cur)olJoin();
+      if(g.phase==='count'&&g.round!==O.round)olStartRace(g);
+      if(O.racing&&g.phase==='done'&&!O.finished&&game.state==='race'){flash('時間切れ…');game.retired=true;finish();}
+      if(O.racing&&!$('result').hidden)olResultTable();}
+    olPanel();}}
+// 待機画面（タイトルの上に出す）
+function olPanel(){const O=ONLINE;if(!O)return;let box=$('olBox');
+  if(!box){box=document.createElement('section');box.id='olBox';box.className='cup';box.style.cssText='border-color:var(--sodium)';const card=document.querySelector('#title .card');card.insertBefore(box,card.querySelector('.topbar'));}
+  const g=O.st,conn=O.ws&&O.ws.readyState===1;
+  if(O.fatal){box.innerHTML='<div class="cupHead"><b>🏁 オンライン</b></div><p class="lede">部屋に入れませんでした。あそび場の招待リンクからもう一度開いてください。</p>';return;}
+  if(!g){box.innerHTML='<div class="cupHead"><b>🏁 オンライン　部屋 '+O.room+'</b><span>'+(conn?'接続中':'接続しています…')+'</span></div><p class="lede" style="font-size:12px">'+(conn?'あそび場で「DDDV 峠オンライン」が始まるのを待っています。':'')+'</p>';syncStart();return;}
+  const fmtT=t=>t==null?'--':fmt(t),ph={ready:'車選び・待機中',count:'カウントダウン',race:'レース中',done:'結果'}[g.phase]||'';
+  const rows=g.order.map(id=>{const p=g.players[id],c=CARS.find(x=>x.id===p.car);return '<div><i style="background:#'+((c?c.top:0x777777).toString(16).padStart(6,'0'))+'"></i><b>'+escH(p.name)+(id===O.you?'（あなた）':'')+'</b><small>'+(c?escH(c.name):'車を選んでいない')+(p.inRace&&p.finish!=null?'　🏁 '+fmtT(p.finish):p.ret?'　リタイア':'')+'</small></div>';}).join('');
+  const crs=Object.entries({down:'月見峠 下り',up:'月見峠 上り',tsuzura:'つづら折り峠',lake:'湖畔ハイウェイ',ridge:'稜線トンネルロード',snow:'白銀ゲレンデ下り',park:'夜の遊園地',airport:'夜の空港',arcade:'天神橋筋商店街',wangan:'湾岸線',c1:'C1環状',neon:'ネオン街'});
+  box.innerHTML='<div class="cupHead"><b>🏁 オンライン　部屋 '+O.room+'</b><span>'+ph+(g.round?'　第'+g.round+'戦':'')+'</span></div>'+
+    '<div class="opts">コース '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olCourse" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+crs.map(([k,n])=>'<option value="'+k+'"'+(k===g.course?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+escH(g.courseName)+'</b>')+'</div>'+
+    '<div class="rivals">'+rows+'</div><p class="lede" style="font-size:12px">ガレージで選んだ車で走ります。'+(O.host?'全員がそろったら、下の「スタート」を押してください。':'ホストがスタートを押すと、いっせいにカウントダウンが始まります。')+'一般車とCPUは出ません。</p>';
+  const sel=$('olCourse');if(sel)sel.onchange=()=>olAct({type:'course',id:sel.value});syncStart();}
+const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// レース開始
+function olStartRace(g){const O=ONLINE;O.round=g.round;O.racing=true;O.finished=false;olClearGhosts();
+  if(!$('result').hidden)$('result').hidden=true;$('title').hidden=true;$('snd').hidden=true;startAudio();startBgm();
+  if(O.prevMode==null)O.prevMode=mode;mode='battle';loadCourse(g.course);resetRace();
+  game.count=Math.max(1,(g.startAt-(Date.now()+O.clock))/1000);
+  g.order.forEach(id=>{if(id!==O.you&&g.players[id].inRace)olGhostMake(id);});
+  flash('オンライン対戦：'+g.courseName+'（'+g.order.filter(id=>g.players[id].inRace).length+'台）');}
+function olGhostMake(id){const O=ONLINE,p=O.st&&O.st.players[id];if(!p||O.ghosts[id])return O.ghosts[id];const c=CARS.find(x=>x.id===p.car)||CARS[0];
+  const m=makeCar(Object.assign({},c),false);const pt=PAINTS.find(x=>x.k===p.paint);if(pt)m.g.userData.paint=pt;m.g.add(nameTag(p.name,c.top));m.g.visible=false;scene.add(m.g);
+  return O.ghosts[id]={mesh:m,x:0,y:0,z:0,yaw:0,tx:0,ty:0,tz:0,tyaw:0,idx:0,got:false};}
+function olGhostPos(id,d){const O=ONLINE;if(!O.racing)return;const g=O.ghosts[id]||olGhostMake(id);if(!g)return;
+  g.tx=d[0];g.ty=d[1];g.tz=d[2];g.tyaw=d[3];g.idx=d[4];g.sp=d[5];if(!g.got){g.got=true;g.x=g.tx;g.y=g.ty;g.z=g.tz;g.yaw=g.tyaw;g.mesh.g.visible=true;}}
+function olClearGhosts(){const O=ONLINE;Object.values(O.ghosts).forEach(g=>scene.remove(g.mesh.g));O.ghosts={};}
+function olStep(dt,now){const O=ONLINE;if(!O||!O.racing)return;
+  Object.values(O.ghosts).forEach(g=>{if(!g.got)return;const k=Math.min(1,dt*10);g.x+=(g.tx-g.x)*k;g.y+=(g.ty-g.y)*k;g.z+=(g.tz-g.z)*k;let dy=((g.tyaw-g.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;g.yaw+=dy*k;
+    g.mesh.g.position.set(g.x,g.y,g.z);g.mesh.g.rotation.set(0,g.yaw,0);updateSprite(g.mesh,g.yaw,false);});
+  if((game.state==='race'||game.state==='count')&&now-O.lastSend>90){O.lastSend=now;olAct({type:'pos',d:[car.x,car.y,car.z,car.yaw,car.idx,Math.hypot(car.vx,car.vz)]});}
+  if(game.state==='race'){const ge=$('gap');if(ge){const others=Object.values(O.ghosts).filter(g=>g.got),ahead=others.filter(g=>g.idx>car.idx).length;ge.textContent='オンライン '+(ahead+1)+'位 / '+(others.length+1)+'台';ge.className=ahead?'':'lead';}}}
+// ゴール・リタイア
+function olFinish(){const O=ONLINE;O.finished=true;const g=O.st;olAct(game.retired?{type:'finish',ret:true}:{type:'finish',t:+game.t.toFixed(2)});
+  const before=g?g.order.filter(id=>g.players[id].finish!=null).length:0,pos=game.retired?0:before+1;
+  const pPos=game.retired?200:[2500,1600,1100,800,600,500,400,300][pos-1]||300,pDrift=Math.round(game.dTotal*.25),earned=pPos+pDrift;wallet+=earned;
+  $('resKick').textContent='オンライン対戦 ／ '+course.name;$('resHead').textContent=game.retired?'リタイア':pos+'位';$('resHead').className='res-big '+(pos===1?'win':'lose');
+  $('resSub').textContent=game.retired?'今回はリタイア。次の1本で巻き返そう。':pos===1?'いちばんにゴール！ 峠はあなたのものだ。':'ゴール！ ほかの人のゴールを待っています…';
+  addRows([[game.retired?'出走ボーナス':pos+'位の賞金',pPos],['ドリフト',pDrift]]);addTotal(earned);
+  $('btnRetry').textContent='部屋に戻る';$('btnMenu').hidden=true;olResultTable();}
+function olResultTable(){const O=ONLINE,g=O.st,box=$('standings');if(!g||!box)return;const r=g.results||[];
+  box.innerHTML='<div class="tbl"><span class="h">#</span><span class="h">ドライバー</span><span class="h">車</span><span class="h num">タイム</span>'+r.map((x,k)=>{const c=CARS.find(y=>y.id===x.car);return '<span class="num">'+(x.t!=null?k+1:'-')+'</span><span class="'+(x.id===O.you?'you':'')+'">'+escH(x.name)+'</span><span>'+escH(c?c.name:'')+'</span><span class="num">'+(x.t!=null?fmt(x.t):x.ret?'リタイア':'走行中')+'</span>';}).join('')+'</div>';}
+function olBackToRoom(){const O=ONLINE;O.racing=false;olClearGhosts();if(O.prevMode!=null){mode=O.prevMode;O.prevMode=null;}$('btnMenu').hidden=false;toMenu();olPanel();}
+if(ONLINE){setTimeout(()=>{olConnect();olPanel();},50);}
+
 })();
 </script>
 

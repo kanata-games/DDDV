@@ -27,6 +27,6 @@ if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
 git -c user.name="Claude" -c user.email="noreply@anthropic.com" commit -q -m "$1
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01FPBx44a2EdMEPxJYUVZacn"
+Claude-Session: https://claude.ai/code/session_01JQbieebtHyf6QQqoB4ah2K"
 git fetch -q origin main && git rebase -q origin/main
 git push -q origin main && git log --oneline -1

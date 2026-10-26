@@ -155,6 +155,22 @@
 - **バグ修正**：`updateSprite` で横の絵（side）の左右反転が逆だった（車が横から見ると後ろ向きに走って見え、斜め→横の境目でくるっと裏返っていた）。`mirror=ang<0` に修正。確認用 `dev/sim/sprite_dir.py`
 - 絵を描くときの決まり：**side は前が右、diag は右後ろから見た絵（前が右奥）**。back/front は左右対称。全車この向きでそろっている
 
+## 5c. オンライン対戦（2026-10-27、試作1段目）
+
+あそび場（GitHub `kanata-games/asobiba`、Cloudflare Worker＋部屋ごとのDurable Object、GitHubに上げると自動で本番に出る）の仕組みに相乗り。**DDDV側は URL に `?online=` が付いた時だけ動く**ので、ふだんの遊び方には影響なし。
+
+- 遊び方：あそび場で部屋を作る →「DDDV 峠オンライン」を始める → 各自「🚗 DDDVを開いて参加」→ DDDVのガレージで車を選ぶ → ホストがDDDVのタイトル上の「オンライン」欄でコースを選び「スタート」→ 5秒カウントで一斉スタート
+- 受け持ち：あそび場＝部屋の進行（ready→count→race→done）と位置の中継だけ。走る・当たり判定・タイムは各自のDDDV。相手の車は「位置を受け取って表示するだけ」（当たらない・CPUと一般車なし）
+- あそび場側のファイル：`src/games/dddv.js`（サーバー）、`public/games/dddv.js`（あそび場の画面）、`public/shared/meta.js`（カテゴリ「レース」）、`test/dddv-sim.mjs`（npm test に入っている）
+  - action：`join`（車・塗装・名前）、`course`（ホスト）、`go`（ホスト）、`pos`（{live}で全員に流すだけ、保存しない）、`finish`（t か ret）、`leave`
+  - 1人目のゴールから60秒、またはスタートから8分で打ち切り（残りはリタイア）。8人まで
+- DDDV側（index.html の末尾 `ONLINE`/`ol*` 関数）：URL `online`(部屋)・`key`・`tok`(あそび場の自分のトークン＝同じメンバーとして入る)・`name`・`srv`(`*.workers.dev`/localhost のみ許可)
+  - `olMsg` が state を受けて、count になったら `olStartRace`（mode='battle'、CPUなし、並び順でスターティンググリッド）。位置は90msごとに `[x,y,z,yaw,idx,速度]`、相手は補間して表示（名前札つき）
+  - ゴール時 `olFinish`：順位賞金 [2500,1600,1100,800,600,500,400,300]＋ドリフト×0.25。結果画面のボタンは「部屋に戻る」
+  - 車の変更は ready/done の時だけ送る（`O.lastJoin` で同じ内容の連打を防ぐ。これがないとレース中に state→join→state の無限ループになった）
+- テスト：`dev/sim/online.mjs`（偽のWebSocketで部屋を再現し、ボット1台と走る。先に asobiba の `src/games/dddv.js`・`util.js` を `/tmp/claude-0/dddv-srv.mjs`・`util.js` にコピー）
+- 次の候補：実際に2人で試してもらう → 相手の車との当たり判定（軽く押し合う程度）、観戦、チャット的な一言、ドリフト勝負など形式の追加
+
 ---
 
 ## 6. 作者の好み・方針
