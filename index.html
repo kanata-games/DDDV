@@ -327,6 +327,10 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
       <div class="opts">相手
         <div class="seg" id="rvSeg"></div>
       </div>
+      <div class="opts">形式
+        <div class="seg" id="fSeg"><button type="button" data-f="race">先にゴール</button><button type="button" data-f="cat">先行・後追い</button><button type="button" data-f="tsui">ドリフト追走</button><button type="button" data-f="clean">ノータッチ一本勝負</button></div>
+      </div>
+      <p class="cDesc" id="fDesc"></p>
       <div class="opts">相手の強さ
         <div class="seg" id="dSeg"><button type="button" data-d="0">やさしい ×0.7</button><button type="button" data-d="1">ふつう ×1</button><button type="button" data-d="2">鬼 ×1.6</button></div>
       </div>
@@ -1686,12 +1690,15 @@ function resetRace(){
     [[START_I,-1.6],[START_I-8,1.6],[START_I-16,0]].forEach(([s0,l],k)=>cpus.push(makeCpu(COP,.9,Math.max(2,s0),l,k===0)));
     ps={s:START_I+70,lat:0};
   } else {
-    cpus.push(senseiMatch?makeCpu(SENSEI,1.27,START_I+6,-1.6,true):makeCpu(battleDef(),battleSkill(),START_I+6,-1.6,true));
-    ps={s:START_I-10,lat:1.6};
+    const F=senseiMatch?'race':bFmt;
+    if(F==='cat'||F==='tsui'){const youLead=F==='cat'&&bHeat===2,lead=START_I+10,follow=START_I-12;
+      cpus.push(makeCpu(battleDef(),battleSkill()*(F==='tsui'?.9:1),youLead?follow:lead,0,true));ps={s:youLead?lead:follow,lat:0};}
+    else{cpus.push(senseiMatch?makeCpu(SENSEI,1.27,START_I+6,-1.6,true):makeCpu(battleDef(),battleSkill(),START_I+(F==='clean'?16:6),-1.6,true));
+    ps={s:START_I-10,lat:1.6};}
   }
   const p=P[Math.round(ps.s)];
   Object.assign(car,{x:p.x+p.rx*ps.lat,y:p.y,z:p.z+p.rz*ps.lat,yaw:p.h,vx:0,vz:0,yr:0,steer:0,idx:Math.round(ps.s),drifting:false,slip:0,lastSkid:0,gear:1});
-  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if((spec.type==='sled'||spec.type==='cart')&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash(spec.type==='cart'?'上り坂をカートで…？ ひたすら押すしかない':'上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={az1:'ガルウイング',kotatsu:'みかん',piano:'演奏',tf:'変形',sweeper:'ブラシ',parade:'手を振る',handcar:'漕ぐ',junk:'アナウンス',trolley:'体重移動',sl:'石炭',kidsbus:'お歌',tiller:'ロータリー',citybus:'ドア',ss:'伏せ',vwbus:'乗ってく？',mirror:'ミラー反射',dump:'ダンプアップ',tractor:'デフロック',snowmo:'雪煙',shovel:'バケット',ketten:'履帯ブレーキ',atv:'ウィリー',panjan:'点火',wrecker:'けん引',swan:'足こぎ',pumpkin:'ガラスの靴',yakiimo:'食べる',golf:'ファー！',crown:'赤色灯',celsior:'積み直し',s15:'クラッチ蹴り',enzetsu:'屋上へ',panda:'100円',senkyo:'演説',stretcher:'AED',bed:'二度寝',tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',amb:'サイレン',fire:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺',astarte:'星詠み',umicar:'ヴェール',cart:'放送',deco:'全灯',f14:'機銃',icecream:'メロディ',horse:'魔法',fc:'リトラ',tug:'押し戻し',loader:'リフト',umimi:'月の光',jumbo:'逆噴射'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ',fire:'放水',mixer:'生コン',f14:'AB'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';if(spec.type==='fire'){$('nitroLbl').textContent='水タンク';}if(spec.type==='mixer'){$('nitroLbl').textContent='生コン';}car.gunCd=0;car.oraT=0;car.turbo=0;game.rvT=0;game.rvOn=0;game.v1=0;game.annT=8;game.wingT=0;car.vtec=0;car.foam=0;car.gull=false;if(spec.type==='az1'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.az1;car.kickReq=0;car.kickT=0;car.kickCd=0;game.fukumen=false;game.glass=spec.type==='celsior'?15:0;game.glDr=0;game.glBr=0;game.imo=spec.type==='yakiimo'?2:0;game.imoT=0;game.imoFart=0;car.fartT=0;game.foreCd=0;car.pedalN=0;car.pedalHot=0;game.shoes=2;game.midnight=false;game.bell=0;game.bellWarn=false;car.pjT=0;car.pjCd=0;car.pjDir=1;car.pjMis=0;game.tows=0;game.towCd=0;car.towT=0;car.ktReq=0;car.ktCd=0;car.bT=0;car.notch=0;car.bHold=0;car.nT=0;car.pDn=false;car.pUp=false;car.upLock=false;car.wheT=0;car.wheCd=0;car.sprayCd=0;game.digs=0;game.digP=0;car.bkCd=0;game.dumped=false;car.dlock=false;game.riders=0;car.hitchCd=0;car.mirCd=0;game.busReq=0;game.busNext=spec.type==='citybus'?game.t+14:0;game.busOk=0;game.busNg=0;car.tuckIn=false;car.doorCd=0;game.cry=0;game.kidsBr=0;game.kidsDr=0;car.songCd=0;car.rotary=false;game.plow=0;game.plowAcc=0;car.leanT=0;car.leanCd=0;car.steam=spec.type==='sl'?.7:0;car.coalCd=0;car.pumpN=0;car.pumpHot=0;game.junkN=spec.type==='junk'?5:0;game.junkDr=0;car.junkCd=0;car.robo=false;car.tfT=0;car.tfAt=0;car.kd=null;car.kdCd=0;car.pHand=0;car.kdBack=null;car.bellCd=0;game.mikan=3;car.sleepy=0;car.dozeT=0;car.pianoT=0;car.pianoCd=0;game.bravo=0;if(spec.type==='tf'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.tf;car.brush=false;game.swept=0;game.sweepAcc=0;game.seiso=100;game.psDr=0;game.psBr=0;car.waveCd=0;if(spec.type==='yakiimo')setTimeout(imoCall,900);car.flS=0;car.stage=false;car.senna=0;car.taps=[];game.netCool=-1;car.coin=30;car.speechT=0;car.speechCd=0;game.votes=0;game.coins=0;car.sleep=false;car.aedT=0;car.aedKick=0;car.tuck=0;game.moonT=0;game.moonOn=0;game.slime=[];if(spec.type==='loader')setLift(false);game.pbT=0;if(spec.type==='fc')setRetra(true);game.passT=0;car.twin=0;car.zT=0;car.devil=0;game.duoT=0;game.duoN=0;game.tapeCd=0;car.onIce=false;game.snowmen=0;game.iceT=0;game.iceSale=0;game.iceMelt=0;game.iceAcc=0;car.sweep=0;if(spec.type==='f14'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.f14;game.gunT=0;game.decoT=0;game.decoOn=0;car.ride=false;game.pizza=100;game.demaT=spec.type==='demae'&&course&&vProf.length===N?demaeTarget():0;car.spraying=false;game.soaked=0;if(spec.type==='fire')car.nitro=1;game.pat=100;game.ambV=null;game.patCd=0;game.sirenHint=false;game.saleT=0;game.veilT=0;game.veilOn=0;game.stampNew=null;game.starT=0;game.starOn=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'||spec.type==='fire'||spec.type==='mixer'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
+  $('nitroLbl').textContent=spec.type==='bike'?'立ちこぎ':'NITRO';if((spec.type==='sled'||spec.type==='cart')&&course&&P[0].y<=P[N-1].y)setTimeout(()=>flash(spec.type==='cart'?'上り坂をカートで…？ ひたすら押すしかない':'上りのコースはソリだとかなりキツい…'),600);$('hornBtn').textContent={az1:'ガルウイング',kotatsu:'みかん',piano:'演奏',tf:'変形',sweeper:'ブラシ',parade:'手を振る',handcar:'漕ぐ',junk:'アナウンス',trolley:'体重移動',sl:'石炭',kidsbus:'お歌',tiller:'ロータリー',citybus:'ドア',ss:'伏せ',vwbus:'乗ってく？',mirror:'ミラー反射',dump:'ダンプアップ',tractor:'デフロック',snowmo:'雪煙',shovel:'バケット',ketten:'履帯ブレーキ',atv:'ウィリー',panjan:'点火',wrecker:'けん引',swan:'足こぎ',pumpkin:'ガラスの靴',yakiimo:'食べる',golf:'ファー！',crown:'赤色灯',celsior:'積み直し',s15:'クラッチ蹴り',enzetsu:'屋上へ',panda:'100円',senkyo:'演説',stretcher:'AED',bed:'二度寝',tank:'主砲',bike:'ベル',packer:'メロディ',dashi:'掛け声',police:'サイレン',amb:'サイレン',fire:'サイレン',alph:'威圧',hokora:'鈴',ita:'水魔法',hearse:'出棺',astarte:'星詠み',umicar:'ヴェール',cart:'放送',deco:'全灯',f14:'機銃',icecream:'メロディ',horse:'魔法',fc:'リトラ',tug:'押し戻し',loader:'リフト',umimi:'月の光',jumbo:'逆噴射'}[spec.type]||'ホーン';car.combo=0;car.beatT=0;car.hop=0;if(car.siren)setSiren(false);car.siren=false;$('nitroBtn').textContent={dashi:'そーりゃ',bike:'立ちこぎ',fire:'放水',mixer:'生コン',f14:'AB'}[spec.type]||'ニトロ';if(spec.type==='dashi')$('nitroLbl').textContent='リズム';if(spec.type==='fire'){$('nitroLbl').textContent='水タンク';}if(spec.type==='mixer'){$('nitroLbl').textContent='生コン';}car.gunCd=0;car.oraT=0;car.turbo=0;game.rvT=0;game.rvOn=0;game.v1=0;game.annT=8;game.wingT=0;car.vtec=0;car.foam=0;car.gull=false;if(spec.type==='az1'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.az1;car.kickReq=0;car.kickT=0;car.kickCd=0;game.fukumen=false;game.glass=spec.type==='celsior'?15:0;game.glDr=0;game.glBr=0;game.imo=spec.type==='yakiimo'?2:0;game.imoT=0;game.imoFart=0;car.fartT=0;game.foreCd=0;car.pedalN=0;car.pedalHot=0;game.shoes=2;game.midnight=false;game.bell=0;game.bellWarn=false;car.pjT=0;car.pjCd=0;car.pjDir=1;car.pjMis=0;game.tows=0;game.towCd=0;car.towT=0;car.ktReq=0;car.ktCd=0;car.bT=0;car.notch=0;car.bHold=0;car.nT=0;car.pDn=false;car.pUp=false;car.upLock=false;car.wheT=0;car.wheCd=0;car.sprayCd=0;game.digs=0;game.digP=0;car.bkCd=0;game.dumped=false;car.dlock=false;game.riders=0;car.hitchCd=0;car.mirCd=0;game.busReq=0;game.busNext=spec.type==='citybus'?game.t+14:0;game.busOk=0;game.busNg=0;car.tuckIn=false;car.doorCd=0;game.cry=0;game.kidsBr=0;game.kidsDr=0;car.songCd=0;car.rotary=false;game.plow=0;game.plowAcc=0;car.leanT=0;car.leanCd=0;car.steam=spec.type==='sl'?.7:0;car.coalCd=0;car.pumpN=0;car.pumpHot=0;game.junkN=spec.type==='junk'?5:0;game.junkDr=0;car.junkCd=0;car.robo=false;car.tfT=0;car.tfAt=0;car.kd=null;car.kdCd=0;car.pHand=0;car.kdBack=null;car.bellCd=0;game.mikan=3;car.sleepy=0;car.dozeT=0;car.pianoT=0;car.pianoCd=0;game.bravo=0;if(spec.type==='tf'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.tf;car.brush=false;game.swept=0;game.sweepAcc=0;game.seiso=100;game.psDr=0;game.psBr=0;car.waveCd=0;if(spec.type==='yakiimo')setTimeout(imoCall,900);car.flS=0;car.stage=false;car.senna=0;car.taps=[];game.netCool=-1;car.coin=30;car.speechT=0;car.speechCd=0;game.votes=0;game.coins=0;car.sleep=false;car.aedT=0;car.aedKick=0;car.tuck=0;game.moonT=0;game.moonOn=0;game.slime=[];if(spec.type==='loader')setLift(false);game.pbT=0;if(spec.type==='fc')setRetra(true);game.passT=0;car.twin=0;car.zT=0;car.devil=0;game.duoT=0;game.duoN=0;game.tapeCd=0;car.onIce=false;game.snowmen=0;game.iceT=0;game.iceSale=0;game.iceMelt=0;game.iceAcc=0;car.sweep=0;if(spec.type==='f14'&&pc.g.userData.spr)pc.g.userData.spr.set=SPR.f14;game.gunT=0;game.decoT=0;game.decoOn=0;car.ride=false;game.pizza=100;game.demaT=spec.type==='demae'&&course&&vProf.length===N?demaeTarget():0;car.spraying=false;game.soaked=0;if(spec.type==='fire')car.nitro=1;game.pat=100;game.ambV=null;game.patCd=0;game.sirenHint=false;game.saleT=0;game.veilT=0;game.veilOn=0;game.stampNew=null;game.starT=0;game.starOn=0;game.shukkan=false;game.hornN=0;game.aquaT=0;game.aquaOn=0;game.omi=null;game.tatari=0;game.bellT=0;car.hp=spec.hpMax;car.nitro=spec.type==='bike'||spec.type==='fire'||spec.type==='mixer'?1:.25;car.boost=false;car.draft=false;Object.assign(game,{dq:false,tsuiGap:0,busted:false,bust:0,copDist:1e9,soryaN:0,maxCombo:0,shoved:0,slowT:0,leadSince:null,wasBehind:false,retired:false,passed:false,t:0,count:3.6,dTotal:0,dChain:0,chainT:0,hits:0,stuck:0,shake:0,state:'count'});
   skid.count=0;skidI=0;
   $('dtotal').textContent='0';
   game.startD=P[car.idx].d;car.s=P[car.idx].d;car.v=0;car.derail=false;car.gauge=0;trail.length=0;
@@ -1748,8 +1755,13 @@ document.querySelectorAll('#freeMap button').forEach(b=>b.addEventListener('clic
 $('btnPA').addEventListener('click',()=>{if(mode==='free'&&game.state==='race')enterPA();});
 const DIFF=[{scale:.84,mult:.7},{scale:.9,mult:1},{scale:1.0,mult:1.6}];
 let diff=+(store.get('touge_diff')??1);if(!DIFF[diff])diff=1;
+let catNext=0;let bFmt=store.get('touge_bfmt')||'race';if(!['race','cat','tsui','clean'].includes(bFmt))bFmt='race';let bHeat=1,catRes=null,tsuiPts=0;
+const FMT_DESC={race:'ふつうのタイマン。先にゴールした方の勝ち。',cat:'2本勝負。1本目は相手が先行・あなたが後追い（離されないように付いていく）、2本目は入れかえてあなたが先行（引き離す）。1本目で離された距離より、2本目で引き離した距離が大きければ勝ち。',tsui:'相手の後ろについてドリフトで追いかける。相手に近いほどドリフトの点が高くなる（近いほど最大2倍、40 m以上離れると0点）。ゴールまでに目標点をこえれば勝ち。追い抜いても点は増えない。',clean:'壁にも車にも一度も触れずにゴールし、しかも相手より先に着けば勝ち。触れた瞬間に失格。勝てば賞金1.5倍。'};
+function syncFmt(){document.querySelectorAll('#fSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===bFmt));const d=$('fDesc');if(d)d.textContent=FMT_DESC[bFmt]+(bFmt==='tsui'?'（目標 '+tsuiGoal().toLocaleString()+' 点）':'');}
+function tsuiGoal(){return [400,700,1100][diff]||700;}
+document.querySelectorAll('#fSeg button').forEach(b=>b.addEventListener('click',()=>{bFmt=b.dataset.f;store.set('touge_bfmt',bFmt);syncFmt();}));
 function syncDiff(){document.querySelectorAll('#dSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===diff));}
-document.querySelectorAll('#dSeg button').forEach(b=>b.addEventListener('click',()=>{diff=+b.dataset.d;store.set('touge_diff',diff);syncDiff();}));
+document.querySelectorAll('#dSeg button').forEach(b=>b.addEventListener('click',()=>{diff=+b.dataset.d;store.set('touge_diff',diff);syncDiff();syncFmt();}));setTimeout(syncFmt);
 {const rs=$('rvSeg');if(rs){BATTLE_RIVALS.forEach(([k,n])=>{const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.r=k;b.addEventListener('click',()=>{battleRival=k;store.set('touge_brival',k);syncRival();});rs.appendChild(b);});}}
 function syncRival(){document.querySelectorAll('#rvSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===battleRival));}syncRival();
 syncDiff();
@@ -1942,6 +1954,7 @@ function startFromMenu(){
   else if(mode==='school'){if(course.id!==schoolStage)loadCourse(schoolStage);}
   else if(mode==='densha'){if(selId!=='train'){denPrev=selId;swapCar('train');}if(course.id!==denLine)loadCourse(denLine);railGroup.visible=true;}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
+  bHeat=1;catRes=null;tsuiPts=0;catNext=0;
   resetRace();
 }
 function toMenu(){clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
@@ -2387,6 +2400,7 @@ function drawSpeed(v,dt){
 }
 const camPos=new THREE.Vector3(),camLook=new THREE.Vector3();let camInit=false;
 function frame(now){
+  if(catNext===-1)catNext=now+2600;else if(catNext&&now>=catNext){catNext=0;if(game.state==='done'&&mode==='battle'&&bHeat===1){bHeat=2;$('count').textContent='';resetRace();flash('2本目：今度はあなたが先行。引き離せ！');}}
   requestAnimationFrame(frame);
   let dt=Math.min(.05,(now-last)/1000);last=now;
   if(game.slowT>0){game.slowT-=dt;dt*=.3;if(game.slowT<=0)$('count').textContent='';}
@@ -2457,7 +2471,8 @@ function frame(now){
     cpus.forEach(c=>{if(c.done)return;
       if(c.ahead&&car.idx>c.s+3){c.ahead=false;if(radioCd<=0)say(c.def,pick(c.def.passed));}
       else if(!c.ahead&&c.s>car.idx+3){c.ahead=true;if(radioCd<=0)say(c.def,pick(c.def.pass));}});
-    cpus.forEach(c=>{if(!c.done&&c.s>=GOAL_I){c.done=game.t;if(mode==='battle'){rivalDone=game.t;flash('ライバルがゴールした！');}}});
+    cpus.forEach(c=>{if(!c.done&&c.s>=GOAL_I){c.done=game.t;if(mode==='battle'){rivalDone=game.t;if(!senseiMatch&&bFmt==='cat'&&game.state==='race'){catHeatEnd(-(GOAL_I-car.idx));}else if(!senseiMatch&&bFmt==='tsui'&&game.state==='race'){flash('先行がゴール！ 追走はあなたのゴールまで');}else flash('ライバルがゴールした！');}}});
+    if(mode==='battle'&&!senseiMatch&&game.state==='race'){if(bFmt==='tsui')stepTsui(dt);if(bFmt==='clean'&&game.hits>0&&!game.dq){game.dq=true;flash('接触！ ノータッチ失格…');finish();}}
     {const rk=rankNow();if(rk===1){if(game.leadSince==null)game.leadSince=game.t;}else{game.leadSince=null;game.wasBehind=true;}}
     if(mode==='escape'&&game.state==='race'){
       const psp=Math.hypot(car.vx,car.vz);let near=0,nd=1e9;
@@ -2613,8 +2628,11 @@ function frame(now){
     else if(mode==='collect'){let nx=null;for(const q of spots)if(!q.done&&q.i>=car.idx-6){nx=q;break;}
       ge.textContent=(game.cprog>0?'回収中 '+'■'.repeat(Math.ceil(game.cprog*8))+'□'.repeat(8-Math.ceil(game.cprog*8)):'残り '+Math.max(0,game.left).toFixed(1)+' 秒　回収 '+game.collected+'/'+spots.length+(nx?'　次まで '+Math.max(0,Math.round(nx.i-car.idx))+' m':'　ゴールへ！'));
       ge.className=game.left<10?'':'lead';}
-    else{const gapM=cpus[0]?cpus[0].s-car.idx:0;
-      if(game.state==='count')ge.textContent='ライバル 先行';
+    else if(mode==='battle'&&!senseiMatch&&bFmt==='tsui'){if(game.state==='count')ge.textContent='追走 目標 '+tsuiGoal().toLocaleString()+' 点';}
+    else{const gapM=cpus[0]?cpus[0].s-car.idx:0;const F=mode==='battle'&&!senseiMatch?bFmt:'race';
+      if(F==='cat'){const tag=bHeat===1?'1本目 後追い　':'2本目 先行　';if(game.state==='count')ge.textContent=tag+(bHeat===1?'離されるな！':'引き離せ！');else{ge.textContent=tag+(gapM>0?'相手まで '+Math.round(gapM)+' m':'リード '+Math.round(-gapM)+' m');ge.className=gapM>0?'':'lead';}}
+      else if(F==='clean'&&game.state==='count')ge.textContent='ノータッチ一本勝負';
+      else if(game.state==='count')ge.textContent='ライバル 先行';
       else if(gapM>0){ge.textContent='ライバルまで '+Math.round(gapM)+' m';ge.className='';}
       else {ge.textContent='リード '+Math.round(-gapM)+' m';ge.className='lead';}}
     if(spec.type==='demae'&&game.state!=='title'&&!game.kyo&&mode!=='free'&&mode!=='densha'){const k=$('kyo'),r=game.demaT-game.t;k.hidden=false;k.innerHTML='配達まで <b>'+(r>=0?Math.ceil(r):'遅刻')+'</b>'+(r>=0?'秒':'')+'　ピザ '+Math.round(game.pizza)+'%';k.className=r<10?'hud bad':'hud';}
@@ -2910,9 +2928,10 @@ function addTotal(earned){{const b=soryaBonus()+taxiFare()+familyBonus()+kyoBonu
     setTimeout(()=>{flash('差し押さえ！ '+nm+'は回収業者に引き取られていった…');say(SHINPAN,'お車、確かに引き取らせていただきました。またのご利用をお待ちしております。',6);},1000);return addTotalRest(earned);}
   const left=zanList().reduce((a,k)=>a+zanM[k].d,0),nm=k=>(CARS.find(c=>c.id===k)||{name:k}).name;setTimeout(()=>flash(done.length?'完済！ '+done.map(nm).join('・')+'は本当にあなたのものになった':short?'支払いが足りない… 延滞 '+zanLate+'回目（3回で差し押さえ）':'残債 あと '+left.toLocaleString()+' P'),1900);}}return addTotalRest(earned);}
 function addTotalRest(earned){const e=$('earn');const t1=document.createElement('span');t1.className='tot';t1.textContent='獲得 （所持 '+wallet.toLocaleString()+' P）';const t2=document.createElement('span');t2.className='tot';t2.textContent=(earned<0?'−':'+')+Math.abs(earned).toLocaleString()+' P';e.append(t1,t2);}
-function finish(){if(car.siren)setSiren(false);stopCopSiren();
+function finish(){if(mode==='battle'&&!senseiMatch&&bFmt==='cat'&&!game.retired&&game.state==='race'){const c=cpus[0],g=c?GOAL_I-c.s:0;if(bHeat===1){catHeatEnd(g);return;}if(catRes&&catRes.g2==null)catRes.g2=g;}
+  if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&!(mode==='battle'&&bFmt!=='race'&&!senseiMatch)&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
@@ -3045,7 +3064,15 @@ function finishCollect(){
   addRows([['回収 '+n+'か所'+(PKr?'（収集車ボーナス）':''),pBag],['残り時間',pTime]].concat(pAll?[['全部回収ボーナス',pAll]]:[],[['接触 '+game.hits+'回',-game.hits*20]]));addTotal(earned);
   $('btnRetry').textContent='もう一回';$('btnMenu').hidden=false;
 }
-function finishBattle(){
+// gap: 1本目＝プレイヤーが相手より前にいる距離（後追いで離されたらマイナス）、2本目＝プレイヤーが相手を引き離した距離
+function catHeatEnd(gap){if(bHeat===1){catRes={g1:gap};game.state='done';endChain(true);
+    $('count').textContent='1本目 終了';flash(gap>=0?'後追いで前に出た！ +'+Math.round(gap)+' m':'先行に '+Math.round(-gap)+' m 離された');
+    catNext=-1;}
+  else{catRes.g2=gap;finish();}}
+function stepTsui(dt){const c=cpus[0];if(!c)return;const gap=c.s-car.idx;game.tsuiGap=gap;
+  if(car.drifting&&car.slip>9&&Math.hypot(car.vx,car.vz)>9&&gap>-5){const near=gap<8?2:gap>40?0:2-(gap-8)/32*2;tsuiPts+=car.slip*Math.hypot(car.vx,car.vz)*dt*.45*near;}
+  const ge=$('gap');if(ge){ge.textContent='追走 '+Math.round(tsuiPts).toLocaleString()+' / '+tsuiGoal().toLocaleString()+' 点　車間 '+Math.max(0,Math.round(gap))+' m';ge.className=tsuiPts>=tsuiGoal()?'lead':'';}}
+function finishBattle(){if(!senseiMatch&&bFmt!=='race')return finishBattleFmt();
   const win=!rivalDone&&!game.retired,d=senseiMatch?{mult:2}:DIFF[diff],RV=senseiMatch?SENSEI:battleDef(),sFirst=senseiMatch&&win&&store.get('touge_sensei_win')!=='1';if(sFirst){store.set('touge_sensei_win','1');setTimeout(()=>flash('教官に勝った！ 本当の卒業だ'),1900);}
   const pBase=game.retired?300:win?2000:600,pDrift=Math.round(game.dTotal*.25),pTime=game.retired?0:Math.max(0,Math.round((170-game.t)*15)),pHit=game.hits*40,pPass=game.passed?500:0;
   const comeback=win&&game.leadSince!=null&&game.t-game.leadSince<10,pRev=comeback?600:0;if(comeback)setTimeout(()=>flash('大逆転！'),300);
@@ -3058,6 +3085,19 @@ function finishBattle(){
   quote(RV,win?RV.lose:RV.win);
   $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;
 }
+function finishBattleFmt(){const d=DIFF[diff],RV=battleDef();let win=false,sub='',rows=[];
+  if(bFmt==='cat'){const g1=catRes?catRes.g1:0,g2=catRes&&catRes.g2!=null?catRes.g2:-99,sc=g1+g2;win=!game.retired&&sc>0;
+    sub=game.retired?'2本目で車が大破した。':'1本目（後追い）：'+(g1>=0?'前に '+Math.round(g1)+' m':Math.round(-g1)+' m 離された')+'　／　2本目（先行）：'+(g2>=0?Math.round(g2)+' m 引き離した':Math.round(-g2)+' m 抜き返された')+'　→ 差し引き '+(sc>=0?'+':'')+Math.round(sc)+' m';
+    rows=[[win?'先行・後追い 勝利':'先行・後追い 参加',win?2500:700],['1本目と2本目の差（1 mにつき10 P、最大1500 P）',Math.min(1500,Math.max(0,Math.round(sc*10)))]];}
+  else if(bFmt==='tsui'){const goal=tsuiGoal();win=!game.retired&&tsuiPts>=goal;sub=game.retired?'追走中に車が大破した。':'追走ポイント '+Math.round(tsuiPts).toLocaleString()+' 点（目標 '+goal.toLocaleString()+' 点）。'+(win?'ぴったり張りついたドリフトだった。':'もっと近くでドリフトを合わせよう。');
+    rows=[[win?'追走 勝利':'追走 参加',win?2500:600],['追走ポイント',Math.round(tsuiPts*.5)]];}
+  else{win=!game.retired&&!game.dq&&!rivalDone;sub=game.dq?'接触して失格。ノータッチ一本勝負はガードレールも車もダメ。':game.retired?'車が大破した。':win?'一度も触れずに相手より先にゴール。完璧な一本だった。':'触れずには走りきったけど、相手が先にゴールした。';
+    rows=[[win?'ノータッチ勝利（×1.5）':game.dq?'失格':'完走',win?3000:game.dq?200:800],['ドリフト',Math.round(game.dTotal*.25)]];}
+  const base=rows.reduce((a,r)=>a+r[1],0),earned=Math.max(200,Math.round(base*d.mult));wallet+=earned;
+  $('resKick').textContent='峠バトル（'+{cat:'先行・後追い',tsui:'ドリフト追走',clean:'ノータッチ一本勝負'}[bFmt]+'） ／ '+course.name;
+  $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');$('resSub').textContent=sub;
+  addRows(rows.concat([['相手の強さ','×'+d.mult]]));addTotal(earned);quote(RV,win?RV.lose:RV.win);
+  $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;}
 function finishCup(){
   const cup=CUPS[cupIdx];let c2;
   // まだ走っているCPUは、今の速さから到着タイムを見積もる
