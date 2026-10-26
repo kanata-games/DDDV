@@ -1268,7 +1268,7 @@ SPR.handcar=sprSet('handcar',{back:[1.45*1.036,1.45],diag:[1.6*1.4053,1.6],side:
 SPR.sweeper=sprSet('sweeper',{back:[2.6*1.1933,2.6],diag:[2.8*1.8139,2.8],side:[5.2,5.2/1.8734],front:[2.6*1.3403,2.6]},{back:2.2,diag:1.9,side:.6,front:2.2},.47);
 SPR.tf=sprSet('tf',{back:[1.2*1.7841,1.2],diag:[1.9*1.8861,1.9],side:[4.5,4.5/2.8647],front:[1.2*1.7515,1.2]},{back:1.4,diag:1.4,side:.6,front:1.4},.52);
 SPR.kotatsu=sprSet('kotatsu',{back:[1.5*1.3833,1.5],diag:[1.6*1.5673,1.6],side:[2.8,2.8/1.7515],front:[1.5*1.4851,1.5]},{back:.9,diag:.9,side:.45,front:.9},.42);
-SPR.marron=sprSet('marron',{back:[1.292,1.921],diag:[1.672,1.945],side:[2.204,1.95],front:[1.253,1.926]},{back:.9,diag:.7,side:.3,front:.9},.62);SPR.marronCut=sprTex('cars/marron-cut.webp');SPR.marronCutSize=[2.886,1.877];
+SPR.marron=sprSet('marron',{back:[1.292,1.921],diag:[1.672,1.945],side:[2.204,1.95],front:[1.253,1.926]},{back:.9,diag:.7,side:.3,front:.9},.62);SPR.marronCut=sprTex('cars/marron-cut.webp');SPR.marronStand=[0,1,2,3].map(k=>sprTex('cars/marron-stand'+k+'.webp'));SPR.marronStandSize=[1.36,1.784];SPR.marronCutSize=[2.886,1.877];
 SPR.piano=sprSet('piano',{back:[1.75*1.0185,1.75],diag:[1.85*1.4036,1.85],side:[3.2,3.2/1.6827],front:[1.75*1.3644,1.75]},{back:1.0,diag:1.0,side:.5,front:1.0},.4);
 SPR.tfr=sprSet('tfr',{back:[4.6*.7475,4.6],diag:[4.6*.6548,4.6],side:[4.6*.8847,4.6],front:[4.6*.7392,4.6]},{back:1.0,diag:1.0,side:.6,front:1.0},.52);SPR.tfr.cockpit='cars/tf-cockpit.webp';SPR.tfrWalk={back:[0,1,2,3].map(k=>sprTex('cars/tfr-walk'+k+'.webp')),diag:[0,1,2,3].map(k=>sprTex('cars/tfr-walk-diag'+k+'.webp')),side:[0,1,2,3].map(k=>sprTex('cars/tfr-walk-side'+k+'.webp'))};SPR.tfrWalkSize={back:[3.826,4.623],diag:[5.409,4.612],side:[4.993,4.438]};
 SPR.parade=sprSet('parade',{back:[2.9*1.2734,2.9],diag:[3.1*1.4293,3.1],side:[5.0,5.0/1.5756],front:[2.9*1.0203,2.9]},{back:2.0,diag:1.8,side:.6,front:2.0},.5);
@@ -1296,6 +1296,7 @@ function updateSprite(obj,yaw,hide){
   else {view='front';mirror=false;}
   let tex=sp.set[view],wh=sp.set.size[view];
   if(obj===pc&&spec.marron&&car.drifting&&(view==='side'||view==='diag')){tex=SPR.marronCut;wh=SPR.marronCutSize;} // マロンさんのブレーキカット
+  else if(obj===pc&&spec.marron&&car.boost&&view==='back'&&Math.hypot(car.vx,car.vz)>1){tex=SPR.marronStand[Math.floor((car.pedD||0)/1.3)%4];wh=SPR.marronStandSize;} // マロンさんの立ちこぎ（真後ろ）
   if(obj===pc&&sp.set===SPR.tfr&&SPR.tfrWalk[view]&&Math.hypot(car.vx,car.vz)>1){tex=SPR.tfrWalk[view][Math.floor((car.walkD||0)/1.8)%4];wh=SPR.tfrWalkSize[view];} // ロボの歩きアニメ（後ろ・斜め・横）
   if(sp.mat.map!==tex){sp.mat.map=tex;sp.mat.needsUpdate=true;}
   const [w,h]=wh;
@@ -2118,7 +2119,7 @@ function stepCar(dt,racing){
   if(spec.marron&&racing){ // 金田スライド風ブレーキカット：サイドを引いた瞬間に横向きになって滑る
     if(!car.kd&&hand&&!car.pHand&&sp>14&&!(car.kdCd>game.t)){car.kd={vx:car.vx,vz:car.vz,yaw0:car.yaw,dir:Math.abs(car.steer)>.15?-Math.sign(car.steer):1,t:0};flash(pick(['ブレーキカット！','ズザザザーッ！','これが大阪のブレーキカットや！']));if(ac){const o=ac.createOscillator(),g=ac.createGain();o.type='sawtooth';o.frequency.setValueAtTime(900,ac.currentTime);o.frequency.exponentialRampToValueAtTime(300,ac.currentTime+1.2);g.gain.setValueAtTime(.05,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+1.3);o.connect(g);g.connect(fxOut());o.start();o.stop(ac.currentTime+1.3);}}
     if(car.kd&&!hand){const k=car.kd,ks=Math.hypot(k.vx,k.vz);car.yaw=Math.atan2(k.vx,k.vz);vf=ks+(k.t>.5?3:0);vr=0;car.yr=0;car.kd=null;car.kdCd=game.t+.8;if(k.t>.5)flash('立て直して、踏み込む！');}
-    car.pHand=hand;}
+    car.pHand=hand;if(car.boost)car.pedD=(car.pedD||0)+sp*dt;}
   // 向き
   let sa=Math.min(1,Math.abs(vf)/5)*Math.sign(vf||1);if((spec.type==='tank'||spec.type==='chair'||spec.type==='shovel'||spec.type==='tf'&&car.robo)&&Math.abs(vf)<5)sa=Math.max(Math.abs(sa),.85)*(vf<-.3?-1:1); // 超信地旋回
   let target,resp;
