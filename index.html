@@ -2151,7 +2151,9 @@ function stepCar(dt,racing){
   }
   if((spec.type==='cart'||spec.type==='stretcher')&&sp>14&&racing){target+=(Math.random()-.5)*Math.min(2.2,(sp-14)*.12);if(Math.random()<dt*2&&ac)joint(sp);}
   car.yr+=(target-car.yr)*Math.min(1,dt*resp);
-  car.yaw+=car.yr*dt;
+  const yaw0=car.yaw;car.yaw+=car.yr*dt;
+  if(car.drifting&&!car.kd){ // ドリフト中は勢いが元の向きに残る（車体だけ回る）→ 横滑りが生まれる
+    const d=car.yaw-yaw0,c=Math.cos(d),s2=Math.sin(d),nvf=vf*c-vr*s2,nvr2=vf*s2+vr*c;vf=nvf;vr=nvr2;}
   // 横グリップ
   let grip=car.drifting?(hand?1.8:2.6)/spec.drift:7.5*spec.grip*f14Grip();
   if(slipDeg>50)grip=6; // スピン防止
@@ -2407,7 +2409,7 @@ function frame(now){
   if(racing){
     game.t+=dt;
     // drift scoring
-    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=car.slip*info.sp*dt*.45*(spec.type==='umimi'&&game.moonOn>game.t?2:spec.type==='ita'?1.25:spec.type==='jzx'?1.4:spec.type==='deco'&&game.decoOn>game.t?1.5:1);car.nitro=Math.min(1,car.nitro+car.slip*info.sp*dt*.45/1500);game.chainT=spec.type==='jzx'?1.6:.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
+    if(car.drifting&&car.slip>9&&info.sp>9){game.dChain+=(car.kd?Math.min(car.slip,35):car.slip)*info.sp*dt*.45*(spec.type==='umimi'&&game.moonOn>game.t?2:spec.type==='ita'?1.25:spec.type==='jzx'?1.4:spec.type==='deco'&&game.decoOn>game.t?1.5:1);car.nitro=Math.min(1,car.nitro+car.slip*info.sp*dt*.45/1500);game.chainT=spec.type==='jzx'?1.6:.6;$('drift').classList.add('show');$('drift').classList.remove('lost');$('dpts').textContent='+'+Math.round(game.dChain).toLocaleString();}
     else if(game.chainT>0){game.chainT-=dt;if(game.chainT<=0){endChain(true);$('drift').classList.remove('show');}}
     if(info.sp<1.5)game.stuck+=dt;else game.stuck=0;if(game.stuck>(mode==='collect'?9:3.5)){recover();game.stuck=0;}
     if(mode==='battle'&&!game.passed&&cpus[0]&&car.idx>cpus[0].s+4&&game.t>2){game.passed=true;flash('追い抜いた！ +500 P');beep(990,.2);}
