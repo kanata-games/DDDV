@@ -245,6 +245,8 @@ body.is-touch #kyo.low{bottom:calc(180px + env(safe-area-inset-bottom,0px))}#kyo
 html.rot90 body,html.rot270 body{position:fixed;top:0;left:0;width:var(--W);height:var(--H);transform-origin:top left}
 html.rot90 body{transform:translateX(var(--H)) rotate(90deg)}
 html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
+.pRain{animation:pRain 2.4s linear infinite}@keyframes pRain{from{filter:saturate(1.6) hue-rotate(0deg)}to{filter:saturate(1.6) hue-rotate(360deg)}}
+.paintRow{display:flex;flex-wrap:wrap;gap:5px}.paintPrev{height:64px;object-fit:contain;align-self:center}
 .tune{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(159,182,255,.15);padding-top:8px}
 .tune:empty{display:none}
 .tuneHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.tuneHead b{font-size:13px}.tuneHead small{font-size:11px;color:var(--dim)}
@@ -1200,6 +1202,34 @@ function makeCar(spec,isPlayer){
   scene.add(g);return {g,body,wheels};
 }
 const texL=new THREE.TextureLoader();
+// ===== スペシャル塗装（絵全体の色を自動で変える。全車共通・車ごとに購入） =====
+const PAINTS=[
+  {k:'mono',n:'モノクロ',price:3000,ops:[['gray',1],['con',1.1]],css:'grayscale(1) contrast(1.1)'},
+  {k:'sepia',n:'セピア',price:3000,ops:[['sepia',.9]],css:'sepia(.9)'},
+  {k:'hueA',n:'色違いA',price:5000,ops:[['hue',120]],css:'hue-rotate(120deg)'},
+  {k:'hueB',n:'色違いB',price:5000,ops:[['hue',240]],css:'hue-rotate(240deg)'},
+  {k:'stealth',n:'ステルス',price:8000,ops:[['sat',.3],['bri',.5],['con',1.3]],css:'saturate(.3) brightness(.5) contrast(1.3)'},
+  {k:'neon',n:'ネオン',price:12000,ops:[['sat',2.4],['con',1.25],['bri',1.1]],css:'saturate(2.4) contrast(1.25) brightness(1.1)'},
+  {k:'gold',n:'ゴールド',price:15000,ops:[['gray',1],['sepia',1],['sat',3],['bri',1.15],['con',1.15]],css:'grayscale(1) sepia(1) saturate(3) brightness(1.15) contrast(1.15)'},
+  {k:'rainbow',n:'虹色（ゲーミング）',price:20000,rainbow:true,ops:[['sat',1.6]],css:''}];
+let paintOwn=(()=>{try{const o=JSON.parse(store.get('touge_paintown')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
+let paintSel=(()=>{try{const o=JSON.parse(store.get('touge_paint')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
+const paintOf=id=>PAINTS.find(p=>p.k===paintSel[id])||null;
+function paintCss(id,el){const p=paintOf(id);el.classList.toggle('pRain',!!(p&&p.rainbow));el.style.filter=p&&!p.rainbow?p.css:'';}
+function paintMat(ops){let M=[1,0,0,0,1,0,0,0,1],o=[0,0,0];const mul=(B,b)=>{const N=[],n=[];for(let r=0;r<3;r++){for(let c=0;c<3;c++)N[r*3+c]=B[r*3]*M[c]+B[r*3+1]*M[3+c]+B[r*3+2]*M[6+c];n[r]=B[r*3]*o[0]+B[r*3+1]*o[1]+B[r*3+2]*o[2]+b[r];}M=N;o=n;};
+  ops.forEach(([t,v])=>{if(t==='hue'){const a=v*Math.PI/180,c=Math.cos(a),s=Math.sin(a);mul([.213+c*.787-s*.213,.715-c*.715-s*.715,.072-c*.072+s*.928,.213-c*.213+s*.143,.715+c*.285+s*.14,.072-c*.072-s*.283,.213-c*.213-s*.787,.715-c*.715+s*.715,.072+c*.928+s*.072],[0,0,0]);}
+    else if(t==='sat'||t==='gray'){const k=t==='sat'?v:1-v;mul([.213+.787*k,.715-.715*k,.072-.072*k,.213-.213*k,.715+.285*k,.072-.072*k,.213-.213*k,.715-.715*k,.072+.928*k],[0,0,0]);}
+    else if(t==='sepia'){const k=1-v;mul([.393+.607*k,.769-.769*k,.189-.189*k,.349-.349*k,.686+.314*k,.168-.168*k,.272-.272*k,.534-.534*k,.131+.869*k],[0,0,0]);}
+    else if(t==='bri')mul([v,0,0,0,v,0,0,0,v],[0,0,0]);
+    else if(t==='con')mul([v,0,0,0,v,0,0,0,v],[127.5*(1-v),127.5*(1-v),127.5*(1-v)]);});
+  return [M,o];}
+const paintCache=new WeakMap();
+function paintedTex(tex,p,step){const img=tex&&tex.image;if(!img||!img.width||!img.complete&&img.complete!==undefined)return tex;
+  let m=paintCache.get(tex);if(!m){m={};paintCache.set(tex,m);}const key=p.k+(p.rainbow?step:'');if(m[key])return m[key];
+  try{const cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;const g=cv.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,cv.width,cv.height),a=d.data;
+    const [M,o]=paintMat(p.rainbow?p.ops.concat([['hue',step*45]]):p.ops);
+    for(let i=0;i<a.length;i+=4){if(!a[i+3])continue;const r=a[i],gg=a[i+1],b=a[i+2];a[i]=M[0]*r+M[1]*gg+M[2]*b+o[0];a[i+1]=M[3]*r+M[4]*gg+M[5]*b+o[1];a[i+2]=M[6]*r+M[7]*gg+M[8]*b+o[2];}
+    g.putImageData(d,0,0);const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;m[key]=t;return t;}catch(e){m[key]=tex;return tex;}}
 function sprTex(f){const t=texL.load(f);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
 const SPR={'86':{back:sprTex('cars/86-back.webp'),diag:sprTex('cars/86-diag.webp'),side:sprTex('cars/86-side.webp'),front:sprTex('cars/86-front.webp'),
   size:{back:[1.42*576/444,1.42],diag:[1.75*576/311,1.75],side:[4.25,4.25*195/576],front:[1.46*535/361,1.46]},push:{back:1.3,diag:1.3,side:.6,front:1.3},cockpit:'cars/86-cockpit.webp',shield:.52}};
@@ -1315,6 +1345,7 @@ function updateSprite(obj,yaw,hide){
   if(obj===pc&&spec.marron&&car.drifting&&(view==='side'||view==='diag')){tex=SPR.marronCut;wh=SPR.marronCutSize;} // マロンさんのブレーキカット
   else if(obj===pc&&spec.marron&&car.boost&&view==='back'&&Math.hypot(car.vx,car.vz)>1){tex=SPR.marronStand[Math.floor((car.pedD||0)/1.3)%4];wh=SPR.marronStandSize;} // マロンさんの立ちこぎ（真後ろ）
   if(obj===pc&&sp.set===SPR.tfr&&SPR.tfrWalk[view]&&Math.hypot(car.vx,car.vz)>1){tex=SPR.tfrWalk[view][Math.floor((car.walkD||0)/1.8)%4];wh=SPR.tfrWalkSize[view];} // ロボの歩きアニメ（後ろ・斜め・横）
+  if((obj===pc||obj===tailCar)&&spec&&paintOf(spec.id)){const pp=paintOf(spec.id);tex=paintedTex(tex,pp,pp.rainbow?Math.floor(performance.now()/140)%8:0);}
   if(sp.mat.map!==tex){sp.mat.map=tex;sp.mat.needsUpdate=true;}
   const [w,h]=wh;
   sp.plane.scale.set(mirror?-w:w,h,1);
@@ -1823,7 +1854,7 @@ function renderGarage(){
   shown.forEach(c=>{const b=document.createElement('button');b.type='button';
     const own=owned.includes(c.id),sel=c.id===selId;
     b.className='carBtn'+(own?' owned':'')+(sel?' sel':'')+(c.id===focusId?' focus':'');
-    b.innerHTML=(c.img?'<img alt="" class="th">':'')+'<span class="sw"><i></i><i></i></span><b></b><small></small>';if(c.img)b.querySelector('.th').src=c.wingAlt&&wingOn(c.id)?'cars/'+c.wingAlt+'-diag.webp':c.img;
+    b.innerHTML=(c.img?'<img alt="" class="th">':'')+'<span class="sw"><i></i><i></i></span><b></b><small></small>';if(c.img){b.querySelector('.th').src=c.wingAlt&&wingOn(c.id)?'cars/'+c.wingAlt+'-diag.webp':c.img;if(owned.includes(c.id))paintCss(c.id,b.querySelector('.th'));}
     const sw=b.querySelectorAll('.sw i');sw[0].style.background=hex(c.top);sw[1].style.background=hex(c.bot);
     b.querySelector('b').textContent=c.name;
     b.querySelector('small').textContent=sel?'選択中':own?'所有':c.price.toLocaleString()+' P';
@@ -1832,7 +1863,7 @@ function renderGarage(){
   list.scrollTop=keep;
   const c=CARS.find(x=>x.id===focusId),info=$('carInfo');
   const own=owned.includes(c.id);
-  info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div><div class="tune"></div>';
+  info.innerHTML='<div><div class="nm"></div><p></p></div><div class="act"></div><div class="bars"></div><div class="tune"></div><div class="tune paint"></div>';
   info.querySelector('.nm').textContent=c.name;{const L=zanM[c.id];info.querySelector('p').textContent=c.note+(own&&L&&L.d>0?'　【残クレ返済中：残債 '+L.d.toLocaleString()+' P／毎レース '+L.p.toLocaleString()+' P】':own&&L?'　【完済済み — 本当にあなたの車】':'');}
   const bars=info.querySelector('.bars');
   {const t=tuneOf(c.id);[['パワー',c.pow*(1+.1*t.acc)/1.5],['最高速',(c.vmax||1)*(1+.1*t.spd)/1.4],['グリップ',c.grip*(1+.06*t.hnd)/1.3],['ドリフト',c.drift/1.35],['耐久',(c.dur||100)*(1+.15*t.dur)/220]].forEach(([l,v])=>{const sp=document.createElement('span');sp.textContent=l;const bar=document.createElement('span');bar.className='bar';bar.innerHTML='<i></i>';bar.firstChild.style.width=Math.round(v*100)+'%';bars.append(sp,bar);});}
@@ -1850,6 +1881,15 @@ function renderGarage(){
     pb.addEventListener('click',()=>{wallet-=L.d;L.d=0;zanSave();store.set('touge_p',wallet);renderAll();flash('完済！ '+c.name+'は本当にあなたのものになった');});act.appendChild(pb);}}
   if(own&&c.wingAlt){const wb=document.createElement('button');wb.type='button';wb.className='buy ghosty';wb.textContent=wingOn(c.id)?'リアウイングを外す':'リアウイングを付ける';
     wb.addEventListener('click',()=>{store.set('touge_wing_'+c.id,wingOn(c.id)?'0':'1');if(selId===c.id)swapCar(c.id);renderGarage();});act.appendChild(wb);}
+  if(own){const pb=info.querySelector('.paint'),h=document.createElement('div');h.className='tuneHead';h.innerHTML='<b>スペシャル塗装</b><small>この車だけ。絵ごと色が変わる（乗っている人も）</small>';pb.appendChild(h);
+    const pv=document.createElement('img');pv.className='paintPrev';pv.alt='';pv.src=c.img;paintCss(c.id,pv);pb.appendChild(pv);
+    const row=document.createElement('div');row.className='paintRow';pb.appendChild(row);const mine=paintOwn[c.id]||[];
+    const show=k=>{const p=PAINTS.find(x=>x.k===k);pv.classList.toggle('pRain',!!(p&&p.rainbow));pv.style.filter=p&&!p.rainbow?p.css:'';};
+    [{k:'',n:'ノーマル'}].concat(PAINTS).forEach(p=>{const b=document.createElement('button');b.type='button';b.className='tb2';const has=!p.k||mine.includes(p.k),cur=(paintSel[c.id]||'')===p.k;
+      b.textContent=cur?'✓ '+p.n:has?p.n:p.n+' '+p.price.toLocaleString()+'P';b.disabled=cur||(!has&&wallet<p.price);
+      b.addEventListener('mouseenter',()=>show(p.k));b.addEventListener('mouseleave',()=>show(paintSel[c.id]||''));b.addEventListener('focus',()=>show(p.k));
+      b.addEventListener('click',()=>{if(!has){wallet-=p.price;paintOwn[c.id]=mine.concat([p.k]);store.set('touge_paintown',JSON.stringify(paintOwn));store.set('touge_p',wallet);flash(c.name+'に「'+p.n+'」を塗った！');}
+        if(p.k)paintSel[c.id]=p.k;else delete paintSel[c.id];store.set('touge_paint',JSON.stringify(paintSel));renderAll();});row.appendChild(b);});}
   const tb=info.querySelector('.tune');
   if(own){const t=tuneOf(c.id);const h=document.createElement('div');h.className='tuneHead';h.innerHTML='<b>チューニング</b><small>この車だけ。下げるとPは全額戻る</small>';tb.appendChild(h);
     TUNE.forEach(T=>{const lv=t[T.k],row=document.createElement('div');row.className='tuneRow';row.title=T.d;
@@ -2530,7 +2570,7 @@ function frame(now){
     camera.position.set(car.x+(-cs)*lx+sn*st[2],car.y+st[1]+(car.stage&&spec.type==='enzetsu'?1.7:0),car.z+sn*lx+cs*st[2]);
     camLook.set(camera.position.x+sn*10,car.y+.95-(car.pitch||0)*10,camera.position.z+cs*10);camera.lookAt(camLook);
     const ck=spec.type==='enzetsu'&&car.stage?'cars/enzetsu-roof.webp':spec.sprite&&SPR[spec.sprite].cockpit,img=$('cockpit');
-    if(ck){if(cockpitOn&&img.dataset.ck!==ck){img.src=ck;img.dataset.ck=ck;}if(!cockpitOn){img.src=ck;img.dataset.ck=ck;img.style.imageRendering=spec.sprite==='hokora'?'pixelated':'';img.hidden=false;cockpitOn=true;}wheelRig.visible=false;
+    if(ck){if(cockpitOn&&img.dataset.ck!==ck){img.src=ck;img.dataset.ck=ck;}if(!cockpitOn){img.src=ck;img.dataset.ck=ck;img.style.imageRendering=spec.sprite==='hokora'?'pixelated':'';paintCss(spec.id,img);img.hidden=false;cockpitOn=true;}wheelRig.visible=false;
       swx+=(-car.yr*7-swx)*Math.min(1,dt*5);swy+=((info.sp>3?Math.sin(now*.031)*Math.min(1.5,info.sp*.03):0)-swy)*Math.min(1,dt*8);const sx=swx+(Math.random()-.5)*game.shake*10,sy=swy+game.shake*(Math.random()-.5)*8;
       img.style.transform='translateX(calc(-50% + '+sx.toFixed(1)+'px)) translateY('+sy.toFixed(1)+'px)';}
     else{if(cockpitOn){cockpitOn=false;img.hidden=true;}wheelRig.visible=true;wheelRig.rotation.z=-car.steer*1.9;}
