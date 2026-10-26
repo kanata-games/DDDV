@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='159ee3eab1';
+const VERSION='297e33caf3';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -18,6 +18,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/amb-cockpit.webp',
   './cars/amb-diag.webp',
   './cars/amb-sheet.webp',
+  './cars/aoten-cockpit.webp',
+  './cars/aoten-diag.webp',
+  './cars/aoten-sheet.webp',
   './cars/astarte-cockpit.webp',
   './cars/astarte-diag.webp',
   './cars/astarte-sheet.webp',
@@ -147,6 +150,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/jzx-cockpit.webp',
   './cars/jzx-diag.webp',
   './cars/jzx-sheet.webp',
+  './cars/kanata-cockpit.webp',
+  './cars/kanata-diag.webp',
+  './cars/kanata-sheet.webp',
   './cars/kei-cockpit.webp',
   './cars/kei-diag.webp',
   './cars/kei-sheet.webp',
