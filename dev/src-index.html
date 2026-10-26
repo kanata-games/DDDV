@@ -311,6 +311,10 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
         <div class="seg" id="ladSeg"></div>
       </div>
       <p class="cDesc" id="ladDesc"></p>
+      <div class="opts">最終決戦
+        <div class="seg" id="nightSeg"></div>
+      </div>
+      <p class="cDesc" id="nightDesc"></p>
       <div class="opts">フリー対戦
         <div class="seg" id="rvSeg"></div>
       </div>
@@ -1202,6 +1206,7 @@ const PAINTS=[
   {k:'chrome',n:'クローム',price:8000,ops:[['gray',.85],['con',1.7],['bri',1.15]],css:'grayscale(.85) contrast(1.7) brightness(1.15)'},
   {k:'neon',n:'ネオン',price:12000,ops:[['sat',2.4],['con',1.25],['bri',1.1]],css:'saturate(2.4) contrast(1.25) brightness(1.1)'},
   {k:'gold',n:'ゴールド',price:15000,ops:[['gray',1],['sepia',1],['sat',4.5],['con',1.35],['bri',1.18]],css:'grayscale(1) sepia(1) saturate(4.5) contrast(1.35) brightness(1.18)'},
+  {k:'lumen',n:'月光（ルーメン）',price:0,night:true,ops:[['gray',.9],['sepia',.6],['hue',185],['sat',2.2],['con',1.15],['bri',1.25]],css:'grayscale(.9) sepia(.6) hue-rotate(185deg) saturate(2.2) contrast(1.15) brightness(1.25)'},
   {k:'rainbow',n:'虹色（ゲーミング）',price:20000,rainbow:true,ops:[['sat',2.2],['con',1.1],['bri',1.08]],css:''}];
 let paintOwn=(()=>{try{const o=JSON.parse(store.get('touge_paintown')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
 let paintSel=(()=>{try{const o=JSON.parse(store.get('touge_paint')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}})();
@@ -1337,7 +1342,7 @@ function updateSprite(obj,yaw,hide){
   if(obj===pc&&spec.marron&&car.drifting&&(view==='side'||view==='diag')){tex=SPR.marronCut;wh=SPR.marronCutSize;} // マロンさんのブレーキカット
   else if(obj===pc&&spec.marron&&car.boost&&view==='back'&&Math.hypot(car.vx,car.vz)>1){tex=SPR.marronStand[Math.floor((car.pedD||0)/1.3)%4];wh=SPR.marronStandSize;} // マロンさんの立ちこぎ（真後ろ）
   if(obj===pc&&sp.set===SPR.tfr&&SPR.tfrWalk[view]&&Math.hypot(car.vx,car.vz)>1){tex=SPR.tfrWalk[view][Math.floor((car.walkD||0)/1.8)%4];wh=SPR.tfrWalkSize[view];} // ロボの歩きアニメ（後ろ・斜め・横）
-  if((obj===pc||obj===tailCar)&&spec&&paintOf(spec.id)){const pp=paintOf(spec.id);tex=paintedTex(tex,pp,pp.rainbow?Math.floor(performance.now()/140)%8:0);}
+  {const pp=(obj===pc||obj===tailCar)?(spec&&paintOf(spec.id)):obj.g.userData.paint;if(pp)tex=paintedTex(tex,pp,pp.rainbow?Math.floor(performance.now()/140)%8:0);}
   if(sp.mat.map!==tex){sp.mat.map=tex;sp.mat.needsUpdate=true;}
   const [w,h]=wh;
   sp.plane.scale.set(mirror?-w:w,h,1);
@@ -1565,6 +1570,28 @@ const LADDER={lake:{boss:'nsx',fmt:'race',no2:'s15',loc:['swan','beat','civic','
   arcade:{boss:'bike',fmt:'clean',no2:'demae',loc:['cart','chair','kotatsu','icecream']},park:{boss:'pumpkin',fmt:'race',no2:'panda',loc:['swan','trolley','handcar','golf','sl']},
   snow:{boss:'snowmo',fmt:'tsui',no2:'sled',loc:['ketten','tractor','kotatsu','tiller']},airport:{boss:'f14',fmt:'race',no2:'loader',loc:['tank','roller','fork']},
   neon:{boss:'packer',fmt:'clean',no2:'sweeper',loc:['junk','yakiimo','wrecker','fire']}};
+// ===== ダークヴェイルの夜：五血盟の抗争（峠カテゴリ5コースを制覇すると挑める）。あなたはルーメン代表 =====
+const NIGHT_REQ=['lake','up','down','tsuzura','ridge'];
+const NIGHT=[
+  {clan:'サングイス',col:'#e0303a',course:'down',fmt:'race',carId:'z',name:'サングイスの緋（あけ）',paint:{k:'cl_s',ops:[['gray',.9],['sepia',1],['hue',-52],['sat',6],['con',1.2],['bri',1]]},
+    pre:['月の血盟が、ここまで来たか。','赤い夜を、見せてあげる。'],passed:['……血が騒ぐわね。'],pass:['遅いわ。'],win:'今夜も赤い月ね。',lose:'…ルーメン、覚えておくわ。'},
+  {clan:'ベスティア',col:'#f0c020',course:'up',fmt:'cat',carId:'gc8',name:'ベスティアの牙王（がおう）',paint:{k:'cl_b',ops:[['gray',.85],['sepia',1],['hue',8],['sat',6],['con',1.1],['bri',1.4]]},
+    pre:['獣の上りに、ついて来られるか！','ガオォ！ 喰らいついてやる！'],passed:['ぐっ、牙が届かねえ！'],pass:['喰らいついたぜ！'],win:'獣の勝ちだ！',lose:'…いい獲物だった。'},
+  {clan:'イグニス',col:'#ff8a20',course:'tsuzura',fmt:'tsui',carId:'supra',name:'イグニスの焔（ほむら）',paint:{k:'cl_i',ops:[['gray',.9],['sepia',1],['hue',-12],['sat',5.5],['con',1.2],['bri',1.1]]},
+    pre:['燃えるドリフトで、ついて来い。','炎のラインを描いてやる。'],passed:['火が…消えた？'],pass:['燃え上がれ！'],win:'燃え尽きたな。',lose:'…いい炎だった。'},
+  {clan:'ヴェスパー',col:'#a050e0',course:'ridge',fmt:'clean',carId:'boss',name:'ヴェスパーの宵（よい）',paint:{k:'cl_v',ops:[['gray',.9],['sepia',1],['hue',235],['sat',3.5],['con',1.25],['bri',.95]]},
+    pre:['最後の夜へ、ようこそ。','触れずに、闇を抜けられるかな。'],passed:['……月が、闇を照らすのか。'],pass:['闇に飲まれろ。'],win:'夜は、まだ明けない。',lose:'ルーメンの夜明けだ。'}];
+let nightRound=Math.max(0,Math.min(4,+(store.get('touge_night')||0)));
+const nightOpen=()=>NIGHT_REQ.every(k=>(ladM[k]||0)>=3);
+function nightDef(){const N=NIGHT[Math.min(3,nightRound)],car=CARS.find(c=>c.id===N.carId)||CARS[0];return Object.assign({car:car.name+'（'+N.clan+'仕様）',col:car.top,bot:car.bot,shape:car.shape,sprite:car.sprite,fav:''},N);}
+function nightWin(win){if(battleRival!=='N'||!win)return 0;const r=nightRound;nightRound=Math.min(4,r+1);store.set('touge_night',nightRound);
+  if(nightRound>=4&&store.get('touge_night_win')!=='1'){store.set('touge_night_win','1');setTimeout(()=>flash('五血盟の抗争、ルーメンの勝利！ 月光の塗装が解放された'),1900);return 20000;}
+  if(nightRound<4)setTimeout(()=>flash(NIGHT[r].clan+'に勝った！ 次は '+NIGHT[nightRound].clan),1900);return 3000;}
+function renderNight(){const box=$('nightSeg'),ds=$('nightDesc');if(!box)return;box.innerHTML='';const got=NIGHT_REQ.filter(k=>(ladM[k]||0)>=3).length,b=document.createElement('button');b.type='button';b.dataset.r='N';
+  if(!nightOpen()){b.textContent='？？？（峠の主 制覇 '+got+'/5）';b.disabled=true;if(ds)ds.textContent='峠カテゴリ5コース（湖畔・月見峠 上り／下り・つづら折り・稜線）の主をすべて倒すと、何かが始まる…';}
+  else{b.textContent=nightRound>=4?'ダークヴェイルの夜 ★（再戦：ヴェスパー）':'ダークヴェイルの夜：'+NIGHT[nightRound].clan+'戦';
+    if(ds)ds.textContent='五血盟の抗争。ルーメンの代表として、4つの血盟の代表と1本ずつ戦う：'+NIGHT.map((N,k)=>(k<nightRound?'✓':'')+N.clan+'（'+FMT_NAME[N.fmt]+'）').join(' → ')+(nightRound>=4?'　ルーメンの勝利！':'　全勝で20,000 Pと「月光」塗装');}
+  b.addEventListener('click',()=>{battleRival='N';store.set('touge_brival','N');syncRival();});box.appendChild(b);}
 const FMT_NAME={race:'先にゴール',cat:'先行・後追い',tsui:'ドリフト追走',clean:'ノータッチ一本勝負'};
 const crewCache={};
 function crewOf(id){if(id&&id[0]==='@')return DRIVERS[id.slice(1)];if(crewCache[id])return crewCache[id];const car=CARS.find(c=>c.id===id);if(!car)return null;
@@ -1576,7 +1603,7 @@ let ladM=(()=>{try{const o=JSON.parse(store.get('touge_ladder')||'{}');return o&
 const ladPick={};
 function ladLocal(cid){const L=LADDER[cid];if(!L)return null;if(!ladPick[cid])ladPick[cid]=L.loc[Math.random()*L.loc.length|0];return ladPick[cid];}
 function ladderDef(n){const L=LADDER[battleCourse];if(!L)return null;return crewOf(n===1?ladLocal(battleCourse):n===2?L.no2:L.boss);}
-function curFmt(){if(battleRival==='L3'&&LADDER[battleCourse])return LADDER[battleCourse].fmt;return bFmt;}
+function curFmt(){if(battleRival==='N')return NIGHT[Math.min(3,nightRound)].fmt;if(battleRival==='L3'&&LADDER[battleCourse])return LADDER[battleCourse].fmt;return bFmt;}
 function ladWin(win){const n=+battleRival.slice(1);if(!n||!LADDER[course.id])return 0;const id=course.id,st=ladM[id]||0;if(win&&n===1)ladPick[id]=null;
   if(!win)return 0;if(n>st){ladM[id]=n;store.set('touge_ladder',JSON.stringify(ladM));}
   if(n===3&&st<3){setTimeout(()=>flash('★ '+course.name+'を制覇！ 峠の主に勝った'),1900);return 10000;}
@@ -1587,10 +1614,10 @@ function renderLadder(){const box=$('ladSeg');if(!box)return;box.innerHTML='';co
   [[1,'地元'],[2,'No.2'],[3,'峠の主']].forEach(([n,lab])=>{const d=ladderDef(n),b=document.createElement('button');b.type='button';b.dataset.r='L'+n;
     const open=n<=st+1;b.textContent=open?lab+'：'+d.name+(n===3&&st>=3?' ★':''):lab+'：？？？';b.disabled=!open;
     b.addEventListener('click',()=>{battleRival='L'+n;store.set('touge_brival',battleRival);syncRival();});box.appendChild(b);});
-  syncRival();}
-let battleRival=store.get('touge_brival')||'yellow';if(!BATTLE_RIVALS.some(r=>r[0]===battleRival)&&!/^L[123]$/.test(battleRival))battleRival='yellow';
-function battleDef(){if(/^L[123]$/.test(battleRival)){const d=ladderDef(+battleRival[1]);if(d)return d;}return FRIEND_RIVALS[battleRival]||DRIVERS[battleRival]||DRIVERS.yellow;}
-function battleSkill(){if(/^L[123]$/.test(battleRival)&&LADDER[battleCourse]){const n=+battleRival[1],d=battleDef();return DIFF[diff].scale+[-.03,.01,.045][n-1]+(d&&d.sk||0)*.5;}const r=BATTLE_RIVALS.find(x=>x[0]===battleRival);return DIFF[diff].scale+(r?r[2]:0);}
+  renderNight();syncRival();}
+let battleRival=store.get('touge_brival')||'yellow';if(!BATTLE_RIVALS.some(r=>r[0]===battleRival)&&!/^(L[123]|N)$/.test(battleRival))battleRival='yellow';
+function battleDef(){if(battleRival==='N')return nightDef();if(/^L[123]$/.test(battleRival)){const d=ladderDef(+battleRival[1]);if(d)return d;}return FRIEND_RIVALS[battleRival]||DRIVERS[battleRival]||DRIVERS.yellow;}
+function battleSkill(){if(battleRival==='N')return DIFF[diff].scale+.05+Math.min(3,nightRound)*.012;if(/^L[123]$/.test(battleRival)&&LADDER[battleCourse]){const n=+battleRival[1],d=battleDef();return DIFF[diff].scale+[-.03,.01,.045][n-1]+(d&&d.sk||0)*.5;}const r=BATTLE_RIVALS.find(x=>x[0]===battleRival);return DIFF[diff].scale+(r?r[2]:0);}
 const COP={name:'警察',car:'パトカー',col:0x3a7bff,bot:0x15161a,shape:'sedan',sprite:'police',type:'police',cop:true,fav:'',
   pre:['そこの車、止まりなさい！','前の車、左に寄せて止まりなさい！'],passed:['逃がすな！','応援を要請する！'],pass:['確保ーっ！','前に回り込んだぞ！'],win:'確保！',lose:'…見失いました。'};
 function nameTag(text,col){
@@ -1601,7 +1628,7 @@ function nameTag(text,col){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));sp.scale.set(3.2,.8,1);sp.position.y=2.7;return sp;}
 let cpus=[];
 function makeCpu(def,skill,s0,lane,light){skill+=def.fav===(course&&course.id)?.025:0;
-  const m=makeCar({top:def.col,bot:def.bot,shape:def.shape,sprite:def.sprite,type:def.type},false);
+  const m=makeCar({top:def.col,bot:def.bot,shape:def.shape,sprite:def.sprite,type:def.type},false);if(def.paint)m.g.userData.paint=def.paint;
   if(mode==='cup')m.g.add(nameTag(def.name,def.col));
   if(light){const l=new THREE.SpotLight(0xfff0d0,1.4,60,.5,.6,1.4);l.position.set(0,.9,1.9);const t=new THREE.Object3D();t.position.set(0,-.6,12);m.g.add(l,t);l.target=t;}
   return {def,name:def.name,mesh:m,skill,s:s0,v:0,lat:lane,lane,x:0,y:0,z:0,yaw:0,drift:false,done:0};
@@ -1786,7 +1813,7 @@ document.querySelectorAll('#fSeg button').forEach(b=>b.addEventListener('click',
 function syncDiff(){document.querySelectorAll('#dSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===diff));}
 document.querySelectorAll('#dSeg button').forEach(b=>b.addEventListener('click',()=>{diff=+b.dataset.d;store.set('touge_diff',diff);syncDiff();syncFmt();}));setTimeout(syncFmt);
 {const rs=$('rvSeg');if(rs){BATTLE_RIVALS.forEach(([k,n])=>{const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.r=k;b.addEventListener('click',()=>{battleRival=k;store.set('touge_brival',k);syncRival();});rs.appendChild(b);});}}
-function syncRival(){let bc;try{bc=battleCourse;}catch(e){bc=null;}if(bc&&/^L[123]$/.test(battleRival)&&!(LADDER[bc]&&+battleRival[1]<=(ladM[bc]||0)+1))battleRival='L1';document.querySelectorAll('#rvSeg button,#ladSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===battleRival));if(bc!==null&&bc!==undefined){renderLadderDesc();syncFmt();}}
+function syncRival(){let bc;try{bc=battleCourse;}catch(e){bc=null;}if(bc&&battleRival==='N'&&!nightOpen())battleRival='L1';if(bc&&/^L[123]$/.test(battleRival)&&!(LADDER[bc]&&+battleRival[1]<=(ladM[bc]||0)+1))battleRival='L1';document.querySelectorAll('#rvSeg button,#ladSeg button,#nightSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===battleRival));if(bc!==null&&bc!==undefined){renderLadderDesc();syncFmt();}}
 function renderLadderDesc(){const ds=$('ladDesc');if(!ds)return;const L=LADDER[battleCourse],st=ladM[battleCourse]||0,n=battleRival[0]==='L'?+battleRival[1]:0,d=n&&L?ladderDef(n):null;ds.textContent=!L?'':d?d.name+'（'+d.car+'）：'+(d.intro||'')+(n===3?'　得意な勝負：'+FMT_NAME[L.fmt]+(st<3?'　初めて勝つと制覇ボーナス 10,000 P':'　（制覇済み）'):''):'地元の走り屋に勝つと No.2、No.2 に勝つと峠の主が現れる。主は得意な形式で勝負してくる。';}syncRival();
 syncDiff();
 const CAMD=[.78,1,1.3,.52];let camDist=+(store.get('touge_camd')??1);if(!CAMD[camDist])camDist=1;
@@ -1924,7 +1951,7 @@ function renderGarage(){
     const pv=document.createElement('img');pv.className='paintPrev';pv.alt='';pv.src=c.img;paintCss(c.id,pv);pb.appendChild(pv);
     const row=document.createElement('div');row.className='paintRow';pb.appendChild(row);const mine=paintOwn[c.id]||[];
     const show=k=>{const p=PAINTS.find(x=>x.k===k);pv.classList.toggle('pRain',!!(p&&p.rainbow));pv.style.filter=p&&!p.rainbow?p.css:'';};
-    [{k:'',n:'ノーマル'}].concat(PAINTS).forEach(p=>{const b=document.createElement('button');b.type='button';b.className='tb2';const has=!p.k||mine.includes(p.k),cur=(paintSel[c.id]||'')===p.k;
+    [{k:'',n:'ノーマル'}].concat(PAINTS).forEach(p=>{if(p.night&&store.get('touge_night_win')!=='1')return;const b=document.createElement('button');b.type='button';b.className='tb2';const has=!p.k||p.night||mine.includes(p.k),cur=(paintSel[c.id]||'')===p.k;
       b.textContent=cur?'✓ '+p.n:has?p.n:p.n+' '+p.price.toLocaleString()+'P';b.disabled=cur||(!has&&wallet<p.price);
       b.addEventListener('mouseenter',()=>show(p.k));b.addEventListener('mouseleave',()=>show(paintSel[c.id]||''));b.addEventListener('focus',()=>show(p.k));
       b.addEventListener('click',()=>{if(!has){wallet-=p.price;paintOwn[c.id]=mine.concat([p.k]);store.set('touge_paintown',JSON.stringify(paintOwn));store.set('touge_p',wallet);flash(c.name+'に「'+p.n+'」を塗った！');}
@@ -1979,6 +2006,7 @@ function startFromMenu(){
   else if(mode==='free'){courseOf('loop').reroll=true;loadCourse(freeMap());}
   else if(mode==='school'){if(course.id!==schoolStage)loadCourse(schoolStage);}
   else if(mode==='densha'){if(selId!=='train'){denPrev=selId;swapCar('train');}if(course.id!==denLine)loadCourse(denLine);railGroup.visible=true;}
+  else if(battleRival==='N'){const nc=NIGHT[Math.min(3,nightRound)].course;if(course.id!==nc)loadCourse(nc);}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   bHeat=1;catRes=null;tsuiPts=0;catNext=0;
   resetRace();
@@ -3103,13 +3131,13 @@ function finishBattle(){if(!senseiMatch&&curFmt()!=='race')return finishBattleFm
   const pBase=game.retired?300:win?2000:600,pDrift=Math.round(game.dTotal*.25),pTime=game.retired?0:Math.max(0,Math.round((170-game.t)*15)),pHit=game.hits*40,pPass=game.passed?500:0;
   const comeback=win&&game.leadSince!=null&&game.t-game.leadSince<10,pRev=comeback?600:0;if(comeback)setTimeout(()=>flash('大逆転！'),300);
   const earned=Math.max(300,Math.round((pBase+pDrift+pTime+pPass+pRev+game.shoved*50-pHit)*d.mult));
-  const pLad=senseiMatch?0:ladWin(win),pSen=(sFirst?5000:0)+pLad;wallet+=earned+pSen;
+  const pLad=senseiMatch?0:ladWin(win)+nightWin(win),pSen=(sFirst?5000:0)+pLad;wallet+=earned+pSen;
   $('resKick').textContent=(senseiMatch?'卒業記念タイマン ／ ':'峠バトル ／ ')+course.name;
   $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');
   $('resSub').textContent=game.retired?'壁にぶつけすぎて車が大破した。耐久はパーツの「ボディ補強」で上げられる。':senseiMatch?(win?'教官を峠で抜き去った。「教習中」の札が、バックミラーの中で小さくなっていく。':'教官に '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。教習車とは思えない速さだった。'):win?(battleRival==='yellow'?'黄色いロータリー':RV.name+'の'+RV.car)+'を峠で抜き去った。今夜の'+course.name+'はあなたのものだ。':'ライバルに '+(game.t-rivalDone).toFixed(2)+' 秒差で先にゴールされた。ヘアピンはサイドで鼻先を早めに入れると縮まる。';
-  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':spec.type==='tug'?'押し戻した車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],[['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]],pSen?[[pLad?'峠を制覇（初勝利）':'教官に初勝利',pSen]]:[]));addTotal(earned+pSen);
+  addRows([[game.retired?'出走ボーナス':win?'勝利ボーナス':'完走ボーナス',pBase],['ドリフト',pDrift],['タイム',pTime],['追い抜き',pPass],['ゴール直前の逆転',pRev]].concat(game.shoved?[[(spec.type==='fork'?'すくい上げた車 ':spec.type==='tank'?'ふっとばした車 ':spec.type==='roller'?'ぺしゃんこにした車 ':spec.type==='tug'?'押し戻した車 ':'どかした車 ')+game.shoved+'台',game.shoved*50]]:[],[['接触 '+game.hits+'回',-pHit],['相手の強さ','×'+d.mult]],pSen?[[pLad?(battleRival==='N'?'ダークヴェイルの夜':'峠を制覇（初勝利）'):'教官に初勝利',pSen]]:[]));addTotal(earned+pSen);
   quote(RV,win?RV.lose:RV.win);
-  $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;
+  $('btnRetry').textContent=battleRival==='N'&&win&&nightRound<4?'次の血盟へ（'+NIGHT[nightRound].clan+'）':'もう一本';$('btnMenu').hidden=false;if(battleRival==='N')$('resKick').textContent='ダークヴェイルの夜 ／ '+RV.clan+'戦（'+course.name+'）';
 }
 function finishBattleFmt(){const d=DIFF[diff],RV=battleDef();let win=false,sub='',rows=[];
   if(curFmt()==='cat'){const g1=catRes?catRes.g1:0,g2=catRes&&catRes.g2!=null?catRes.g2:-99,sc=g1+g2;win=!game.retired&&sc>0;
@@ -3119,11 +3147,11 @@ function finishBattleFmt(){const d=DIFF[diff],RV=battleDef();let win=false,sub='
     rows=[[win?'追走 勝利':'追走 参加',win?2500:600],['追走ポイント',Math.round(tsuiPts*.5)]];}
   else{win=!game.retired&&!game.dq&&!rivalDone;sub=game.dq?'接触して失格。ノータッチ一本勝負はガードレールも車もダメ。':game.retired?'車が大破した。':win?'一度も触れずに相手より先にゴール。完璧な一本だった。':'触れずには走りきったけど、相手が先にゴールした。';
     rows=[[win?'ノータッチ勝利（×1.5）':game.dq?'失格':'完走',win?3000:game.dq?200:800],['ドリフト',Math.round(game.dTotal*.25)]];}
-  const pLad=ladWin(win);if(pLad)rows.push(['峠を制覇（初勝利）',pLad]);const base=rows.reduce((a,r)=>a+r[1],0)-pLad,earned=Math.max(200,Math.round(base*d.mult))+pLad;wallet+=earned;
+  const pLad=ladWin(win)+nightWin(win);if(pLad)rows.push([battleRival==='N'?(nightRound>=4?'五血盟の抗争 制覇':'血盟に勝利'):'峠を制覇（初勝利）',pLad]);const base=rows.reduce((a,r)=>a+r[1],0)-pLad,earned=Math.max(200,Math.round(base*d.mult))+pLad;wallet+=earned;
   $('resKick').textContent='峠バトル（'+{cat:'先行・後追い',tsui:'ドリフト追走',clean:'ノータッチ一本勝負'}[curFmt()]+'） ／ '+course.name;
   $('resHead').textContent=game.retired?'大破':win?'勝利':'敗北';$('resHead').className='res-big '+(win?'win':'lose');$('resSub').textContent=sub;
   addRows(rows.concat([['相手の強さ','×'+d.mult]]));addTotal(earned);quote(RV,win?RV.lose:RV.win);
-  $('btnRetry').textContent='もう一本';$('btnMenu').hidden=false;}
+  $('btnRetry').textContent=battleRival==='N'&&win&&nightRound<4?'次の血盟へ（'+NIGHT[nightRound].clan+'）':'もう一本';$('btnMenu').hidden=false;if(battleRival==='N')$('resKick').textContent='ダークヴェイルの夜 ／ '+RV.clan+'戦（'+course.name+'）';}
 function finishCup(){
   const cup=CUPS[cupIdx];let c2;
   // まだ走っているCPUは、今の速さから到着タイムを見積もる
