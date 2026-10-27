@@ -36,6 +36,6 @@ function run(id,hfn){ls.set('touge_course','down');ls.set('touge_p','5000');T.sw
  for(let i=0;i<5;i++){now+=16.7;raf(now);}
  console.log(id,'state',T.game.state,'t',T.game.t.toFixed(1),'idx',T.car.idx,'/',T.N,'coins',T.game.coins,'votes',T.game.votes,'walletΔ',T.wallet-w0,'head',els.resHead&&els.resHead.textContent,'hits',T.game.hits,'hp',Math.round(T.car.hp));}
 const H=()=>{key('KeyH',true);key('KeyH',false);};
-for(const id of ['neenia','neenia','neenia','aoten','aoten']){run(id,fr=>{});}
-for(const id of ['starfina','starfina']){run(id,fr=>{if(fr>300&&fr%(60*8)===0)H();});}
+for(const id of ['astsib','astsib','astarte','starfina']){run(id,fr=>{});}
+for(const id of ['astsib','astsib']){run(id,fr=>{if(fr>300&&fr%(60*8)===0)H();});}
 setTimeout(()=>process.exit(0),30);
