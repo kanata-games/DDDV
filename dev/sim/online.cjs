@@ -6,11 +6,11 @@ const Q=[];let G=null,ME=null;const room={members:[{id:'p1',name:'やまだ',hos
 function view(){return {t:'state',you:'p1',room,game:G?SRV.viewFor(G,'p1'):null};}
 function tickSrv(){if(G&&SRV.wakeAt(G)&&Date.now()>=SRV.wakeAt(G)){SRV.tick(G,Date.now());Q.push(view());}}
 function act(pid,a,host){tickSrv();const r=SRV.action(G,pid,a,{isHost:host});if(r&&'live' in r){if(r.live)Q.push({t:'live',data:r.live});return;}Q.push(view());}
-globalThis.WebSocket=class{constructor(u){this.url=u;this.readyState=1;ME=this;Q.push({__open:1});}send(raw){const m=JSON.parse(raw);if(m.t==='hello'){Q.push({t:'welcome',you:'p1',token:'T1'});G=SRV.setup([{id:'p1',name:'やまだ'},{id:'p2',name:'ボット'}],{course:'down'});act('p2',{type:'join',car:'fr',paint:'neon',name:'ボット'},false);}else if(m.t==='act')act('p1',m.action,true);}};
+globalThis.WebSocket=class{constructor(u){this.url=u;this.readyState=1;ME=this;Q.push({__open:1});}send(raw){const m=JSON.parse(raw);if(m.t==='hello'){Q.push({t:'welcome',you:'p1',token:'T1'});G=SRV.setup([{id:'p1',name:'やまだ'},{id:'p2',name:'ボット'}],{course:'down',reg:'equal'});act('p2',{type:'join',car:'fr',paint:'neon',name:'ボット'},false);}else if(m.t==='act')act('p1',m.action,true);}};
 globalThis.__flush=()=>{while(Q.length){const m=Q.shift();if(m.__open){ME.onopen();continue;}ME&&ME.onmessage&&ME.onmessage({data:JSON.stringify(m)});}};
 const fs=require('fs');
 let src=fs.readFileSync('/tmp/claude-0/t.js','utf8');
-src=src.replace(/\}\)\(\);\s*$/,`globalThis.__T={get car(){return car},get cpus(){return cpus},get game(){return game},get P(){return P},get N(){return N},get GOAL_I(){return GOAL_I},get course(){return course},get cupState(){return cupState},get wallet(){return wallet},get cleared(){return cleared},setTab,startFromMenu,toMenu,loadCourse,get mode(){return mode},get vProf(){return vProf},swapCar,get spec(){return spec},get traffic(){return traffic},__setParts:p=>{Object.assign(parts,p);},selectCup,get cupIdx(){return cupIdx},get cleared(){return cleared},get ONLINE(){return ONLINE},get selId(){return selId}};})();`);
+src=src.replace(/\}\)\(\);\s*$/,`globalThis.__T={get car(){return car},get cpus(){return cpus},get game(){return game},get P(){return P},get N(){return N},get GOAL_I(){return GOAL_I},get course(){return course},get cupState(){return cupState},get wallet(){return wallet},get cleared(){return cleared},setTab,startFromMenu,toMenu,loadCourse,get mode(){return mode},get vProf(){return vProf},swapCar,get spec(){return spec},get traffic(){return traffic},__setParts:p=>{Object.assign(parts,p);},selectCup,get cupIdx(){return cupIdx},get cleared(){return cleared},get ONLINE(){return ONLINE},get selId(){return selId},get spec(){return spec}};})();`);
 const deep=()=>{const f=function(){};return new Proxy(f,{get(t,k){if(k===Symbol.toPrimitive)return()=>0;if(k==='length')return 0;if(k==='then')return undefined;if(k==='children')return [];if(!(k in t))t[k]=deep();return t[k];},set(t,k,v){t[k]=v;return true;},apply(){return deep();},construct(){return deep();}});};
 const els={};
 const mkEl=id=>{const t={__l:{},textContent:'',hidden:false,style:{setProperty(){}},className:'',value:'',checked:false};return new Proxy(t,{get(o,k){if(k==='addEventListener')return(ev,fn)=>{o.__l[ev]=fn;};if(k==='click')return()=>o.__l.click&&o.__l.click();if(k in o)return o[k];o[k]=deep();return o[k];},set(o,k,v){o[k]=v;return true;}});};
@@ -47,7 +47,7 @@ const O=T.ONLINE;L('connected you',O.you,'host',O.host,'phase',O.st&&O.st.phase,
 T.swapCar('gtr');await new Promise(r=>_st(r,10));for(let i=0;i<5;i++)step();L('car change ->',G.players.p1.car);
 L('start btn:',els.btnStart.textContent,'disabled',els.btnStart.disabled);
 L('click');els.btnStart.__l.click();L('clicked',Q.length);__flush();L('flushed',G.phase);for(let i=0;i<3;i++){step();L('s',i);}
-L('after go: phase',G.phase,'racing',O.racing,'course',T.course.id,'cpus',T.cpus.length,'traffic',T.traffic.length,'count',T.game.count.toFixed(2),'ghosts',Object.keys(O.ghosts));
+L('after go: phase',G.phase,'spec eq',T.spec.eq,'pow',T.spec.pow.toFixed(2),'racing',O.racing,'course',T.course.id,'cpus',T.cpus.length,'traffic',T.traffic.length,'count',T.game.count.toFixed(2),'ghosts',Object.keys(O.ghosts));
 // ボットは峠を走る（毎フレーム位置を送る）
 let bs=T.P[0].d,fr=0,sent=0,doneFor=0;
 while(fr<40000){now+=16.7;
