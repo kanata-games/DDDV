@@ -1818,10 +1818,25 @@ const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Arrow
 addEventListener('keydown',e=>{const k=keymap[e.code];if(k){input[k]=1;e.preventDefault();}
   if(e.code==='KeyC')toggleView();if(e.code==='KeyR'&&game.state==='race')recover();if(e.code==='KeyM')toggleMute();if(e.code==='KeyB')stepTrack(1);if(e.code==='KeyH')horn();if(e.code==='KeyP'&&mode==='free'&&game.state==='race')enterPA();if(e.code==='Escape')quitRace();});
 addEventListener('keyup',e=>{const k=keymap[e.code];if(k)input[k]=0;});
+// タッチのボタン：指ごとに数える（スマホは touch イベントで、指が触れている間だけ押す。連打で押しっぱなしにならないように）
 document.querySelectorAll('#touch .tb').forEach(el=>{
-  const k=el.dataset.k,on=e=>{e.preventDefault();if(k==='horn'){startAudio();horn();}input[k]=1;el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){}},off=e=>{input[k]=0;el.classList.remove('on');};
-  el.addEventListener('pointerdown',on);el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);
+  const k=el.dataset.k,ids=new Set();let ptr=false;
+  const set=v=>{input[k]=v?1:0;el.classList.toggle('on',!!v);},press=()=>{if(k==='horn'){startAudio();horn();}set(1);};
+  el.addEventListener('touchstart',e=>{e.preventDefault();const was=ids.size;for(const t of e.changedTouches)ids.add(t.identifier);if(!was&&!ptr)press();},{passive:false});
+  const tend=e=>{for(const t of e.changedTouches)ids.delete(t.identifier);if(!ids.size&&!ptr)set(0);};
+  el.addEventListener('touchend',tend);el.addEventListener('touchcancel',tend);
+  // マウス・ペン（PCでの確認用）
+  el.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;e.preventDefault();ptr=true;press();try{el.setPointerCapture(e.pointerId)}catch(_){}});
+  const pend=e=>{if(e.pointerType==='touch'||!ptr)return;ptr=false;if(!ids.size)set(0);};
+  el.addEventListener('pointerup',pend);el.addEventListener('pointercancel',pend);el.addEventListener('lostpointercapture',pend);
+  el.__rel=()=>{ids.clear();ptr=false;set(0);};
+  el.__sync=live=>{let ch=false;ids.forEach(i=>{if(!live.has(i)){ids.delete(i);ch=true;}});if(ch&&!ids.size&&!ptr)set(0);};
 });
+// 念のため：指が離れるたびに「いま画面に触れている指」と照らし合わせ、もう触れていない指で押されたままのボタンは離す。アプリの切り替えでも離す
+{const chk=e=>{const live=new Set([...e.touches].map(t=>t.identifier));document.querySelectorAll('#touch .tb').forEach(el=>el.__sync&&el.__sync(live));};
+ document.addEventListener('touchend',chk,true);document.addEventListener('touchcancel',chk,true);document.addEventListener('touchstart',chk,true);}
+addEventListener('blur',()=>document.querySelectorAll('#touch .tb').forEach(el=>el.__rel&&el.__rel()));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)document.querySelectorAll('#touch .tb').forEach(el=>el.__rel&&el.__rel());});
 const VIEW_NAMES=['後方','ハンドル','フロント','サイド'];
 function toggleView(){game.view=(game.view+1)%4;wheelRig.visible=game.view===1;$('btnView').textContent='視点：'+VIEW_NAMES[game.view];}
 $('btnView').addEventListener('click',toggleView);
