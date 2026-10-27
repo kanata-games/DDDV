@@ -1829,6 +1829,11 @@ document.querySelectorAll('#qSeg button').forEach(b=>b.addEventListener('click',
 {const sr=()=>document.querySelectorAll('#rotSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r===rotMode));document.querySelectorAll('#rotSeg button').forEach(b=>b.addEventListener('click',()=>{rotMode=+b.dataset.r;store.set('touge_rot',rotMode);sr();resize();}));sr();}
 // iPhoneのダブルタップ・ピンチでのズームを止める
 try{['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+// スマホ：結果画面のボタンは指を離した瞬間に押す（iPhoneはペダルなど別の指が画面に触れたままだと click が来ないため）
+{const SEL='#result button';document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const b=e.target.closest&&e.target.closest(SEL);if(b)b.__pd=e.pointerId;},true);
+ document.addEventListener('pointercancel',e=>{const b=e.target.closest&&e.target.closest(SEL);if(b)b.__pd=null;},true);
+ document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')return;const b=e.target.closest&&e.target.closest(SEL);if(!b||b.__pd!==e.pointerId||b.disabled||b.hidden)return;b.__pd=null;b.__t=Date.now();b.__ours=true;b.click();},true);
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest(SEL);if(!b)return;if(b.__ours){b.__ours=false;return;}if(b.__t&&Date.now()-b.__t<800){e.stopImmediatePropagation();e.preventDefault();}},true);}
 {let lastTouch=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouch<350&&!(e.target.closest&&e.target.closest('input,select,textarea')))e.preventDefault();lastTouch=now;},{passive:false});}
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
