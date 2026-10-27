@@ -21,6 +21,7 @@
 | claude.ai アーティファクト | https://claude.ai/artifact/8kNWxQoDN1XKLzSw1ssL18 （同じゲームの試遊版） |
 
 ### アーティファクトの注意
+- **2026-10-27から、アーティファクト版の更新はやめた（作者の判断）。確認は GitHub Pages で行う。** 以下は昔の運用メモ（再開する時用）。上げた直後は service worker が古い版を出すことがあるので、少し待ってから再読み込み
 - 1つのアーティファクトに置けるファイルは **511個まで**。ゲームが使う webp と bgm だけを載せ、png は載せない。
 - **後ろ・横・前の絵は1枚のシート `id-sheet.webp` にまとめて使う**（縦に back→side→front）。`dev/build_sheets.py` がシートを作り、index.html の `SHEET` 寸法表（`/*SHEETS*/…/*SHEETS_END*/`）を更新する（sync で自動実行）。ゲームは `sprTex` でシートから切り出す。アーティファクトには **sheet・diag・cockpit（＋特別な絵）だけ**載せ、個別の back/side/front は載せない（車1台3ファイル）。新しい車を足したら sheet を作ってからアップロード
 - 新しい会話から更新するときは、まず `Artifact action:"read"` でURLを読んでから publish する。
@@ -32,7 +33,7 @@
 1. リポジトリを clone（`/home/claude/dddv` 想定）
 2. 作業用に `dev/src-index.html` を `/home/claude/touge/index.html` へ、`cars/` `bgm/` も `/home/claude/touge/` へコピー
 3. `dev/sync-dddv.sh` と `dev/build_sheets.py` を `/home/claude/` に置く（中のパス `SRC=/home/claude/touge; DST=/home/claude/dddv` に合わせる。PWAアイコンは `/home/claude/pwa/` に `icons/` `manifest.webmanifest` `sw.js.tmpl` を置く＝リポジトリの icons/ と manifest と dev/sw.js.tmpl をコピー）
-4. 編集 → テスト → `/home/claude/sync-dddv.sh "コミットメッセージ"` → アーティファクト更新
+4. 編集 → テスト → `/home/claude/sync-dddv.sh "コミットメッセージ"`（アーティファクトは更新しない）
 5. 作業が終わったら `dev/src-index.html` も更新しておく（sync 後に `cp /home/claude/touge/index.html /home/claude/dddv/dev/src-index.html` → もう一度 sync）
 
 ### テスト（dev/sim）
