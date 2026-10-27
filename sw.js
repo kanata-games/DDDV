@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='4067ccd3bc';
+const VERSION='6bdf663f99';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -191,6 +191,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/nbox-cockpit.webp',
   './cars/nbox-diag.webp',
   './cars/nbox-sheet.webp',
+  './cars/neenia-cockpit.webp',
+  './cars/neenia-diag.webp',
+  './cars/neenia-sheet.webp',
   './cars/noah-cockpit.webp',
   './cars/noah-diag.webp',
   './cars/noah-sheet.webp',
@@ -248,6 +251,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/stairs-cockpit.webp',
   './cars/stairs-diag.webp',
   './cars/stairs-sheet.webp',
+  './cars/starfina-cockpit.webp',
+  './cars/starfina-diag.webp',
+  './cars/starfina-sheet.webp',
   './cars/stretcher-cockpit.webp',
   './cars/stretcher-diag.webp',
   './cars/stretcher-sheet.webp',
