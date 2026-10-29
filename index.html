@@ -3409,9 +3409,10 @@ function olPanel(){const O=ONLINE;if(!O)return;let box=$('olBox');
   box.innerHTML='<div class="cupHead"><b>🏁 オンライン　部屋 '+O.room+'</b><span>'+ph+(g.round?'　第'+g.round+'戦':'')+'</span></div>'+
     '<div class="opts">コース '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olCourse" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+crs.map(([k,n])=>'<option value="'+k+'"'+(k===g.course?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+escH(g.courseName)+'</b>')+
     '　レギュ '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olReg" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+[['open','無差別'],['equal','イコール性能']].map(([k,n])=>'<option value="'+k+'"'+(k===(g.reg||'open')?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+escH(g.regName||'無差別')+'</b>')+'</div>'+
+    '<div class="opts">当たり判定 '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olHit" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+[['on','あり（軽く押し合う）'],['off','なし（すり抜け）']].map(([k,n])=>'<option value="'+k+'"'+(k===(g.hit||'on')?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+(g.hit==='off'?'なし（すり抜け）':'あり（軽く押し合う）')+'</b>')+'</div>'+
     '<p class="lede" style="font-size:12px;margin:4px 0">'+(g.reg==='equal'?'イコール性能：総合力は全車同じ。あなたの車の得意 → '+(()=>{const c=eqStats(CARS.find(x=>x.id===selId)||CARS[0]);return ['加速','最高速','曲がり'].map((n,i)=>{const v=Math.round((c[i]-1)*100);return n+(v>0?' +':' ')+v+'%';}).join('／');})():'無差別：車そのものの性能で勝負。')+'　改造（パーツ・チューン）はオンラインでは無効です。</p>'+
     '<div class="rivals">'+rows+'</div><p class="lede" style="font-size:12px">ガレージで選んだ車で走ります。'+(O.host?'全員がそろったら、下の「スタート」を押してください。':'ホストがスタートを押すと、いっせいにカウントダウンが始まります。')+'一般車とCPUは出ません。</p>';
-  const sel=$('olCourse');if(sel)sel.onchange=()=>olAct({type:'course',id:sel.value});const rs=$('olReg');if(rs)rs.onchange=()=>olAct({type:'reg',id:rs.value});syncStart();}
+  const sel=$('olCourse');if(sel)sel.onchange=()=>olAct({type:'course',id:sel.value});const rs=$('olReg');if(rs)rs.onchange=()=>olAct({type:'reg',id:rs.value});const hs=$('olHit');if(hs)hs.onchange=()=>olAct({type:'hit',id:hs.value});syncStart();}
 const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // レース開始
 function olStartRace(g){const O=ONLINE;O.round=g.round;O.racing=true;O.finished=false;olClearGhosts();
@@ -3423,14 +3424,28 @@ function olStartRace(g){const O=ONLINE;O.round=g.round;O.racing=true;O.finished=
 function olGhostMake(id){const O=ONLINE,p=O.st&&O.st.players[id];if(!p||O.ghosts[id])return O.ghosts[id];const c=CARS.find(x=>x.id===p.car)||CARS[0];
   const m=makeCar(Object.assign({},c),false);const pt=PAINTS.find(x=>x.k===p.paint);if(pt)m.g.userData.paint=pt;m.g.add(nameTag(p.name,c.top));m.g.visible=false;scene.add(m.g);
   return O.ghosts[id]={mesh:m,x:0,y:0,z:0,yaw:0,tx:0,ty:0,tz:0,tyaw:0,idx:0,got:false};}
-function olGhostPos(id,d){const O=ONLINE;if(!O.racing)return;const g=O.ghosts[id]||olGhostMake(id);if(!g)return;
+function olGhostPos(id,d){const O=ONLINE;if(!O.racing)return;const g=O.ghosts[id]||olGhostMake(id);if(!g)return;g.lastT=performance.now();
   g.tx=d[0];g.ty=d[1];g.tz=d[2];g.tyaw=d[3];g.idx=d[4];g.sp=d[5];if(!g.got){g.got=true;g.x=g.tx;g.y=g.ty;g.z=g.tz;g.yaw=g.tyaw;g.mesh.g.visible=true;}}
 function olClearGhosts(){const O=ONLINE;Object.values(O.ghosts).forEach(g=>scene.remove(g.mesh.g));O.ghosts={};}
 function olStep(dt,now){const O=ONLINE;if(!O||!O.racing)return;
-  Object.values(O.ghosts).forEach(g=>{if(!g.got)return;const k=Math.min(1,dt*10);g.x+=(g.tx-g.x)*k;g.y+=(g.ty-g.y)*k;g.z+=(g.tz-g.z)*k;let dy=((g.tyaw-g.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;g.yaw+=dy*k;
+  const pn=performance.now();Object.values(O.ghosts).forEach(g=>{if(!g.got)return;const k=Math.min(1,dt*12),la=Math.min(.25,Math.max(0,(pn-(g.lastT||pn))/1000)),sp=g.sp||0; // 届いた位置から、速さと向きで「今いるはずの位置」を先読みして表示
+    g.x+=(g.tx+Math.sin(g.tyaw)*sp*la-g.x)*k;g.y+=(g.ty-g.y)*k;g.z+=(g.tz+Math.cos(g.tyaw)*sp*la-g.z)*k;let dy=((g.tyaw-g.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;g.yaw+=dy*k;
     g.mesh.g.position.set(g.x,g.y,g.z);g.mesh.g.rotation.set(0,g.yaw,0);updateSprite(g.mesh,g.yaw,false);});
+  if(game.state==='race'&&O.st&&O.st.hit!=='off')olBump();
   if((game.state==='race'||game.state==='count')&&now-O.lastSend>90){O.lastSend=now;olAct({type:'pos',d:[car.x,car.y,car.z,car.yaw,car.idx,Math.hypot(car.vx,car.vz)]});}
   if(game.state==='race'){const ge=$('gap');if(ge){const others=Object.values(O.ghosts).filter(g=>g.got),ahead=others.filter(g=>g.idx>car.idx).length;ge.textContent='オンライン '+(ahead+1)+'位 / '+(others.length+1)+'台';ge.className=ahead?'':'lead';}}}
+// 軽い当たり判定：自分の車だけを押し返す（相手の画面では相手が同じことをする）。ダメージなし
+function olBump(){const O=ONLINE,st=O.st,now=performance.now();
+  for(const id in O.ghosts){const g=O.ghosts[id],p=st.players[id];if(!g.got||!p||p.finish!=null||p.ret)continue;
+    const age=(now-(g.lastT||0))/1000;if(age>.6)continue; // 届かなくなった車は当たらない
+    const sp=g.sp||0,gx=g.x,gz=g.z; // 見えている位置（先読み済み）で当たる
+    if(Math.abs((g.ty||car.y)-car.y)>3)continue;
+    const c=CARS.find(x=>x.id===p.car),R=1.25+(spec.halfW||.85)*.6+((c&&c.halfW)||.85)*.6;
+    const dx=car.x-gx,dz=car.z-gz,d=Math.hypot(dx,dz);if(d>=R||d<.01)continue;
+    const nx=dx/d,nz=dz/d,pu=R-d;car.x+=nx*pu*.6;car.z+=nz*pu*.6;
+    const gvx=Math.sin(g.tyaw)*sp,gvz=Math.cos(g.tyaw)*sp,vn=(car.vx-gvx)*nx+(car.vz-gvz)*nz;
+    if(vn<0){car.vx-=nx*vn*1.1;car.vz-=nz*vn*1.1;car.vx*=.985;car.vz*=.985;
+      if(vn<-2&&!(g.bumpCd>now)){g.bumpCd=now+500;hitSound();game.shake=Math.max(game.shake,.2);}}}}
 // ゴール・リタイア
 function olFinish(){const O=ONLINE;O.finished=true;const g=O.st;olAct(game.retired?{type:'finish',ret:true}:{type:'finish',t:+game.t.toFixed(2)});
   const before=g?g.order.filter(id=>g.players[id].finish!=null).length:0,pos=game.retired?0:before+1;
