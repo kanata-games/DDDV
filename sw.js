@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='d46ba51a56';
+const VERSION='5483b99460';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -117,6 +117,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/gc8-cockpit.webp',
   './cars/gc8-diag.webp',
   './cars/gc8-sheet.webp',
+  './cars/gissha-cockpit.webp',
+  './cars/gissha-diag.webp',
+  './cars/gissha-sheet.webp',
   './cars/golf-cockpit.webp',
   './cars/golf-diag.webp',
   './cars/golf-sheet.webp',
@@ -322,6 +325,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/tug-cockpit.webp',
   './cars/tug-diag.webp',
   './cars/tug-sheet.webp',
+  './cars/uma-cockpit.webp',
+  './cars/uma-diag.webp',
+  './cars/uma-sheet.webp',
   './cars/umicar-cockpit.webp',
   './cars/umicar-diag.webp',
   './cars/umicar-sheet.webp',
