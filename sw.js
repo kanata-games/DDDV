@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='467ba0a261';
+const VERSION='4c71b20241';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -218,6 +218,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/piano-cockpit.webp',
   './cars/piano-diag.webp',
   './cars/piano-sheet.webp',
+  './cars/plow-cockpit.webp',
+  './cars/plow-diag.webp',
+  './cars/plow-sheet.webp',
   './cars/police-cockpit.webp',
   './cars/police-diag.webp',
   './cars/police-sheet.webp',
@@ -304,6 +307,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/train-cockpit.webp',
   './cars/train-diag.webp',
   './cars/train-sheet.webp',
+  './cars/trike-cockpit.webp',
+  './cars/trike-diag.webp',
+  './cars/trike-sheet.webp',
   './cars/trolley-cockpit.webp',
   './cars/trolley-diag.webp',
   './cars/trolley-sheet.webp',
