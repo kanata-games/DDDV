@@ -2138,7 +2138,10 @@ const TRACKS=[
 {f:'bgm/gesshoku-butou.mp3',t:'月蝕の舞踏（アスターテのテーマ）'},
 {f:'bgm/aoki-majo.mp3',t:'蒼き魔女の疾走（海音のテーマ）'},
 {f:'bgm/show-mirage.mp3',t:'Show Mirage'},
-{f:'bgm/evolve.mp3',t:'evolve'}
+{f:'bgm/evolve.mp3',t:'evolve'},
+{f:'bgm/donguri-downhill.mp3',t:'DONGURI DOWNHILL ～紅葉峠～'},
+{f:'bgm/clear-tide.mp3',t:'澄みわたる蒼 — CLEAR TIDE（海音のテーマ）'},
+{f:'bgm/gekka-no-shashu.mp3',t:'月花の射手（ネーニアのテーマ）'}
 ];
 const vol=Object.assign({bgm:70,eng:40,fx:60},(()=>{try{return JSON.parse(store.get('touge_vol')||'{}')}catch(e){return{}}})());
 let bgmMode=store.get('touge_bgm')||'shuffle',viaGraph=false; // 'shuffle' | 'off' | '0'..'5'
@@ -2181,8 +2184,10 @@ function playTrack(i){
 }
 function randomTrack(){let i;do{i=Math.random()*TRACKS.length|0;}while(TRACKS.length>1&&i===cur);return i;}
 // 友達の車に乗った時・友達と勝負する時はテーマ曲（シャッフル中のみ）
-function themeTrack(){const who=mode==='battle'&&!senseiMatch&&typeof battleRival!=='undefined'&&battleRival!=='yellow'?battleRival:spec.type==='astarte'?'astarte':(spec.type==='umicar'||spec.type==='ita')?'umi':null;
-  const f=who==='astarte'?'bgm/gesshoku-butou.mp3':who==='umi'?'bgm/aoki-majo.mp3':null;return f?TRACKS.findIndex(t=>t.f===f):-1;}
+function themeTrack(){const who=mode==='battle'&&!senseiMatch&&typeof battleRival!=='undefined'&&battleRival!=='yellow'?battleRival:spec.type==='astarte'?'astarte':(spec.type==='umicar'||spec.type==='ita')?'umi':spec.type==='neenia'?'neenia':null;
+  // 海音はテーマ曲が2曲：今かかっている方を続け、そうでなければどちらかを選ぶ
+  const umiF=['bgm/aoki-majo.mp3','bgm/clear-tide.mp3'],umiNow=cur>=0&&umiF.includes(TRACKS[cur].f)?TRACKS[cur].f:umiF[Math.random()*2|0];
+  const f=who==='astarte'?'bgm/gesshoku-butou.mp3':who==='umi'?umiNow:who==='neenia'?'bgm/gekka-no-shashu.mp3':null;return f?TRACKS.findIndex(t=>t.f===f):-1;}
 function startBgm(){
   if(bgmMode==='off'){bgmEl.pause();cur=-1;nowPlaying();return;}
   if(bgmMode==='shuffle'){const th=themeTrack();if(th>=0){if(cur!==th||bgmEl.paused)playTrack(th);}else if(bgmEl.paused||cur<0)playTrack(randomTrack());}
