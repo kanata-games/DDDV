@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='1d0eca43c2';
+const VERSION='bfa544db34';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -35,6 +35,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/az1-sheet.webp',
   './cars/az1o-diag.webp',
   './cars/az1o-sheet.webp',
+  './cars/bathtub-cockpit.webp',
+  './cars/bathtub-diag.webp',
+  './cars/bathtub-sheet.webp',
   './cars/beat-cockpit.webp',
   './cars/beat-diag.webp',
   './cars/beat-sheet.webp',
@@ -364,6 +367,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/wrecker-cockpit.webp',
   './cars/wrecker-diag.webp',
   './cars/wrecker-sheet.webp',
+  './cars/yadokari-cockpit.webp',
+  './cars/yadokari-diag.webp',
+  './cars/yadokari-sheet.webp',
   './cars/yakiimo-cockpit.webp',
   './cars/yakiimo-diag.webp',
   './cars/yakiimo-sheet.webp',
