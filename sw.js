@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='bfa544db34';
+const VERSION='77e4742345';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -80,6 +80,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/crown-cockpit.webp',
   './cars/crown-diag.webp',
   './cars/crown-sheet.webp',
+  './cars/daisha-cockpit.webp',
+  './cars/daisha-diag.webp',
+  './cars/daisha-sheet.webp',
   './cars/dashi-cockpit.webp',
   './cars/dashi-diag.webp',
   './cars/dashi-sheet.webp',
@@ -153,6 +156,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/hoshi-cockpit.webp',
   './cars/hoshi-diag.webp',
   './cars/hoshi-sheet.webp',
+  './cars/hut-cockpit.webp',
+  './cars/hut-diag.webp',
+  './cars/hut-sheet.webp',
   './cars/icecream-cockpit.webp',
   './cars/icecream-diag.webp',
   './cars/icecream-sheet.webp',
