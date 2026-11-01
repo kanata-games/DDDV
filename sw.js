@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='dfb7895789';
+const VERSION='95a96e2624';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -47,6 +47,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/boss-cockpit.webp',
   './cars/boss-diag.webp',
   './cars/boss-sheet.webp',
+  './cars/broom-cockpit.webp',
+  './cars/broom-diag.webp',
+  './cars/broom-sheet.webp',
   './cars/cappu-cockpit.webp',
   './cars/cappu-diag.webp',
   './cars/cappu-sheet.webp',
@@ -117,6 +120,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/gc8-cockpit.webp',
   './cars/gc8-diag.webp',
   './cars/gc8-sheet.webp',
+  './cars/ghostcar-cockpit.webp',
+  './cars/ghostcar-diag.webp',
+  './cars/ghostcar-sheet.webp',
   './cars/gissha-cockpit.webp',
   './cars/gissha-diag.webp',
   './cars/gissha-sheet.webp',
