@@ -2467,11 +2467,11 @@ function stepCar(dt,racing){
   if(spec.type==='carriage'){if(racing&&game.state==='race'&&!(car.gallopT>game.t))car.stam=Math.min(1,(car.stam||0)+dt/14);const gb=$('derailBar');gb.style.width=Math.round(Math.max(0,car.stam||0)*100)+'%';gb.className=(car.stam||0)<.35?'hot':'';}
   if(spec.type==='combine'){const gb=$('derailBar');gb.style.width=Math.round(game.rice/8)+'%';gb.className=game.rice>=800?'hot':'';}
   if(spec.type==='lumenf1'&&car.drs&&input.brake){car.drs=false;flash('DRS クローズ');if(ac)beep(520,.06);}
-  if(spec.type==='hut'&&car.hutLand&&game.t>=car.hutLand){car.hutLand=0;game.shake=Math.max(game.shake,.9);let n=0;for(const c of cpus.concat(traffic)){if(c.def&&c.def.cop)continue;if(Math.hypot(c.x-car.x,c.z-car.z)<12){c.stunT=Math.max(c.stunT||0,1.3);c.wob=.6;c.v*=.6;n++;if(c.def&&radioCd<=0&&n===1)say(c.def,pick(['家が…降ってきた!?','地震か!?','ニワトリの脚…!?']));}}
+  if(spec.type==='hut'&&car.hutLand&&game.t>=car.hutLand){car.hutLand=0;game.shake=Math.max(game.shake,.9);let n=0;for(const c of fxPool()){if(c.def&&c.def.cop)continue;if(Math.hypot(c.x-car.x,c.z-car.z)<12){c.stunT=Math.max(c.stunT||0,1.3);c.wob=.6;c.v*=.6;n++;if(c.def&&radioCd<=0&&n===1)say(c.def,pick(['家が…降ってきた!?','地震か!?','ニワトリの脚…!?']));}}
     for(let k=0;k<10;k++)puff(car.x,car.y+.3,car.z,(Math.random()-.5)*14,(Math.random()-.5)*14);flash('ドスン！'+(n?'　'+n+'台がよろめいた':''));if(ac){beep(70,.35);setTimeout(()=>beep(55,.3),60);}}
   if(spec.type==='plow'&&car.plow&&racing&&!(course&&course.snow)){const sp=Math.hypot(car.vx,car.vz);if(sp>4&&game.t>car.plowSp){car.plowSp=game.t+.12;spark(car.x+Math.sin(car.yaw)*3.4,car.y+.1,car.z+Math.cos(car.yaw)*3.4);}}
   if(spec.type==='trike'&&racing&&game.state==='race'){const sp=Math.hypot(car.vx,car.vz);if(sp>10)car.yr+=(Math.random()-.5)*dt*(sp-10)*1.8;}
-  if(spec.type==='aoten'&&racing&&game.state==='race'){const pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;const nb=cpus.some(c=>Math.abs(c.s-car.idx)<8&&Math.abs((c.lat||0)-plat)<5);if(nb&&!car.sideBy)flash(pick(['…となり、いいよね？','ずっと一緒に…','えへへ、並んでる…']));car.sideBy=nb;}
+  if(spec.type==='aoten'&&racing&&game.state==='race'){const pp=P[car.idx],plat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;const nb=cpus.concat(olPx()).some(c=>Math.abs(c.s-car.idx)<8&&Math.abs((c.lat||0)-plat)<5);if(nb&&!car.sideBy)flash(pick(['…となり、いいよね？','ずっと一緒に…','えへへ、並んでる…']));car.sideBy=nb;}
   if(spec.type==='tf'&&racing){stepTf();if(car.robo)car.walkD=(car.walkD||0)+sp*dt;}
   if(spec.type==='celsior'){const gb=$('derailBar');gb.style.width=Math.round((game.glass||0)/15*100)+'%';gb.className=(game.glass||0)<=5?'hot':'';}
   if(car.drifting&&((slipDeg<6&&!hand)||sp<7))car.drifting=false;
@@ -2720,7 +2720,7 @@ function frame(now){
    if(spec.type==='umimi'&&racing)stepUmimi(dt);
    car.draft=(spec.type==='astarte'||spec.type==='horse')&&game.starOn>game.t&&racing;
    if(racing&&!car.derail){const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz;
-     for(const c of cpus.concat(traffic)){const ds=c.s-p.d;if(ds>4&&ds<20&&Math.abs(c.lat-lat)<1.9){car.draft=true;break;}}
+     for(const c of cpus.concat(traffic,olPx())){const ds=c.s-p.d;if(ds>4&&ds<20&&Math.abs(c.lat-lat)<1.9){car.draft=true;break;}}
      if(car.draft&&spec.type!=='dashi')car.nitro=Math.min(1,car.nitro+dt*.07);}
    $('draftTag').hidden=!car.draft;const nb=$('nitroBar');nb.style.width=Math.round(car.nitro*100)+'%';nb.className=car.nitro>=.999?'full':'';}
   let info={vf:0,vr:0,sp:0};
@@ -3040,18 +3040,18 @@ function moonGlow(){if(ac){[784,988,1175,1568].forEach((f,k)=>setTimeout(()=>bee
   game.moonT=game.t+20;game.moonOn=game.t+5;flash('月の光 — ウミミがふわっと浮いた');lily(['ウミミ、お願い。','月の光よ、この子を守って。','ふふ、いい子ね。'],true);}
 function stepUmimi(dt){const pp=P[car.idx],lat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;game.slimeT=(game.slimeT||0)-dt;
   if(game.slimeT<=0&&Math.hypot(car.vx,car.vz)>6){game.slimeT=.35;(game.slime=game.slime||[]).push({s:pp.d-2,lat,life:12});if(game.slime.length>40)game.slime.shift();}
-  game.slime=(game.slime||[]).filter(q=>{q.life-=dt;cpus.concat(traffic).forEach(c=>{if(Math.abs(c.s-q.s)<1.5&&Math.abs(c.lat-q.lat)<1.5&&!(c.slT>game.t)){c.slT=game.t+2;c.v*=.85;c.wob=.3;if(c.def&&radioCd<=0)say(c.def,pick(['な、なんかヌルっとした!?','光る跡で滑る！','ウミウシの…あと!?']));}});return q.life>0;});
+  game.slime=(game.slime||[]).filter(q=>{q.life-=dt;fxPool().forEach(c=>{if(Math.abs(c.s-q.s)<1.5&&Math.abs(c.lat-q.lat)<1.5&&!(c.slT>game.t)){c.slT=game.t+2;c.v*=.85;c.wob=.3;if(c.def&&radioCd<=0)say(c.def,pick(['な、なんかヌルっとした!?','光る跡で滑る！','ウミウシの…あと!?']));}});return q.life>0;});
   if(game.moonOn>game.t&&Math.random()<dt*20)spark(car.x+(Math.random()-.5)*2,car.y+1.5+Math.random(),car.z+(Math.random()-.5)*2);}
 function setLift(up){car.lift=up;const u=pc.g.userData;if(u.spr)u.spr.set=up?SPR.loaderu:SPR.loader;}
 function pandaCoin(){if(game.state!=='race')return;if(wallet<100){flash('100P足りない… パンダが止まっちゃう');return;}wallet-=100;store.set('touge_p',wallet);game.coins=(game.coins||0)+1;car.coin=(car.coin||0)+25;flash('チャリン♪ 100円投入（残り '+Math.ceil(car.coin)+' 秒）');if(ac){beep(1568,.08);setTimeout(()=>beep(2093,.15),90);}}
 const SENKYO=['DDDVを、DDDVをよろしくお願いいたします！','峠に夜の灯りを！ DDDVでございます！','ご声援ありがとうございます！ 最後のお願いにまいりました！','夜の峠を、もっと速く！ DDDVです！'];
 function speech(){if(game.state!=='race')return;if(game.t<(car.speechCd||0)){flash('のどを休めています… あと '+Math.ceil(car.speechCd-game.t)+'秒');return;}car.speechCd=game.t+10;car.speechT=game.t+6;
-  let v=0;traffic.forEach(t=>{const g=t.s-car.idx;if(g>-40&&g<120)v++;});cpus.forEach(c=>{const g=c.s-car.idx;if(g>-30&&g<70&&!c.def.cop){c.stunT=Math.max(c.stunT||0,1.2);c.v*=.8;v+=5;}});
+  let v=0;traffic.forEach(t=>{const g=t.s-car.idx;if(g>-40&&g<120)v++;});cpus.forEach(c=>{const g=c.s-car.idx;if(g>-30&&g<70&&!(c.def&&c.def.cop)){c.stunT=Math.max(c.stunT||0,1.2);c.v*=.8;v+=5;}});
   game.votes=(game.votes||0)+v;flash('📢「'+pick(SENKYO)+'」 +'+v+'票（計 '+game.votes+'票）');if(ac){[0,.18,.36].forEach(d=>setTimeout(()=>beep(660+Math.random()*80,.16),d*1000));}}
 function senkyoBonus(){if((spec.type!=='senkyo'&&spec.type!=='enzetsu')||game.retired||mode==='free'||!game.votes)return 0;return Math.round(game.votes)*(spec.type==='enzetsu'?25:30);}
 function stageToggle(){if(game.state!=='race')return;car.stage=!car.stage;$('hornBtn').textContent=car.stage?'運転席へ':'屋上へ';flash(car.stage?'はしごで屋根へ…演説台に立った！（最高速55%）':'運転席に戻った');if(ac){beep(car.stage?523:392,.12);setTimeout(()=>beep(car.stage?784:262,.18),130);}}
 function stepStage(dt){if(!car.stage)return;game.stT=(game.stT||0)+dt;if(game.stT<1)return;game.stT=0;let v=0;
-  traffic.forEach(t=>{const g=t.s-car.idx;if(g>-60&&g<120)v+=.25;});cpus.forEach(c=>{const g=c.s-car.idx;if(g>-50&&g<60&&!c.def.cop){v+=.5;if(Math.abs(g)<35&&Math.random()<.3){c.stunT=Math.max(c.stunT||0,.7);c.v*=.9;}}});
+  traffic.forEach(t=>{const g=t.s-car.idx;if(g>-60&&g<120)v+=.25;});fxPool().forEach(c=>{if(!c.olId&&!c.def)return;const g=c.s-car.idx;if(g>-50&&g<60&&!(c.def&&c.def.cop)){v+=.5;if(Math.abs(g)<35&&Math.random()<.3){c.stunT=Math.max(c.stunT||0,.7);c.v*=.9;}}});
   game.votes=(game.votes||0)+v;if(game.t>(game.spT||0)){game.spT=game.t+5;flash('🎤「'+pick(['みなさん、こんばんは！ 夜の峠からまいりました！','お車の窓からで結構です、どうか聞いてください！','走りながら失礼いたします！','この峠に、街灯を！ ガードレールを！'])+'」 計 '+Math.round(game.votes)+'票');if(ac)[0,.15].forEach(d=>setTimeout(()=>beep(600+Math.random()*90,.14),d*1000));}}
 function glassLose(n,why){if(spec.type!=='celsior'||!(game.glass>0)||game.state!=='race')return;game.glass=Math.max(0,game.glass-n);flash(why+'グラスが落ちた… パリーン！ 残り '+game.glass+'／15');if(ac){[0,.06,.13].forEach((d,k)=>setTimeout(()=>beep(2400+k*600,.07),d*1000));}}
 function glassRefill(){if(game.state!=='race')return;const sp=Math.hypot(car.vx,car.vz);if(game.glass>=15){flash('シャンパンタワーは無事 15／15');return;}if(sp>3){flash('止まらないと積み直せない（残り '+game.glass+'／15）');return;}game.glass=15;flash('グラスを積み直した 15／15');if(ac){beep(1800,.1);setTimeout(()=>beep(2400,.12),120);}}
@@ -3243,7 +3243,7 @@ function aed(){if(game.state!=='race')return;if(game.t<(car.aedT||-99)){flash('�
 function sleepToggle(){car.sleep=!car.sleep;flash(car.sleep?'二度寝… Zzz（勝手に道なりに走る）':'おはよう！ 自分で運転');if(ac){beep(car.sleep?392:784,.2);setTimeout(()=>beep(car.sleep?262:988,.25),180);}}
 function liftToggle(){setLift(!car.lift);if(ac){beep(car.lift?440:330,.15);setTimeout(()=>beep(car.lift?550:260,.2),160);}flash(car.lift?'リフト上昇 — 見晴らし最高（低速）':'リフト下降 — 通常走行');}
 function stepLoader(dt){if(!car.lift)return;const pp=P[car.idx],lat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
-  cpus.concat(traffic).forEach(c=>{const gb=pp.d-c.s;if(gb>2&&gb<30&&Math.abs(c.lat-lat)<3&&!(c.blkT>game.t)){c.blkT=game.t+2.5;c.v*=.8;c.wob=.2;if(c.def&&radioCd<=0)say(c.def,pick(['前が荷台しか見えねえ！','なんでリフト上げて走ってんだ…','ローラーの裏側しか見えない！']));}});}
+  fxPool().forEach(c=>{const gb=pp.d-c.s;if(gb>2&&gb<30&&Math.abs(c.lat-lat)<3&&!(c.blkT>game.t)){c.blkT=game.t+2.5;c.v*=.8;c.wob=.2;if(c.def&&radioCd<=0)say(c.def,pick(['前が荷台しか見えねえ！','なんでリフト上げて走ってんだ…','ローラーの裏側しか見えない！']));}});}
 function pushback(){if(ac){beep(300,.25);setTimeout(()=>beep(300,.25),300);}if(game.state!=='race')return;if(game.t<(game.pbT||0)){flash('連結棒の準備中… あと '+Math.ceil(game.pbT-game.t)+' 秒');return;}
   let best=null,bd=28;cpus.concat(traffic).forEach(c=>{const d=c.s-car.idx;if(d>1&&d<bd){bd=d;best=c;}});if(!best){flash('前に押し戻せる車がいない');return;}
   game.pbT=game.t+15;best.s=Math.max(2,best.s-45);best.v*=.3;best.stunT=1;placeCpu(best);game.shoved++;flash('プッシュバック！ 後ろへ押し戻した');if(best.def&&radioCd<=0)say(best.def,pick(['ちょ、飛行機じゃねえぞ!?','引っぱられてる!?','なんで後ろに下がってんだ俺！']));}
@@ -3259,19 +3259,19 @@ function iceBonus(){if(spec.type!=='icecream'||game.retired)return 0;return Math
 function decoHorn(){if(ac){[392,494,587,494,392].forEach((f,k)=>setTimeout(()=>{beep(f,.3);beep(f*1.26,.3);},k*230));}if(game.state!=='race')return;if(game.t<(game.decoT||0)){flash('全灯はまだ… あと '+Math.ceil(game.decoT-game.t)+' 秒');return;}
   game.decoT=game.t+18;game.decoOn=game.t+8;flash('全灯点灯！ 魅せドリ ×1.5');}
 function stepDeco(dt){if(!(game.decoOn>game.t))return;const pp=P[car.idx],lat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
-  cpus.concat(traffic).forEach(c=>{const gb=pp.d-c.s;if(gb>2&&gb<40&&Math.abs(c.lat-lat)<3&&!(c.dazT>game.t)){c.dazT=game.t+3;c.v*=.75;c.wob=.35;if(c.def&&radioCd<=0)say(c.def,pick(['ま、まぶしいっ！','前が光ってて見えねえ！','なんだあのトラック、ギラギラすぎる…']));}});
+  fxPool().forEach(c=>{const gb=pp.d-c.s;if(gb>2&&gb<40&&Math.abs(c.lat-lat)<3&&!(c.dazT>game.t)){c.dazT=game.t+3;c.v*=.75;c.wob=.35;if(c.def&&radioCd<=0)say(c.def,pick(['ま、まぶしいっ！','前が光ってて見えねえ！','なんだあのトラック、ギラギラすぎる…']));}});
   if(Math.random()<dt*14){const fx=Math.sin(car.yaw),fz=Math.cos(car.yaw),rx=-Math.cos(car.yaw),rz=Math.sin(car.yaw),o=(Math.random()-.5)*2.4,b=-Math.random()*6.5;spark(car.x+rx*o+fx*b,car.y+1+Math.random()*2.6,car.z+rz*o+fz*b);}}
 function stepMixer(dt){car.mixT=(car.mixT||0)-dt;const pp=P[car.idx];
   if(input.nitro&&car.nitro>.12&&car.mixT<=0){car.nitro-=.12;car.mixT=.45;const s=pp.d-4.5,lat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz,a=sampleAt(Math.max(0,s)),m=new THREE.Mesh(puddleG,puddleM);m.position.set(a.x+a.rx*lat,a.y+.04,a.z+a.rz*lat);m.scale.set(1+Math.random()*.3,1,1.3);scene.add(m);
     puddles.push({s,lat,m,life:25});if(puddles.length>16){scene.remove(puddles[0].m);puddles.shift();}if(ac)joint(8);if(!car.mixMsg){car.mixMsg=1;flash('生コン投下！');}}
   if(!input.nitro){car.mixMsg=0;car.nitro=Math.min(1,car.nitro+dt*.03);}
   puddles=puddles.filter(q=>{q.life-=dt;if(q.life<=0){scene.remove(q.m);return false;}q.m.material.opacity=Math.min(.92,q.life/3);
-    cpus.concat(traffic).forEach(c=>{if(Math.abs(c.s-q.s)<2.2&&Math.abs(c.lat-q.lat)<1.9&&!(c.mudT>game.t)){c.mudT=game.t+2;c.v*=.45;c.wob=.5;game.mud=(game.mud||0)+1;if(c.def&&radioCd<=0)say(c.def,pick(['な、なんだこの灰色の…生コン!?','タイヤが埋まる！','固まる前に抜けろ…！']));}});return true;});}
+    fxPool().forEach(c=>{if(Math.abs(c.s-q.s)<2.2&&Math.abs(c.lat-q.lat)<1.9&&!(c.mudT>game.t)){c.mudT=game.t+2;c.v*=.45;c.wob=.5;game.mud=(game.mud||0)+1;if(c.def&&radioCd<=0)say(c.def,pick(['な、なんだこの灰色の…生コン!?','タイヤが埋まる！','固まる前に抜けろ…！']));}});return true;});}
 function stepSpray(dt){const on=input.nitro&&car.nitro>.01;
   if(on){car.nitro=Math.max(0,car.nitro-dt*.22);if(!car.spraying){car.spraying=true;flash('放水開始！');}
     const fx=Math.sin(car.yaw),fz=Math.cos(car.yaw);if(Math.random()<dt*30){const d=4+Math.random()*16;puff(car.x+fx*d+(Math.random()-.5)*1.5,car.y+1.6-d*.06,car.z+fz*d+(Math.random()-.5)*1.5,fx*25,fz*25);}
     const pp=P[car.idx],lat=(car.x-pp.x)*pp.rx+(car.z-pp.z)*pp.rz;
-    cpus.concat(traffic).forEach(c=>{const ds=c.s-pp.d;if(ds>6&&ds<32&&Math.abs(c.lat-lat)<2.8){if(!(c.soakT>game.t)){c.soakT=game.t+3.5;c.stunT=.7;c.v*=.7;c.wob=.5;game.soaked=(game.soaked||0)+1;if(c.def&&radioCd<=0)say(c.def,pick(['つめてっ！','前が見えねえ！','び、びしょ濡れだ…！','タイヤが滑る!?']));}}});}
+    fxPool().forEach(c=>{const ds=c.s-pp.d;if(ds>6&&ds<32&&Math.abs(c.lat-lat)<2.8){if(!(c.soakT>game.t)){c.soakT=game.t+3.5;c.stunT=.7;c.v*=.7;c.wob=.5;game.soaked=(game.soaked||0)+1;if(c.def&&radioCd<=0)say(c.def,pick(['つめてっ！','前が見えねえ！','び、びしょ濡れだ…！','タイヤが滑る!?']));}}});}
   else{if(car.spraying){car.spraying=false;}const sp=Math.hypot(car.vx,car.vz);car.nitro=Math.min(1,car.nitro+dt*(sp<2?.12:.025));}}
 function timeSale(){if(ac){[784,659,523,659].forEach((f,k)=>setTimeout(()=>beep(f,.22),k*190));}if(game.state!=='race')return;if(game.t<(game.saleT||0)){flash('次のタイムセールまで あと '+Math.ceil(game.saleT-game.t)+' 秒');return;}game.saleT=game.t+20;
   flash('ピンポンパンポーン♪ ただいまよりタイムセール！');let n=0;cpus.concat(traffic).forEach(c=>{const d=Math.abs(c.s-car.idx);if(d<90&&!(c.def&&c.def.cop)){c.stunT=1.3;c.wob=.4;n++;if(c.def&&radioCd<=0)say(c.def,pick(['た、タイムセール!?','卵10円…だと…','今すぐ行かなきゃ…！']));}});if(!n)setTimeout(()=>flash('…近くに誰もいなかった'),900);}
@@ -3612,7 +3612,7 @@ const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 // レース開始
 function olStartRace(g){const O=ONLINE;O.round=g.round;O.racing=true;O.finished=false;olClearGhosts();
   if(!$('result').hidden)$('result').hidden=true;$('title').hidden=true;$('snd').hidden=true;startAudio();startBgm();
-  if(O.prevMode==null)O.prevMode=mode;mode='battle';spec=buildSpec(selId);loadCourse(g.course);resetRace();car.olImmune=0;car.olStunT=0;for(const k in OL_FXLAST)delete OL_FXLAST[k];
+  if(O.prevMode==null)O.prevMode=mode;mode='battle';spec=buildSpec(selId);loadCourse(g.course);resetRace();car.olImmune=0;car.olStunT=0;ONLINE.px={};for(const k in OL_FXLAST)delete OL_FXLAST[k];
   game.count=Math.max(1,(g.startAt-(Date.now()+O.clock))/1000);
   g.order.forEach(id=>{if(id!==O.you&&g.players[id].inRace)olGhostMake(id);});
   flash('オンライン対戦：'+g.courseName+'（'+g.order.filter(id=>g.players[id].inRace).length+'台）');}
@@ -3640,27 +3640,30 @@ function olBump(){const O=ONLINE,st=O.st,now=performance.now();
     const nx=dx/d,nz=dz/d,pu=R-d;car.x+=nx*pu*.6;car.z+=nz*pu*.6;
     const gvx=Math.sin(g.tyaw)*sp,gvz=Math.cos(g.tyaw)*sp,vn=(car.vx-gvx)*nx+(car.vz-gvz)*nz;
     if(vn<0){car.vx-=nx*vn*1.1;car.vz-=nz*vn*1.1;car.vx*=.985;car.vz*=.985;
-      if(vn<-2&&!(g.bumpCd>now)){g.bumpCd=now+500;hitSound();game.shake=Math.max(game.shake,.2);}}}}
+      if(vn<-2&&!(g.bumpCd>now)){g.bumpCd=now+500;hitSound();game.shake=Math.max(game.shake,.2);
+        // ぶつかって効くギミック（ローラーのぺしゃんこ、フォークのすくい上げ、ゴミ収集車の押しのけ など）
+        const BF={roller:[1.5,.5,0],fork:[1.2,.35,0],hokora:[1.2,1,0],packer:[0,.6,1.8],tug:[0,.6,1.8],tank:[.8,.6,1.5],dashi:[0,.6,1.8],mixer:[0,.6,1.8],deco:[0,.6,1.8],gissha:[0,.6,1.8],hut:[.8,.6,1.8]}[spec.type]||(spec.type==='tf'&&car.robo?[0,.6,1.8]:null);
+        if(BF&&st.gim!=='off'){const q=P[car.idx],side=((gx-car.x)*q.rx+(gz-car.z)*q.rz)>=0?1:-1,f=olFxQ(id);if(BF[0])f.stun=Math.max(f.stun||0,BF[0]);if(BF[1]<1)f.vmul=Math.min(f.vmul||1,BF[1]);if(BF[2])f.lat=side*BF[2];f.wob=Math.max(f.wob||0,.4);}}}}}
 // ギミック攻撃：Hのギミックが相手の車にも効く。Hを押している間だけ、相手の車を「CPUのふり」をした代役として cpus に混ぜる。
 // 代役に加えられた変化（足止め・減速・横へ押す・引き戻し）を拾って相手に送り、相手は自分の画面で自分の車に効かせる。
 function olOn(){return typeof ONLINE!=='undefined'&&ONLINE&&ONLINE.racing&&ONLINE.st&&game.state==='race';}
-function olWrapHorn(fn){if(!olOn()||ONLINE.st.gim==='off')return fn();const px=olProxies();px.forEach(x=>cpus.push(x));try{return fn();}finally{px.forEach(x=>{const i=cpus.indexOf(x);if(i>=0)cpus.splice(i,1);});}}
-function olProxies(){const O=ONLINE,st=O.st,out=[];
-  for(const id in O.ghosts){const g=O.ghosts[id],p=st.players[id];if(!g.got||!p||p.finish!=null||p.ret)continue;
+function fxPool(){return cpus.concat(traffic,olPx());}
+function olPx(){if(!olOn())return [];const O=ONLINE;O.px=O.px||{};const out=[];for(const id in O.ghosts){const g=O.ghosts[id],p=O.st.players[id];if(!g.got||!p||p.finish!=null||p.ret)continue;out.push(O.px[id]||(O.px[id]=olMakeProxy(id)));}return out;}
+function olWrapHorn(fn){if(!olOn()||ONLINE.st.gim==='off')return fn();const px=olPx();px.forEach(x=>cpus.push(x));try{return fn();}finally{px.forEach(x=>{const i=cpus.indexOf(x);if(i>=0)cpus.splice(i,1);});}}
+function olMakeProxy(id){const O=ONLINE;{const g=O.ghosts[id],p=O.st.players[id];
     const store={def:null,cd:0,stunT:0,wob:0,olId:id};
     const latOf=()=>{const q=P[Math.max(0,Math.min(N-1,g.idx|0))];return (g.x-q.x)*q.rx+(g.z-q.z)*q.rz;};
-    const live={x:()=>g.x,y:()=>g.y,z:()=>g.z,yaw:()=>g.yaw,s:()=>g.idx,v:()=>g.sp||0,lat:latOf,done:()=>p.finish!=null};
-    out.push(new Proxy(store,{get(o,k){if(k in live)return live[k]();return o[k];},
+    const live={x:()=>g.x,y:()=>g.y,z:()=>g.z,yaw:()=>g.yaw,s:()=>g.idx,v:()=>g.sp||0,lat:latOf,done:()=>{const q=O.st&&O.st.players[id];return !!q&&q.finish!=null;}};
+    return new Proxy(store,{get(o,k){if(k in live)return live[k]();return o[k];},
       set(o,k,v){const f=olFxQ(id);
         if(k==='stunT'||k==='liftT'||k==='squash'){if(v>0)f.stun=Math.max(f.stun||0,v);}
         else if(k==='wob'){if(v>0)f.wob=Math.max(f.wob||0,v);}
         else if(k==='v'){const old=Math.max(.5,g.sp||0);if(v<old)f.vmul=Math.min(f.vmul||1,Math.max(0,v/old));}
         else if(k==='lat'){const d=v-latOf();if(Math.abs(d)>.2)f.lat=(f.lat||0)+d;}
         else if(k==='s'){if(v<g.idx-.5){f.stun=Math.max(f.stun||0,1);f.vmul=Math.min(f.vmul||1,.6);}}
-        o[k]=v;return true;}}));}
-  return out;}
+        o[k]=v;return true;}});}}
 const OL_FXQ={},OL_FXLAST={};
-function olFxQ(id){if(!OL_FXQ[id]){OL_FXQ[id]={};setTimeout(()=>{const f=OL_FXQ[id];delete OL_FXQ[id];const now=game.t;
+function olFxQ(id){if(ONLINE&&ONLINE.st&&ONLINE.st.gim==='off')return {};if(!OL_FXQ[id]){OL_FXQ[id]={};setTimeout(()=>{const f=OL_FXQ[id];delete OL_FXQ[id];const now=game.t;
     if(!f||!(f.stun||f.vmul||f.lat||f.wob))return;if(OL_FXLAST[id]!=null&&OL_FXLAST[id]<=now&&OL_FXLAST[id]>now-1.2)return;OL_FXLAST[id]=now;
     olAct({type:'fx',to:id,stun:f.stun||0,vmul:f.vmul||1,lat:f.lat||0,wob:f.wob||0,car:selId});},0);}return OL_FXQ[id];}
 function olFxApply(from,fx){const O=ONLINE;if(!olOn()||O.finished||O.st.gim==='off')return;
