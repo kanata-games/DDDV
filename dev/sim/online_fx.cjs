@@ -41,7 +41,6 @@ function drive(){
   press('KeyN',USE_N&&m<0.006&&sp<vt-3);
 }
 let USE_N=true;
-L('ST',String(globalThis.setTimeout).slice(0,60));
 const step=()=>{now+=16.7;__flush();tickSrv();raf(now);};
 const H=()=>{key('KeyH',true);key('KeyH',false);};
 (async()=>{await new Promise(r=>_st(r,30));for(let i=0;i<30;i++)step();
@@ -54,6 +53,7 @@ async function round(id,course){
   // bot sits ahead of me
   for(fr=0;fr<60*6;fr++){now+=16.7;drive();
     const ii=Math.min(T.N-1,T.car.idx+(id==='ostrich'?3:12)),p=T.P[ii];act('p2',{type:'pos',d:[p.x,p.y,p.z,p.h,ii,Math.hypot(T.car.vx,T.car.vz)]},false);
+    if(fr===120)H();__flush();tickSrv();raf(now);if(fr%20===0)await new Promise(r=>_st(r,2));}
   await new Promise(r=>_st(r,20));L(id.padEnd(9),'fx sent:',JSON.stringify(FX.map(f=>({stun:f.stun,vmul:+f.vmul.toFixed(2),lat:+f.lat.toFixed(2)}))));
   act('p2',{type:'finish',t:200},false);T.toMenu();__flush();for(let i=0;i<5;i++)step();await new Promise(r=>_st(r,5));
   // 次のラウンドのため部屋を done→ready へ（leave で done にする）
