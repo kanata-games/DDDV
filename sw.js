@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='18de58b6a6';
+const VERSION='b0d8daf708';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -291,6 +291,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/s15-cockpit.webp',
   './cars/s15-diag.webp',
   './cars/s15-sheet.webp',
+  './cars/satvan-cockpit.webp',
+  './cars/satvan-diag.webp',
+  './cars/satvan-sheet.webp',
   './cars/senkyo-cockpit.webp',
   './cars/senkyo-diag.webp',
   './cars/senkyo-sheet.webp',
@@ -300,6 +303,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/shovel-cockpit.webp',
   './cars/shovel-diag.webp',
   './cars/shovel-sheet.webp',
+  './cars/signtruck-cockpit.webp',
+  './cars/signtruck-diag.webp',
+  './cars/signtruck-sheet.webp',
   './cars/sl-cockpit.webp',
   './cars/sl-diag.webp',
   './cars/sl-sheet.webp',
