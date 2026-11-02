@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='cdc46bdafd';
+const VERSION='826c9cf2b5';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -80,6 +80,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/civic-cockpit.webp',
   './cars/civic-diag.webp',
   './cars/civic-sheet.webp',
+  './cars/classicgt-cockpit.webp',
+  './cars/classicgt-diag.webp',
+  './cars/classicgt-sheet.webp',
   './cars/combine-cockpit.webp',
   './cars/combine-diag.webp',
   './cars/combine-sheet.webp',
@@ -348,6 +351,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/sweeper-cockpit.webp',
   './cars/sweeper-diag.webp',
   './cars/sweeper-sheet.webp',
+  './cars/tandem-cockpit.webp',
+  './cars/tandem-diag.webp',
+  './cars/tandem-sheet.webp',
   './cars/tank-cockpit.webp',
   './cars/tank-diag.webp',
   './cars/tank-sheet.webp',
