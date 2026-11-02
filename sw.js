@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='b0d8daf708';
+const VERSION='456a3d46c7';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -211,6 +211,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/kyoshu-cockpit.webp',
   './cars/kyoshu-diag.webp',
   './cars/kyoshu-sheet.webp',
+  './cars/lav-cockpit.webp',
+  './cars/lav-diag.webp',
+  './cars/lav-sheet.webp',
   './cars/loader-cockpit.webp',
   './cars/loader-diag.webp',
   './cars/loader-sheet.webp',
@@ -246,6 +249,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/nsx-cockpit.webp',
   './cars/nsx-diag.webp',
   './cars/nsx-sheet.webp',
+  './cars/ochair-cockpit.webp',
+  './cars/ochair-diag.webp',
+  './cars/ochair-sheet.webp',
   './cars/orion-cockpit.webp',
   './cars/orion-diag.webp',
   './cars/orion-sheet.webp',
