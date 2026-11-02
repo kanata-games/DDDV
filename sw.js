@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='826c9cf2b5';
+const VERSION='825664a1d6';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -201,6 +201,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/kei-cockpit.webp',
   './cars/kei-diag.webp',
   './cars/kei-sheet.webp',
+  './cars/kei360-cockpit.webp',
+  './cars/kei360-diag.webp',
+  './cars/kei360-sheet.webp',
   './cars/ketten-cockpit.webp',
   './cars/ketten-diag.webp',
   './cars/ketten-sheet.webp',
@@ -220,6 +223,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/lav-cockpit.webp',
   './cars/lav-diag.webp',
   './cars/lav-sheet.webp',
+  './cars/lmh-cockpit.webp',
+  './cars/lmh-diag.webp',
+  './cars/lmh-sheet.webp',
   './cars/loader-cockpit.webp',
   './cars/loader-diag.webp',
   './cars/loader-sheet.webp',
