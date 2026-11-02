@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='456a3d46c7';
+const VERSION='cdc46bdafd';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -101,6 +101,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/dump-cockpit.webp',
   './cars/dump-diag.webp',
   './cars/dump-sheet.webp',
+  './cars/ekick-cockpit.webp',
+  './cars/ekick-diag.webp',
+  './cars/ekick-sheet.webp',
   './cars/enzetsu-cockpit.webp',
   './cars/enzetsu-diag.webp',
   './cars/enzetsu-roof.webp',
@@ -291,6 +294,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/rickshaw-cockpit.webp',
   './cars/rickshaw-diag.webp',
   './cars/rickshaw-sheet.webp',
+  './cars/roadbike-cockpit.webp',
+  './cars/roadbike-diag.webp',
+  './cars/roadbike-sheet.webp',
   './cars/roller-cockpit.webp',
   './cars/roller-diag.webp',
   './cars/roller-sheet.webp',
