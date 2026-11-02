@@ -265,24 +265,21 @@ html.rot270 body{transform:translateY(var(--W)) rotate(-90deg)}
 @media (max-width:620px){.cupList{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){#drift,#msg{transition:none}}
 /* ===== タイトル画面（スプラッシュ）：斜めの文字・キレのある動き・夜の峠 ===== */
-/* おばあちゃんのみかん便カットイン */
-.ci{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
-.ci-band{position:absolute;left:-20%;right:-20%;top:30%;height:clamp(150px,34vh,260px);transform:rotate(-8deg);background:linear-gradient(90deg,#ff8a1e,#ffb347 45%,#ff7a12);box-shadow:inset 0 4px 0 #fff,inset 0 -4px 0 #fff,0 10px 30px rgba(0,0,0,.5);animation:ciIn .22s cubic-bezier(.7,0,.2,1) both}
-.ci-img{position:absolute;left:4%;top:calc(30% - 4vh);height:clamp(190px,44vh,340px);transform:rotate(-8deg);filter:drop-shadow(6px 8px 0 rgba(0,0,0,.35));animation:ciSlide .32s cubic-bezier(.2,1.3,.3,1) .08s both}
-.ci-txt{position:absolute;right:6%;top:calc(30% + 6vh);transform:rotate(-8deg);font-family:'Dela Gothic One','Zen Kaku Gothic New',sans-serif;font-size:clamp(22px,4.6vw,52px);color:#fff;-webkit-text-stroke:2px #7a2e00;text-shadow:5px 5px 0 #7a2e00;white-space:nowrap;animation:ciSlideR .3s cubic-bezier(.2,1.3,.3,1) .12s both}
-.ci-txt small{display:block;font-size:.42em;text-align:right;margin-top:.3em;-webkit-text-stroke:0;text-shadow:2px 2px 0 #7a2e00}
-.ci-wrap img{height:100%;display:block}.ci-mk2{position:absolute;left:54%;top:12%;font-size:clamp(22px,4vw,44px);opacity:0;animation:ciThrow2 .95s cubic-bezier(.3,.2,.4,1) .38s both}
-@keyframes ciThrow2{0%{opacity:0;transform:translate(0,0) rotate(0)}6%{opacity:1}50%{transform:translate(30vw,-12vh) rotate(540deg)}100%{opacity:1;transform:translate(60vw,40vh) rotate(900deg) scale(.5)}}
-.ci-hill{position:absolute;left:-5%;bottom:-5%;width:55%;height:75%;background:linear-gradient(160deg,#1f3a24,#0c1a10);clip-path:polygon(0 0,35% 8%,100% 100%,0 100%);opacity:.95;animation:ciSlide .3s cubic-bezier(.2,1.2,.3,1) both}
-.ci-mk{position:absolute;font-size:clamp(28px,5vw,56px);left:30%;top:30%;animation:ciThrow .9s cubic-bezier(.3,.2,.4,1) .45s both}
-.ci.out{animation:ciOut .2s ease both}
-.ci-img.emo{height:auto;font-size:clamp(120px,28vh,220px);line-height:1}
-@media (max-width:700px){.ci-img{height:18vh;top:22%;left:2%}.ci-img.emo{font-size:15vh}.ci-band{top:28%;height:30vh}.ci-txt{top:calc(28% + 19vh);right:4%;font-size:6.4vw}.ci-mk{left:30%;top:36%}}
-@keyframes ciIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-@keyframes ciSlide{from{opacity:0;transform:translateX(-60%) rotate(-8deg)}to{opacity:1}}
-@keyframes ciSlideR{from{opacity:0;transform:translateX(40%) rotate(-8deg)}to{opacity:1}}
-@keyframes ciThrow{0%{opacity:0;transform:translate(0,0) rotate(0)}10%{opacity:1}55%{transform:translate(32vw,-14vh) rotate(540deg)}100%{opacity:1;transform:translate(62vw,45vh) rotate(900deg) scale(.5)}}
-@keyframes ciOut{to{opacity:0}}
+/* おばあちゃんのみかん便カットイン：左端の小さな斜めの窓（前が見えるように） */
+.ci{position:fixed;left:0;top:calc(118px + env(safe-area-inset-top,0px));width:min(44vw,300px);height:min(22vh,160px);z-index:4;pointer-events:none;animation:ciIn .25s cubic-bezier(.2,1.2,.3,1) both}
+.ci-box{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,86% 100%,0 100%);background:linear-gradient(170deg,#ffb347,#ff7a12);box-shadow:0 6px 18px rgba(0,0,0,.45);overflow:hidden}
+.ci-box::after{content:'';position:absolute;inset:0;clip-path:polygon(0 0,100% 0,86% 100%,0 100%);box-shadow:inset 0 0 0 3px #fff}
+.ci-hill{position:absolute;left:-10%;bottom:-10%;width:80%;height:70%;background:linear-gradient(160deg,#2b5a33,#123019);clip-path:polygon(0 30%,60% 0,100% 100%,0 100%)}
+.ci-img{position:absolute;left:4%;bottom:2%;height:96%}
+.ci-wrap img{height:100%;display:block}
+.ci-img.emo{height:auto;font-size:min(16vh,110px);line-height:1;bottom:4%}
+.ci-txt{position:absolute;right:15%;top:8%;text-align:right;font-family:'Dela Gothic One','Zen Kaku Gothic New',sans-serif;font-size:clamp(13px,2.2vw,20px);line-height:1.15;color:#fff;-webkit-text-stroke:1px #7a2e00;text-shadow:2px 2px 0 #7a2e00}
+.ci-txt small{display:block;font-size:.62em;-webkit-text-stroke:0;text-shadow:1px 1px 0 #7a2e00}
+.ci-mk2{position:absolute;left:54%;top:12%;font-size:clamp(18px,3vw,30px);opacity:0;animation:ciThrow2 .8s cubic-bezier(.3,.2,.4,1) .38s both}
+.ci.out{animation:ciOut .22s ease both}
+@keyframes ciIn{from{transform:translateX(-105%)}to{transform:none}}
+@keyframes ciThrow2{0%{opacity:0;transform:translate(0,0) rotate(0)}6%{opacity:1}45%{transform:translate(calc(var(--tx,300px)*.55),calc(var(--ty,200px)*.1 - 5vh)) rotate(400deg)}100%{opacity:1;transform:translate(var(--tx,300px),var(--ty,200px)) rotate(800deg) scale(.6)}}
+@keyframes ciOut{to{transform:translateX(-105%)}}
 body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnView,body.spOn #btnSnd,body.spOn #btnQuit{visibility:hidden}
 .sp{position:fixed;inset:0;z-index:8;overflow:hidden;color:#fff;font-family:'Chakra Petch','Zen Kaku Gothic New',system-ui,sans-serif;user-select:none;-webkit-user-select:none;cursor:pointer;touch-action:manipulation;--sk:-9deg;--moonc:#9fb6ff;--sod:#ffae42}
 .sp *{box-sizing:border-box}
@@ -365,6 +362,7 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
   .sp-press{bottom:36vh}
   .sp-foot{display:none}
 }
+@media (max-width:560px){.ci{width:58vw;height:min(17vh,130px)}.ci-txt{display:none}}
 @media (pointer:coarse){.sp-hint{display:none!important}}
 @media (prefers-reduced-motion:reduce){.sp *{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
 </style>
@@ -3132,9 +3130,11 @@ function mikan(){if(game.state!=='race')return;if(!(game.mikan>0)){flash('みか
 const BAACHAN=[0,1,2].map(k=>{const im=new Image();im.src='cars/kotatsu-baachan-'+k+'.webp';return im;}); // 振りかぶる→投げる→投げ終わり
 function mikanDelivery(){let el=document.getElementById('mikanCI');if(el)el.remove();el=document.createElement('div');el.id='mikanCI';el.className='ci';
   const ok=BAACHAN.every(im=>im.complete&&im.naturalWidth);
-  const img=ok?'<div class="ci-img ci-wrap"><img id="ciBaa" src="'+BAACHAN[0].src+'" alt=""><span class="ci-mk2">🍊</span></div>':'<div class="ci-img emo">👵</div>';
-  el.innerHTML='<div class="ci-hill"></div><div class="ci-band"></div>'+img+'<div class="ci-txt">ほれ、みかんじゃよ〜！<small>峠の上から おばあちゃんのみかん便</small></div>'+(ok?'':'<div class="ci-mk">🍊</div>');
+  const img=ok?'<div class="ci-img ci-wrap"><img id="ciBaa" src="'+BAACHAN[0].src+'" alt=""></div>':'<div class="ci-img emo">👵</div>';
+  el.innerHTML='<div class="ci-box"><div class="ci-hill"></div>'+img+'<div class="ci-txt">ほれ、<br>みかんじゃよ〜！<small>おばあちゃんのみかん便</small></div></div>'+'<span class="ci-mk2" id="ciMk">🍊</span>';
   document.body.appendChild(el);if(ac){beep(660,.06);setTimeout(()=>beep(990,.08),90);}
+  // みかんは窓の外へ飛ばしたいので、窓（切り抜き）の外に置いて、手の位置に合わせる
+  setTimeout(()=>{const m=document.getElementById('ciMk'),w=el.querySelector('.ci-img');if(m&&w&&w.getBoundingClientRect){const r=w.getBoundingClientRect(),e=el.getBoundingClientRect();const sx=r.left+r.width*(ok?.56:.6),sy=r.top+r.height*(ok?.14:.3);m.style.left=(sx-e.left)+'px';m.style.top=(sy-e.top)+'px';m.style.setProperty('--tx',(innerWidth*.5-sx)+'px');m.style.setProperty('--ty',(innerHeight*.66-sy)+'px');}},300);
   if(ok){setTimeout(()=>{const b=document.getElementById('ciBaa');if(b)b.src=BAACHAN[1].src;if(ac)beep(1400,.04);},380);setTimeout(()=>{const b=document.getElementById('ciBaa');if(b)b.src=BAACHAN[2].src;},560);}
   setTimeout(()=>{game.mikan=(game.mikan||0)+3;flash('みかんが3個届いた！（残り '+game.mikan+'個）');if(ac){beep(1175,.08);setTimeout(()=>beep(1568,.12),90);}},1100);
   setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),220);},1800);}
