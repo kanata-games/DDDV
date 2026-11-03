@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='c6a70835b8';
+const VERSION='0cca2f4f10';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -174,6 +174,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/hoshi-cockpit.webp',
   './cars/hoshi-diag.webp',
   './cars/hoshi-sheet.webp',
+  './cars/hunter-cockpit.webp',
+  './cars/hunter-diag.webp',
+  './cars/hunter-sheet.webp',
   './cars/hut-cockpit.webp',
   './cars/hut-diag.webp',
   './cars/hut-sheet.webp',
@@ -249,6 +252,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/marron-stand1.webp',
   './cars/marron-stand2.webp',
   './cars/marron-stand3.webp',
+  './cars/megacruise-cockpit.webp',
+  './cars/megacruise-diag.webp',
+  './cars/megacruise-sheet.webp',
   './cars/mirror-cockpit.webp',
   './cars/mirror-diag.webp',
   './cars/mirror-sheet.webp',
