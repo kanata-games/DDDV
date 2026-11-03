@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='0cca2f4f10';
+const VERSION='1c453b0346';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -15,6 +15,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/alph-cockpit.webp',
   './cars/alph-diag.webp',
   './cars/alph-sheet.webp',
+  './cars/alto-cockpit.webp',
+  './cars/alto-diag.webp',
+  './cars/alto-sheet.webp',
   './cars/amb-cockpit.webp',
   './cars/amb-diag.webp',
   './cars/amb-sheet.webp',
@@ -59,6 +62,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/broom-cockpit.webp',
   './cars/broom-diag.webp',
   './cars/broom-sheet.webp',
+  './cars/camper-cockpit.webp',
+  './cars/camper-diag.webp',
+  './cars/camper-sheet.webp',
   './cars/cappu-cockpit.webp',
   './cars/cappu-diag.webp',
   './cars/cappu-sheet.webp',
