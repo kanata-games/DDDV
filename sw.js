@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='5491ae059d';
+const VERSION='c6a70835b8';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -147,6 +147,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/golf-cockpit.webp',
   './cars/golf-diag.webp',
   './cars/golf-sheet.webp',
+  './cars/greenslow-cockpit.webp',
+  './cars/greenslow-diag.webp',
+  './cars/greenslow-sheet.webp',
   './cars/gtr-cockpit.webp',
   './cars/gtr-diag.webp',
   './cars/gtr-sheet.webp',
@@ -252,6 +255,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/mixer-cockpit.webp',
   './cars/mixer-diag.webp',
   './cars/mixer-sheet.webp',
+  './cars/moped-cockpit.webp',
+  './cars/moped-diag.webp',
+  './cars/moped-sheet.webp',
   './cars/nbox-cockpit.webp',
   './cars/nbox-diag.webp',
   './cars/nbox-sheet.webp',
