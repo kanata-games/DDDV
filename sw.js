@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='d1ab3ea085';
+const VERSION='5491ae059d';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -401,12 +401,18 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/trike-cockpit.webp',
   './cars/trike-diag.webp',
   './cars/trike-sheet.webp',
+  './cars/trike3-cockpit.webp',
+  './cars/trike3-diag.webp',
+  './cars/trike3-sheet.webp',
   './cars/trolley-cockpit.webp',
   './cars/trolley-diag.webp',
   './cars/trolley-sheet.webp',
   './cars/tug-cockpit.webp',
   './cars/tug-diag.webp',
   './cars/tug-sheet.webp',
+  './cars/tuktuk-cockpit.webp',
+  './cars/tuktuk-diag.webp',
+  './cars/tuktuk-sheet.webp',
   './cars/uma-cockpit.webp',
   './cars/uma-diag.webp',
   './cars/uma-sheet.webp',
