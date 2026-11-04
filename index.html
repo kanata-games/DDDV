@@ -565,7 +565,12 @@ const DOWN_SEGS=[
   ['C',30,95,.05],['S',60,.06],['C',85,-30,.05],['S',160,.03]
 ];
 const LAKE_SEGS=[['S',160,.01],['C',120,45,.01],['C',90,-60,.015],['S',120,.01],['C',60,80,.02],['S',80,.01],['C',150,-40,0],['C',45,-70,.02],['S',140,.01],['C',75,95,.015],['C',110,-50,.01],['S',100,0],['C',38,110,.02],['S',90,.01],['C',90,-75,.01],['C',130,30,0],['S',200,.01],['C',55,-80,.015],['S',120,.01]];
-// 4つ目以降の値に'T'があればトンネル
+// 4つ目以降の値に'T'があればトンネル、'V'があれば高架橋（ループ橋）
+const KYUDO_SEGS=[['S',80,0.04],['C',25,70,0.05],['S',30,0.06],['C',14,-120,0.05],['S',25,0.06],['C',18,95,0.05],['C',30,-40,0.05],['S',40,0.06],['C',12,160,0.04],['S',35,0.06],['C',22,-80,0.05],['S',20,0.06],['C',16,110,0.05],['S',30,0.06],['C',13,-150,0.04],['S',40,0.06],['C',35,50,0.05],['C',20,-90,0.05],['S',25,0.06],['C',15,130,0.05],['S',30,0.06],['C',25,-60,0.05],['C',12,-110,0.04],['S',45,0.06],['C',18,140,0.05],['S',30,0.06],['C',28,-70,0.05],['S',20,0.06],['C',14,165,0.04],['S',35,0.06],['C',20,-100,0.05],['C',30,45,0.05],['S',30,0.06],['C',13,-160,0.04],['S',40,0.06],['C',22,85,0.05],['S',25,0.06],['C',16,-120,0.05],['C',40,35,0.05],['S',60,0.05],['C',18,100,0.05],['S',30,0.06],['C',25,-75,0.05],['S',40,0.05],['C',14,140,0.04],['S',30,0.06],['C',20,-95,0.05],['C',26,60,0.05],['S',35,0.06],['C',12,-155,0.04],['S',45,0.06],['C',30,70,0.05],['S',100,0.04]];
+const LOOPB_SEGS=[['S',120,0.03],['C',90,30,0.04],['S',100,0.04],['C',60,-60,0.05],['S',80,0.04,'T'],['C',120,25,0.04,'T'],['S',90,0.04,'T'],['C',70,50,0.05],['S',90,0.05],['C',45,-80,0.05],['S',60,0.05],['C',35,95,0.05],['S',70,0.04],['S',40,0.03,'V'],['C',38,-750,0.045,'V'],['S',60,0.03,'V'],['C',60,40,0.05],['S',80,0.05],['C',30,-110,0.05],['S',70,0.05],['C',50,70,0.05],['C',80,-40,0.04],['S',160,0.03]];
+const IROHA_SEGS=[['S',80,0.05],['C',70,-30,0.05],['C',70,30,0.05],['S',30,0.06],['S',25,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',25,0.075],['C',20,180,0.055],['S',44,0.085],['C',19,-180,0.055],['S',28,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',28,0.075],['C',21,180,0.055],['S',20,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',20,0.075],['C',20,-180,0.055],['S',52,0.085],['C',18,180,0.055],['S',23,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',23,0.075],['C',20,-180,0.055],['S',29,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',29,0.075],['C',19,180,0.055],['S',42,0.085],['C',21,-180,0.055],['S',25,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',25,0.075],['C',20,180,0.055],['S',54,0.085],['C',18,-180,0.055],['S',20,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',20,0.075],['C',20,180,0.055],['S',28,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',28,0.075],['C',19,-180,0.055],['S',48,0.07],['C',60,-40,0.05],['S',110,0.04]];
+// いろは歌（いろは坂のカーブ看板）
+const IROHA_KANA='いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせす';
 const TSUZURA_SEGS=[['S',120,.05],['C',60,40,.06],['S',70,.07],
  ['C',21,176,.05],['S',75,.09],['C',21,-176,.05],['S',75,.09],['C',21,176,.05],['S',75,.09],['C',21,-176,.05],['S',60,.08],
  ['C',70,-45,.06],['S',90,.07],['C',40,-20,.06],['S',60,.07],
@@ -610,6 +615,9 @@ const COURSES=[
   {id:'up',name:'月見峠 上り',sub:'登り坂でパワーが試される',from:'down',reverse:true,lampStep:72},
   {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72},
   {id:'tsuzura',name:'つづら折り峠',sub:'ヘアピンが7つ続く急な下り',segs:TSUZURA_SEGS,y0:300,lampStep:60},
+  {id:'kyudo',name:'峠の旧道',sub:'すれ違えないほど細い旧道。カーブ番号の標識が続く。車幅が広いほど壁が近い',segs:KYUDO_SEGS,y0:200,half:2.9,lampStep:150,signs:'num'},
+  {id:'loopb',name:'ループ橋峠',sub:'山道とトンネルを抜けて、2回転する巨大なループ橋をぐるぐる下る',segs:LOOPB_SEGS,y0:140,lampStep:60},
+  {id:'iroha',name:'いろは坂 下り',sub:'ヘアピンとS字が続く紅葉の坂。28のカーブに「い・ろ・は…」の看板',segs:IROHA_SEGS,y0:230,lampStep:64,signs:'iroha',signSkip:[0,1,30],koyo:true},
   {id:'ridge',name:'稜線トンネルロード',sub:'長いトンネルを抜ける高速コース',segs:RIDGE_SEGS,y0:140,lampStep:70},
   {id:'wangan',name:'湾岸線',sub:'首都高。長い直線で一般車を縫って走る',segs:WANGAN_SEGS,y0:30,env:'highway',half:8,traffic:16},
   {id:'c1',name:'C1環状',sub:'首都高。壁が迫る連続コーナーとトンネル',segs:C1_SEGS,y0:30,env:'highway',half:6.5,traffic:10},
@@ -644,10 +652,10 @@ const courseOf=id=>COURSES.find(c=>c.id===id)||COURSES[2];
 function genPts(segs,y0){
   const pts=[];let x=0,y=y0,z=0,h=0,dist=0;
   pts.push({x,y,z,h,k:0,d:0});
-  for(const s of segs){const T=s[0]==='S'?s[3]==='T':s[4]==='T';
-    if(s[0]==='S'){for(let i=0;i<s[1];i++){x+=Math.sin(h);z+=Math.cos(h);y-=s[2];dist+=1;pts.push({x,y,z,h,k:0,d:dist,T});}}
+  for(const s of segs){const F=s[0]==='S'?s[3]:s[4],T=F==='T',V=F==='V';
+    if(s[0]==='S'){for(let i=0;i<s[1];i++){x+=Math.sin(h);z+=Math.cos(h);y-=s[2];dist+=1;pts.push({x,y,z,h,k:0,d:dist,T,V});}}
     else{const R=s[1],ang=s[2]*Math.PI/180,n=Math.round(Math.abs(ang)*R),k=Math.sign(ang)/R,dh=ang/n;
-      for(let i=0;i<n;i++){h+=dh/2;x+=Math.sin(h);z+=Math.cos(h);h+=dh/2;y-=s[3];dist+=1;pts.push({x,y,z,h,k,d:dist,T});}}
+      for(let i=0;i<n;i++){h+=dh/2;x+=Math.sin(h);z+=Math.cos(h);h+=dh/2;y-=s[3];dist+=1;pts.push({x,y,z,h,k,d:dist,T,V});}}
   }
   for(let pass=0;pass<3;pass++){const ys=pts.map(p=>p.y);for(let i=2;i<pts.length-2;i++)pts[i].y=(ys[i-2]+ys[i-1]+ys[i]+ys[i+1]+ys[i+2])/5;}
   return pts;
@@ -794,11 +802,15 @@ function buildScenery(){
   if(course.osakaMark)buildOsaka(G);
   if(course.snow)buildSnow(G);
   else{
+  // 高架橋（ループ橋）のまわりは崖や木を控えめにする
+  const vPts=[];for(let i=0;i<N;i+=8)if(P[i].V)vPts.push(P[i]);
+  const nearV=(x,z,r)=>vPts.length&&vPts.some(q=>(q.x-x)*(q.x-x)+(q.z-z)*(q.z-z)<r*r);
   // cliff (left) & drop (right)
   {const offsC=[0,1.2,1.2,1.6,7,20,46],offsD=[0,6,14,30,46];
    for(const s of [-1,1]){
-     const offs=s<0?offsC:offsD,rows=[];
-     for(let i=0;i<N;i+=STEP){const p=P[i],w=width[s][i],row=[];
+     const offs=s<0?offsC:offsD,cliffM=new THREE.MeshLambertMaterial({map:rockTex,vertexColors:true,side:THREE.DoubleSide});let rows=[];
+     const flush=()=>{if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{vc:true}),cliffM));rows=[];};
+     for(let i=0;i<N;i+=STEP){const p=P[i],w=vPts.length&&nearV(P[i].x,P[i].z,55)?Math.min(width[s][i],6):width[s][i],row=[];if(p.V||(P[i+6]&&P[i+6].V)||(P[i-6]&&P[i-6].V)){flush();continue;}
        offs.forEach((o,j)=>{const off=Math.min(o,w)+HALF;const oo=Math.min(o,w);const hh=sideH(s,oo+(s<0&&j===2?.01:0));
          const x=p.x+p.rx*s*off,z=p.z+p.rz*s*off;
          let r,g,b; if(s<0){ if(oo<1.3){r=.32;g=.33;b=.34;} else if(oo<7){r=.45;g=.47;b=.44;} else {r=.16;g=.24;b=.15;} }
@@ -807,8 +819,10 @@ function buildScenery(){
          row.push([x,p.y+hh,z,oo/4,p.d/4,r,g,b]);});
        if(s<0)row.reverse();
        rows.push(row);}
-     G.add(new THREE.Mesh(ribbon(rows,{vc:true}),new THREE.MeshLambertMaterial({map:rockTex,vertexColors:true,side:THREE.DoubleSide})));
+     flush();
    }}
+  if(P.some(p=>p.V))buildViaduct(G);
+  if(course.signs)curveSigns(G);
   // valley floor / lake
   {let minY=1e9,cx=0,cz=0;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;
    const m=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),course.water?new THREE.MeshPhongMaterial({color:0x0c1c33,emissive:0x050b16,specular:0x6f86c8,shininess:60}):new THREE.MeshLambertMaterial({color:course.snow?0xb8c4d6:0x0d1810}));
@@ -834,8 +848,10 @@ function buildScenery(){
      const oo=(s<0?6:3)+Math.random()*(w-(s<0?6:3)),p=P[i],off=oo+HALF,x=p.x+p.rx*s*off,z=p.z+p.rz*s*off;
      if(nearRoad(x,z,HALF+3.5,-1,-1)||p.T||P[Math.min(N-1,i+8)].T||P[Math.max(0,i-8)].T)continue;
      if(course.water&&s>0&&oo>9)continue; // 湖側は水際まで
+     if(nearV(x,z,52))continue;
      const sc=.7+Math.random()*.9;o.position.set(x,p.y+sideH(s,oo)-.2,z);o.rotation.y=Math.random()*6;o.scale.set(sc,sc*(.8+Math.random()*.6),sc);o.updateMatrix();
      cone.setMatrixAt(n,o.matrix);trunk.setMatrixAt(n,o.matrix);n++;}
+   if(course.koyo){const KC=[0xc8321e,0xe0561a,0xe88a1c,0xd8b020,0xa8241a,0x2a4a26];const cc=new THREE.Color();for(let k=0;k<n;k++){cc.setHex(KC[Math.random()*KC.length|0]);cone.setColorAt(k,cc);}cone.material.color.setHex(0xffffff);cone.material.emissive.setHex(0x1a0804);}
    cone.count=trunk.count=n;G.add(cone,trunk);}
   // street lamps (cliff side) with fake light pools
   {const step=course.lampStep||72,cnt=Math.floor(N/step);
@@ -936,6 +952,42 @@ function buildHighway(G){
      gr.position.set(p.x,p.y,p.z);gr.rotation.y=p.h;G.add(gr);}}
 }
 // 吊り橋：2本の主塔と、ライトの並んだメインケーブル
+// 高架橋（ループ橋）：橋桁の裏・側面・両側の欄干・橋脚
+function buildViaduct(G){let minY=1e9;P.forEach(p=>minY=Math.min(minY,p.y));const gy=minY-45,E=HALF+1.6;
+  const conc=new THREE.MeshLambertMaterial({color:0x8a8e94,emissive:0x15171a,side:THREE.DoubleSide});
+  let i=0;while(i<N){if(!P[i].V){i++;continue;}let j=i;while(j<N&&P[j].V)j++;const a=Math.max(0,i-4),b=Math.min(N-1,j+4);
+    const und=[],sl=[],sr=[],rl=[];
+    for(let k=a;k<=b;k+=STEP){const p=P[k];und.push([[p.x-p.rx*E,p.y-1.5,p.z-p.rz*E,0,0],[p.x+p.rx*E,p.y-1.5,p.z+p.rz*E,1,0]]);
+      [[sl,-1],[sr,1]].forEach(([r,sd])=>r.push([[p.x+p.rx*sd*E,p.y-1.5,p.z+p.rz*sd*E,0,0],[p.x+p.rx*sd*E,p.y+.05,p.z+p.rz*sd*E,1,0]]));
+      const o=HALF+.45;rl.push([[p.x-p.rx*o,p.y+.42,p.z-p.rz*o,p.d/4,0],[p.x-p.rx*o,p.y+.86,p.z-p.rz*o,p.d/4,1]]);}
+    [und,sl,sr].forEach(r=>{if(r.length>1)G.add(new THREE.Mesh(ribbon(r,{}),conc));});
+    // 路面の外側の張り出し（路肩）
+    [-1,1].forEach(sd=>{const r=[];for(let k=a;k<=b;k+=STEP){const p=P[k];r.push([[p.x+p.rx*sd*HALF,p.y-.01,p.z+p.rz*sd*HALF,0,0],[p.x+p.rx*sd*E,p.y-.01,p.z+p.rz*sd*E,1,0]]);}if(r.length>1)G.add(new THREE.Mesh(ribbon(r,{}),conc));});
+    if(rl.length>1)G.add(new THREE.Mesh(ribbon(rl,{}),new THREE.MeshLambertMaterial({map:railTex,side:THREE.DoubleSide})));
+    // 橋脚：橋桁の左右に2本ずつ立てて、下で梁を渡す（ループで重なった下の段とぶつかる所は立てない）
+    const pil=[],beam=[],PO=E+1.9;for(let k=i;k<j;k+=24){const p=P[k];
+      [-1,1].forEach(sd=>{const x=p.x+p.rx*sd*PO,z=p.z+p.rz*sd*PO;let hit=false;for(let q=a;q<b;q+=2){if(P[q].y>=p.y-2)continue;const dx=P[q].x-x,dz=P[q].z-z;if(dx*dx+dz*dz<(E+1.8)*(E+1.8)){hit=true;break;}}if(!hit)pil.push({x,z,top:p.y-1.5});});
+      beam.push(p);}
+    const pg=new THREE.CylinderGeometry(.9,1.1,1,8);pg.translate(0,.5,0);const im=new THREE.InstancedMesh(pg,conc,Math.max(1,pil.length)),o=new THREE.Object3D();im.count=pil.length;
+    pil.forEach((q,k)=>{o.position.set(q.x,gy,q.z);o.scale.set(1,Math.max(1,q.top-gy),1);o.rotation.set(0,0,0);o.updateMatrix();im.setMatrixAt(k,o.matrix);});G.add(im);
+    const bm=new THREE.InstancedMesh(new THREE.BoxGeometry(PO*2+2,1.2,1.4),conc,Math.max(1,beam.length));bm.count=beam.length;
+    beam.forEach((p,k)=>{o.position.set(p.x,p.y-2.1,p.z);o.scale.set(1,1,1);o.rotation.set(0,p.h,0);o.updateMatrix();bm.setMatrixAt(k,o.matrix);});G.add(bm);
+    // 赤い警告灯（橋の手すり）
+    const lm=new THREE.SpriteMaterial({map:haloT,color:0xff5a3a,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+    for(let k=i;k<j;k+=40){const p=P[k];[-1,1].forEach(sd=>{const sp=new THREE.Sprite(lm);sp.scale.set(1.6,1.6,1);sp.position.set(p.x+p.rx*sd*(HALF+.6),p.y+1.1,p.z+p.rz*sd*(HALF+.6));G.add(sp);});}
+    i=j;}}
+// カーブ番号の看板（旧道は「C-12/40」、いろは坂は「い・ろ・は…」）
+function curveSigns(G){const segs=course.segs;let idx=0,ci=0,lab=0;const list=[];const skip=course.signSkip||[];
+  for(const sg of segs){if(sg[0]==='S'){idx+=sg[1];continue;}const n=Math.round(Math.abs(sg[2]*Math.PI/180)*sg[1]);
+    if(!skip.includes(ci)&&(course.signs==='iroha'||Math.abs(sg[2])>=40))list.push({at:idx,dir:Math.sign(sg[2])});ci++;idx+=n;}
+  const tot=list.length,poleM=new THREE.MeshLambertMaterial({color:0x6b7078});
+  list.forEach((c,k)=>{const i=Math.max(2,c.at-14),p=P[i];if(!p)return;
+    const txt=course.signs==='iroha'?(IROHA_KANA[k]||''):'C-'+(k+1)+'/'+tot;
+    const tex=canvasTex(256,192,(g,w,h)=>{if(course.signs==='iroha'){g.fillStyle='#5a3a22';g.fillRect(0,0,w,h);g.strokeStyle='#e8d8b8';g.lineWidth=10;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#fff6e0';g.font='bold 120px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,w/2,h/2+6);g.font='bold 22px sans-serif';g.fillText('いろは坂 第'+(k+1)+'カーブ',w/2,30);}
+      else{g.fillStyle='#f4f4f0';g.fillRect(0,0,w,h);g.strokeStyle='#1a3a8a';g.lineWidth=12;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#1a3a8a';g.font='bold 72px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,w/2,h/2);}});
+    const sd=-1,off=HALF+1.0,bx=p.x+p.rx*sd*off,bz=p.z+p.rz*sd*off;
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.2,6),poleM);pole.position.set(bx,p.y+1.1,bz);G.add(pole);
+    const bd=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.1),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));bd.position.set(bx,p.y+2.5,bz);bd.rotation.y=p.h+Math.PI;G.add(bd);});}
 function buildBridge(G,r,gy){const W=HALF,a=r.a??r.body+260,b=r.b??r.body+1500;if(b>=r.to-50)return;const H=95,pm=new THREE.MeshLambertMaterial({color:0xcfd3da,emissive:0x2a2c33});
   [a,b].forEach(i=>{const p=P[i];[-1,1].forEach(sd=>{const m=new THREE.Mesh(new THREE.BoxGeometry(3,H+(p.y-gy),3),pm);m.position.set(p.x+p.rx*sd*(W+2.5),(gy+p.y+H)/2,p.z+p.rz*sd*(W+2.5));m.rotation.y=p.h;G.add(m);});
     for(const hh of [H*.55,H-4]){const bm=new THREE.Mesh(new THREE.BoxGeometry(W*2+8,2.4,2.4),pm);bm.position.set(p.x,p.y+hh,p.z);bm.rotation.y=p.h;G.add(bm);}
@@ -1818,6 +1870,7 @@ const LADDER={lake:{boss:'nsx',fmt:'race',no2:'s15',loc:['swan','beat','civic','
   c1soto:{boss:'jzx',fmt:'tsui',no2:'taxi',loc:['amb','fire','noah']},rainbow:{boss:'tf',fmt:'race',no2:'mirror',loc:['vwbus','kidsbus','golf']},
   wanganS:{boss:'deco',fmt:'race',no2:'dump',loc:['mixer','roller','shovel']},hanedaL:{boss:'jumbo',fmt:'race',no2:'tug',loc:['stretcher','bed','mixer','stairs']},
   arcade:{boss:'bike',fmt:'clean',no2:'demae',loc:['cart','chair','kotatsu','icecream','trike','rickshaw','ochair','ekick','kei360','tuktuk','greenslow']},park:{boss:'pumpkin',fmt:'race',no2:'panda',loc:['swan','trolley','handcar','golf','sl','carriage','uma','bathtub','hut']},
+  kyudo:{boss:'beat',fmt:'tsui',no2:'cappu',loc:['alto','move','kei360','kei','moped','hustler','tuktuk']},loopb:{boss:'evo',fmt:'cat',no2:'s15',loc:['camper','megacruise','vwbus','civic','integra']},iroha:{boss:'supra',fmt:'cat',no2:'jzx',loc:['tanto','nbox','taxi','crown','classicgt']},
   snow:{boss:'snowmo',fmt:'tsui',no2:'sled',loc:['ketten','tractor','kotatsu','tiller','plow','megacruise','hunter']},airport:{boss:'f14',fmt:'race',no2:'loader',loc:['tank','roller','fork','stairs','daisha','apc','karl']},
   neon:{boss:'packer',fmt:'clean',no2:'sweeper',loc:['junk','yakiimo','wrecker','fire','ghostcar','lav']}};
 // ===== ダークヴェイルの夜：五血盟の抗争（峠カテゴリ5コースを制覇すると挑める）。あなたはルーメン代表 =====
@@ -3794,7 +3847,7 @@ function olPanel(){const O=ONLINE;if(!O)return;let box=$('olBox');
   if(!g){box.innerHTML='<div class="cupHead"><b>🏁 オンライン　部屋 '+O.room+'</b><span>'+(conn?'接続中':'接続しています…')+'</span></div><p class="lede" style="font-size:12px">'+(conn?'あそび場で「DDDV 峠オンライン」が始まるのを待っています。':'')+'</p>';syncStart();return;}
   const fmtT=t=>t==null?'--':fmt(t),ph={ready:'車選び・待機中',count:'カウントダウン',race:'レース中',done:'結果'}[g.phase]||'';
   const rows=g.order.map(id=>{const p=g.players[id],c=CARS.find(x=>x.id===p.car);return '<div><i style="background:#'+((c?c.top:0x777777).toString(16).padStart(6,'0'))+'"></i><b>'+escH(p.name)+(id===O.you?'（あなた）':'')+'</b><small>'+(c?escH(c.name):'車を選んでいない')+(p.inRace&&p.finish!=null?'　🏁 '+fmtT(p.finish):p.ret?'　リタイア':'')+'</small></div>';}).join('');
-  const crs=Object.entries({down:'月見峠 下り',up:'月見峠 上り',tsuzura:'つづら折り峠',lake:'湖畔ハイウェイ',ridge:'稜線トンネルロード',snow:'白銀ゲレンデ下り',park:'夜の遊園地',airport:'夜の空港',arcade:'天神橋筋商店街',wangan:'湾岸線',c1:'C1環状',neon:'ネオン街'});
+  const crs=Object.entries({down:'月見峠 下り',up:'月見峠 上り',tsuzura:'つづら折り峠',kyudo:'峠の旧道',loopb:'ループ橋峠',iroha:'いろは坂 下り',lake:'湖畔ハイウェイ',ridge:'稜線トンネルロード',snow:'白銀ゲレンデ下り',park:'夜の遊園地',airport:'夜の空港',arcade:'天神橋筋商店街',wangan:'湾岸線',c1:'C1環状',neon:'ネオン街'});
   box.innerHTML='<div class="cupHead"><b>🏁 オンライン　部屋 '+O.room+'</b><span>'+ph+(g.round?'　第'+g.round+'戦':'')+'</span></div>'+
     '<div class="opts">コース '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olCourse" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+crs.map(([k,n])=>'<option value="'+k+'"'+(k===g.course?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+escH(g.courseName)+'</b>')+
     '　レギュ '+(O.host&&(g.phase==='ready'||g.phase==='done')?'<select id="olReg" style="font:inherit;background:var(--night);color:var(--ink);border:1px solid rgba(159,182,255,.3);border-radius:4px;padding:4px">'+[['open','無差別'],['equal','イコール性能']].map(([k,n])=>'<option value="'+k+'"'+(k===(g.reg||'open')?' selected':'')+'>'+n+'</option>').join('')+'</select>':'<b>'+escH(g.regName||'無差別')+'</b>')+'</div>'+
