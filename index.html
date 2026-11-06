@@ -712,8 +712,8 @@ function buildTrack(def){
 let course=null,P=[],N=0,TOTAL=0,HAIRPINS=0,START_I=24,GOAL_I=0;
 const CELL=12;let grid=new Map();
 function nearRoad(x,z,r,skipFrom,skipTo){
-  const cx=Math.floor(x/CELL),cz=Math.floor(z/CELL),r2=r*r;
-  for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const l=grid.get((cx+a)+','+(cz+b));if(!l)continue;
+  const cx=Math.floor(x/CELL),cz=Math.floor(z/CELL),r2=r*r,n=Math.max(1,Math.ceil(r/CELL)); // 半径に合わせて調べるマス数を広げる（以前は±1マス固定で、半径24m以上の道を見逃してビルがトンネル等に食い込んでいた）
+  for(let a=-n;a<=n;a++)for(let b=-n;b<=n;b++){const l=grid.get((cx+a)+','+(cz+b));if(!l)continue;
     for(const i of l){if(i>=skipFrom&&i<=skipTo)continue;const dx=P[i].x-x,dz=P[i].z-z;if(dx*dx+dz*dz<r2)return true;}}
   return false;
 }
@@ -876,7 +876,7 @@ function buildScenery(){
      flush();
    }}
   if(P.some(p=>p.V))buildViaduct(G);
-  if(course.signs)curveSigns(G);
+  if((course.signs==='num'||course.signs==='iroha')&&course.segs)curveSigns(G); // 首都高の signs（案内標識の配列）とは別物
   // valley floor / lake
   {let minY=1e9,cx=0,cz=0;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;
    const m=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),course.water?new THREE.MeshPhongMaterial({color:0x0c1c33,emissive:0x050b16,specular:0x6f86c8,shininess:60}):new THREE.MeshLambertMaterial({color:course.snow?0xb8c4d6:0x0d1810}));
