@@ -250,6 +250,17 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 #dpNotch{display:flex;gap:3px;justify-content:flex-end;margin-top:8px}#dpNotch span{min-width:20px;padding:2px 0;text-align:center;font:700 12px var(--f-num);border-radius:3px;background:#202942;color:#7e88a6}
 #dpNotch span.on{background:#ff8a2a;color:#fff}#dpNotch span.p.on{background:#3cc46a}#dpNotch span.n.on{background:#8d97b3;color:#111}#dpNotch span.eb.on{background:#ff3030}
 body.den #dash,body.den #total{display:none}
+#townHud{inset:0;pointer-events:none}
+#thTime{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);text-align:center;font-family:var(--f-num);line-height:1;text-shadow:0 2px 8px #000}
+#thTime small{display:block;font-size:13px;color:#cfd8f0;letter-spacing:.2em}#thTime b{font-size:64px;color:#ffd23f}#thTime.low b{color:#ff5a5a}
+#thArrow{position:absolute;top:calc(92px + env(safe-area-inset-top,0px));left:50%;width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:64px solid #ffd23f;transform-origin:50% 70%;filter:drop-shadow(0 2px 6px #000)}#thArrow.ride{border-bottom-color:#5be37d}
+#thRide{position:absolute;top:calc(166px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(5,9,20,.85);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 16px;text-align:center;font-family:var(--f-body);color:#fff;white-space:nowrap}
+#thRide small{display:block;font-size:12px;color:#cfd8f0}#thRide b{display:block;font-size:24px}#thRide span{font-size:15px;margin:0 6px;color:#e9eefb}#thRide i{font-style:normal;font-family:var(--f-num);font-size:22px;color:#5dd6ff}#thRide .bad i{color:#ff5a5a}
+#thMoney{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));font-family:var(--f-num);font-size:22px;color:#fff;text-shadow:0 2px 6px #000}#thMoney b{font-size:40px;color:#5be37d;margin-left:2px}#thMoney small{display:block;font-size:14px;color:#cfd8f0;font-family:var(--f-body)}
+#thPop{position:absolute;top:47%;left:50%;transform:translate(-50%,-50%);font-family:var(--f-body);font-weight:700;font-size:34px;text-shadow:0 3px 10px #000,0 0 2px #000;opacity:0;white-space:nowrap}
+#thPop.show{animation:thPop 1.6s ease-out}@keyframes thPop{0%{opacity:0;transform:translate(-50%,-30%) scale(1.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+body.town #tl,body.town #total,body.town #meter{display:none}
+@media (max-width:640px){#thTime b{font-size:44px}#thArrow{top:calc(70px + env(safe-area-inset-top,0px));border-left-width:22px;border-right-width:22px;border-bottom-width:46px}#thRide{top:calc(124px + env(safe-area-inset-top,0px));padding:4px 10px}#thRide b{font-size:18px}#thMoney b{font-size:28px}#thPop{font-size:22px}}
 body.den #radio{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 @media (max-width:640px){body.den #radio{bottom:calc(128px + env(safe-area-inset-bottom,0px))}}
 @media (max-width:640px){#denPanel{gap:8px;padding:8px 10px;grid-template-columns:1fr 1.15fr .95fr}#dpSt{font-size:20px}#dpDist b{font-size:38px}#dpSpd b{font-size:32px}.dpRow{font-size:12px}.dpRow b{font-size:18px}#dpHint{font-size:11px;white-space:normal}#dpNotch span{min-width:13px;font-size:10px}#denPanel small{font-size:11px}}
@@ -429,6 +440,7 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
 <div class="hud" id="drift"><b>DRIFT</b><span id="dpts">0</span></div>
 <div class="hud" id="count"></div>
 <div class="hud" id="msg"></div>
+<div class="hud" id="townHud" hidden><div id="thTime"><small>TIME</small><b>50</b></div><div id="thArrow"></div><div id="thRide"></div><div id="thMoney">¥<b>0</b></div><div id="thPop"></div></div>
 <div class="hud" id="denPanel" hidden>
   <div class="dpL"><small>次は</small><b id="dpSt">-</b><div id="dpTime" class="dpRow"></div></div>
   <div class="dpC"><small>停止位置まで</small><div id="dpDist"><b>-</b><i>m</i></div><div id="dpBar"><span id="dpZone"></span><span id="dpStop"></span><span id="dpPred"></span></div><div id="dpHint"></div></div>
@@ -451,7 +463,7 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button><button type="button" role="tab" data-tab="densha">電車</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button><button type="button" role="tab" data-tab="densha">電車</button><button type="button" role="tab" data-tab="town">タクシー</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -501,6 +513,12 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
       <div class="cup"><div class="cupHead"><b>深夜の逃走劇</b><span id="escBest">逃げ切り 0回</span></div>
       <p class="lede" style="font-size:12px">後ろからパトカーが追ってくる。パトカーにくっつかれると捕獲ゲージがたまり、満タンで逮捕。スピードで振り切るか、一般車を盾にしてゴールまで逃げ切ろう。途中で増援も来る。</p>
       <div class="courseList" id="escList"></div></div>
+    </section>
+    <section class="pane" id="pane-town" role="tabpanel" hidden>
+      <div class="cup"><div class="cupHead"><b>DDDV市 クレイジータクシー</b><span id="townBest">BEST --</span></div>
+      <p class="lede" style="font-size:12px">夜の街を走り回って、お客さんを目的地まで運ぼう。<b>光の柱の下にいるお客さんの前で止まる</b>と乗車。画面上の<b>矢印</b>が行き先を指す。行き先の緑の輪の中で止まれば運賃ゲット。早く着くほど持ち時間が増える（SPEEDY! なら＋5秒以上）。</p>
+      <p class="lede" style="font-size:12px">お客さんを乗せている間の<b>ドリフト</b>と一般車への<b>ニアミス</b>はチップ（続けるほど倍増）。ぶつけると連続が切れる。柱の色は距離の目安：<span style="color:#ff5a5a">赤＝近い</span>・<span style="color:#ffa64a">橙</span>・<span style="color:#ffe45a">黄</span>・<span style="color:#5be37d">緑＝遠い（高い）</span>。持ち時間が0になったら営業終了。どの車でも営業できる（電車は除く）。</p>
+      </div>
     </section>
     <section class="pane" id="pane-densha" role="tabpanel" hidden>
       <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士（月見線）</b><span id="denBest">BEST --</span></div>
@@ -641,6 +659,7 @@ const COURSES=[
   {id:'up',name:'月見峠 上り',sub:'登り坂でパワーが試される',from:'down',reverse:true,lampStep:72},
   {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72},
   {id:'tsuzura',name:'つづら折り峠',sub:'ヘアピンが7つ続く急な下り',segs:TSUZURA_SEGS,y0:300,lampStep:60},
+  {id:'town',name:'DDDV市',sub:'クレイジータクシーの街',segs:[['S',60,0]],y0:0,half:6,env:'town',hidden:true},
   {id:'dentetsu',name:'DDDV電鉄 月見線',sub:'田んぼと川とトンネルを抜けて温泉へ向かう、夜のローカル線',segs:DEN_SEGS,y0:40,half:2.4,env:'rail',hidden:true,railMax:95,railA:3.2,denStart:130,stations:DEN_ST,xings:[453, 1778, 2821]},
   {id:'kyudo',name:'峠の旧道',sub:'すれ違えないほど細い旧道。カーブ番号の標識が続く。車幅が広いほど壁が近い',segs:KYUDO_SEGS,y0:200,half:2.9,lampStep:150,signs:'num'},
   {id:'loopb',name:'ループ橋峠',sub:'山道とトンネルを抜けて、2回転する巨大なループ橋をぐるぐる下る',segs:LOOPB_SEGS,y0:140,lampStep:60},
@@ -722,7 +741,7 @@ const MAXW=46;let width={};
 function computeWidth(){
   grid=new Map();P.forEach((p,i)=>{const k=Math.floor(p.x/CELL)+','+Math.floor(p.z/CELL);(grid.get(k)||grid.set(k,[]).get(k)).push(i);});
   width={'-1':new Float32Array(N),'1':new Float32Array(N)};
-  if(course&&(course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport')){width['-1'].fill(2);width['1'].fill(2);return;}
+  if(course&&(course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'||course.env==='town')){width['-1'].fill(2);width['1'].fill(2);return;}
   for(const s of [-1,1]){
     const w=width[s];
     for(let i=0;i<N;i++){const p=P[i];let t=HALF+2;
@@ -843,7 +862,7 @@ function buildScenery(){
   clearGroup(trackGroup);clearGroup(railGroup);
   const G=trackGroup;
   // road
-  {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
+  if(course.env!=='town'){const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
    G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='rail'?ballastTex:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'?roadTexCity:roadTex,color:course.snow?0xc8d4e4:0xffffff})));}
   if(course.env==='highway')buildHighway(G);
   else if(course.env==='city')buildCity(G);
@@ -855,6 +874,7 @@ function buildScenery(){
   if(course.osakaMark)buildOsaka(G);
   if(course.snow)buildSnow(G);
   else if(course.env==='rail')buildRailLine(G);
+  else if(course.env==='town')buildTown(G);
   else{
   // 高架橋（ループ橋）のまわりは崖や木を控えめにする
   const vPts=[];for(let i=0;i<N;i+=8)if(P[i].V)vPts.push(P[i]);
@@ -2135,7 +2155,7 @@ function buildProfiles(){
 // k>0 = left turn => inside is left => lat negative (car-right axis)
 function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;course.spin=null;course.coaster=null;course.gim=null;course.sky=null;course.tower=null;if(course.loop&&course.reroll&&!course.ring){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
-  {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport',fc=course.snow?0x3a4660:urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:course.snow?20:25;scene.fog.far=urban?560:course.snow?200:240;}
+  {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'||course.env==='town',fc=course.snow?0x3a4660:urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:course.snow?20:25;scene.fog.far=urban?560:course.snow?200:240;}
   snowFx.visible=!!course.snow;
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.ring){const w0=200;let best=1e18,j0=0;for(let j=Math.floor(N*.6);j<N-300;j++){const d=(P[j].x-P[w0].x)**2+(P[j].z-P[w0].z)**2;if(d<best){best=d;j0=j;}} // 1周ぶん先の同じ地点へワープ
@@ -2164,8 +2184,8 @@ function resetRace(){
     ps=slots(4);
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
-  } else if(mode==='densha'){
-    ps={s:course.denStart||START_I,lat:0};
+  } else if(mode==='densha'||mode==='town'){
+    ps={s:mode==='densha'?course.denStart||START_I:START_I,lat:0};
   } else if(mode==='free'||mode==='school'){
     ps={s:mode==='school'?START_I-14:START_I,lat:0};
   } else if(mode==='escape'){
@@ -2190,7 +2210,7 @@ function resetRace(){
   cpus.forEach(c=>{placeCpu(c);c.ahead=c.s>car.idx||!c.def.cop;});
   if(mode==='escape'){game.bust=0;game.reinf=0;startCopSiren();}
   spawnTraffic();if(mode==='collect')spawnSpots();
-  clearStations();if(mode==='densha')setupDen();clearPuddles();
+  clearStations();if(mode==='densha')setupDen();clearPuddles();townClear();game.town=null;$('townHud').hidden=true;document.body.classList.remove('town');if(mode==='town'&&course.env==='town')setupTown();
   if(spec.type==='demae'&&mode!=='free'&&mode!=='densha')setTimeout(()=>flash('配達目標 '+game.demaT+' 秒！ ピザを届けろ'),1500);
   if(spec.type==='amb')setTimeout(()=>say(MEDIC,pick(['患者さん収容完了！ 病院（ゴール）へ急いでください！','出発します！ やさしく、でも急いで！']),3.2),1500);
   if(spec.type==='jumbo')setTimeout(()=>capt(['皆さま、本日はDDDVエアラインをご利用いただきありがとうございます。当機はこれより峠へ向けて出発いたします。'],true),1500);
@@ -2299,7 +2319,7 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
-let mode=['battle','collect','escape','free','school','densha'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
+let mode=['battle','collect','escape','free','school','densha','town'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
 const cupDrivers=()=>CUPS[cupIdx].drivers.map(k=>DRIVERS[k]);
@@ -2443,12 +2463,14 @@ function syncStart(){
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
   else if(mode==='free')b.textContent={c1ring:'首都高へ出る（C1 実寸）',bigring:'首都高へ出る（湾岸ループ 実寸）',bayring:'首都高へ出る（東京ベイ大周回 実寸）'}[freeMap()]||'首都高へ出る（夜の環状）';
   else if(mode==='densha')b.textContent='乗務開始（'+DEN_LINES.find(l=>l.id===denLine).name+'）';
+  else if(mode==='town')b.textContent='営業開始（DDDV市）';
   else if(mode==='school')b.textContent='検定を受ける（'+courseOf(schoolStage).name+'）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  ['gp','battle','garage','parts','collect','escape','free','school','densha'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  ['gp','battle','garage','parts','collect','escape','free','school','densha','town'].forEach(k=>$('pane-'+k).hidden=k!==t);
+  if(t==='town'){mode='town';store.set('touge_mode','town');if(!course||course.id!=='town')loadCourse('town');const b=+(store.get('touge_town_best')||0);$('townBest').textContent=b?'BEST ¥'+b.toLocaleString():'BEST --';}
   if(t==='densha'){mode='densha';store.set('touge_mode','densha');if(!course||course.id!==denLine)loadCourse(denLine);renderDen();}
   if(t==='school'){mode='school';store.set('touge_mode','school');if(!course||course.id!==schoolStage)loadCourse(schoolStage);renderSchool();}
   if(t==='free'){mode='free';store.set('touge_mode','free');if(!course||course.id!==freeMap())loadCourse(freeMap());freeMapUI();const b=sj('touge_free_best',null);$('freeBest').textContent=b?'BEST '+b.w+'勝 ／ '+b.km.toFixed(1)+' km':'BEST --';}
@@ -2468,12 +2490,13 @@ function startFromMenu(){
   else if(mode==='free'){courseOf('loop').reroll=true;loadCourse(freeMap());}
   else if(mode==='school'){if(course.id!==schoolStage)loadCourse(schoolStage);}
   else if(mode==='densha'){if(selId!=='train'){denPrev=selId;swapCar('train');}if(course.id!==denLine)loadCourse(denLine);railGroup.visible=true;}
+  else if(mode==='town'){if(RAIL(spec.type))swapCar('taxi');if(course.id!=='town')loadCourse('town');}
   else if(battleRival==='N'){const nc=NIGHT[Math.min(3,nightRound)].course;if(course.id!==nc)loadCourse(nc);}
   else if(course.id!==battleCourse)loadCourse(battleCourse);
   bHeat=1;catRes=null;tsuiPts=0;catNext=0;
   resetRace();
 }
-function toMenu(){$('denPanel').hidden=true;document.body.classList.remove('den');if(ONLINE&&ONLINE.racing&&!ONLINE.finished&&game.state!=='title'){olAct({type:'leave'});ONLINE.racing=false;spec=buildSpec(selId);olClearGhosts();if(ONLINE.prevMode!=null){mode=ONLINE.prevMode;ONLINE.prevMode=null;}}clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){townClear();game.town=null;$('townHud').hidden=true;document.body.classList.remove('town');$('denPanel').hidden=true;document.body.classList.remove('den');if(ONLINE&&ONLINE.racing&&!ONLINE.finished&&game.state!=='title'){olAct({type:'leave'});ONLINE.racing=false;spec=buildSpec(selId);olClearGhosts();if(ONLINE.prevMode!=null){mode=ONLINE.prevMode;ONLINE.prevMode=null;}}clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -2490,7 +2513,7 @@ function wreck(){
   for(let k=0;k<14;k++)puff(car.x+(Math.random()-.5)*2,car.y+Math.random(),car.z+(Math.random()-.5)*2,(Math.random()-.5)*20,(Math.random()-.5)*20);
   boom();flash('大破！ リタイア');if(spec.type==='hokora')setTimeout(()=>say(SHII,'祠が…祠が壊れたのじゃ〜！ だれが壊したのじゃ〜！',3.5),300);setTimeout(finish,1600);
 }
-function recover(){const p=P[car.idx];Object.assign(car,{x:p.x,y:p.y,z:p.z,yaw:p.h,vx:Math.sin(p.h)*4,vz:Math.cos(p.h)*4,yr:0,drifting:false,derail:false,s:p.d,v:4,gauge:0});endChain(false);flash('コースに復帰');}
+function recover(){if(course&&course.env==='town'){townRecover();return;}const p=P[car.idx];Object.assign(car,{x:p.x,y:p.y,z:p.z,yaw:p.h,vx:Math.sin(p.h)*4,vz:Math.cos(p.h)*4,yr:0,drifting:false,derail:false,s:p.d,v:4,gauge:0});endChain(false);flash('コースに復帰');}
 let radioT=0,radioCd=0;
 function say(d,t,dur){if(!d||!t)return;const r=$('radio');r.style.setProperty('--rc',hex(d.col));$('radioName').textContent=d.name;$('radioText').textContent='「'+t+'」';r.hidden=false;radioT=dur||2.8;radioCd=3.5;}
 let msgT=0;function flash(t){$('msg').textContent=t;$('msg').classList.add('show');msgT=1.6;}
@@ -2781,6 +2804,7 @@ function stepCar(dt,racing){
   if(spec.type==='move'&&car.mvT>game.t){car.x+=-Math.cos(car.yaw)*car.mvD*10*dt;car.z+=Math.sin(car.yaw)*car.mvD*10*dt;}
   car.x+=car.vx*dt;car.z+=car.vz*dt;
   car.slip=slipDeg;
+  if(course.env==='town'){townPhys(dt,racing,vf);return {vf,vr,sp};} // 街モード：線路（P）を使わず自由に走る
   // コース上の位置
   let best=1e9,bi=car.idx;for(let i=Math.max(0,car.idx-20);i<=Math.min(N-1,car.idx+20);i++){const dx=P[i].x-car.x,dz=P[i].z-car.z,d=dx*dx+dz*dz;if(d<best){best=d;bi=i;}}
   car.idx=bi;const p=P[bi];
@@ -2926,7 +2950,7 @@ let mnx=0,mxx=1,mnz=0,mxz=1,msc=1,mox=0,moz=0;
 function buildMinimap(){mnx=1e9;mxx=-1e9;mnz=1e9;mxz=-1e9;P.forEach(p=>{mnx=Math.min(mnx,p.x);mxx=Math.max(mxx,p.x);mnz=Math.min(mnz,p.z);mxz=Math.max(mxz,p.z);});
   msc=200/Math.max(mxx-mnx,mxz-mnz);mox=(240-(mxx-mnx)*msc)/2;moz=(240-(mxz-mnz)*msc)/2;}
 const mp=(x,z)=>[240-(mox+(x-mnx)*msc),moz+(z-mnz)*msc];
-function drawMini(){
+function drawMini(){if(course&&course.env==='town'){drawTownMini();return;}
   mg.clearRect(0,0,240,240);mg.lineWidth=7;mg.lineCap='round';mg.lineJoin='round';mg.strokeStyle='rgba(159,182,255,.35)';
   mg.beginPath();for(let i=0;i<N;i+=6){const [a,b]=mp(P[i].x,P[i].z);i?mg.lineTo(a,b):mg.moveTo(a,b);}mg.stroke();
   if(!course.loop){const [gx,gz]=mp(P[GOAL_I].x,P[GOAL_I].z);mg.fillStyle='#e9ecf5';mg.fillRect(gx-5,gz-5,10,10);}
@@ -3070,8 +3094,9 @@ function frame(now){
     if(game.kyo&&game.state==='race'){stepKyo(dt,info);if(mode==='school')stepSchool(dt,info);}
     if(course.gim)(course.snow?stepSnow:stepGim)(dt);
     if(mode==='free'&&game.state==='race')stepFree(dt);
+    if(mode==='town'&&game.state==='race')stepTown(dt);
     if(mode==='densha'&&game.state==='race')stepDen(dt,info);
-    if(game.state==='race'&&mode!=='free'&&mode!=='densha'&&car.idx>=GOAL_I)finish();
+    if(game.state==='race'&&mode!=='free'&&mode!=='densha'&&mode!=='town'&&car.idx>=GOAL_I)finish();
   }
   // 耐久が減ると車から煙
   if(game.state!=='title'&&car.hp<spec.hpMax*.5&&Math.random()<dt*(car.hp<=0?30:6+(1-car.hp/spec.hpMax)*18)){
@@ -3189,6 +3214,7 @@ function frame(now){
       ge.textContent='ゴールまで '+Math.max(0,Math.round(GOAL_I-car.idx))+' m　追跡 '+cpus.filter(c=>c.def.cop).length+'台'+(game.copDist<200?'（'+Math.round(game.copDist)+' m）':'')+'　捕獲 '+'■'.repeat(n)+'□'.repeat(8-n);
       ge.className=b>.5||game.copDist<12?'':'lead';}
     else if(mode==='free')freeHud(ge);
+    else if(mode==='town')townHud(ge);
     else if(mode==='school')schoolHud(ge);
     else if(mode==='densha')denHud(ge);
     else if(mode==='collect'){let nx=null;for(const q of spots)if(!q.done&&q.i>=car.idx-6){nx=q;break;}
@@ -3679,6 +3705,192 @@ function omikuji(){if(spec.type!=='hokora'||game.retired)return null;if(!game.om
 function stampBonus(){if(spec.type!=='umicar'||game.retired||mode==='free')return 0;if(game.stampNew==null){const st=sj('touge_umi_stamp',[]);game.stampNew=!st.includes(course.id);if(game.stampNew){st.push(course.id);store.set('touge_umi_stamp',JSON.stringify(st));game.stampN=st.length;}}return game.stampNew?500:0;}
 function fanBonus(){return spec.type==='ita'&&!game.retired?Math.round((game.dTotal||0)*.1):0;}
 function tatariBonus(){return spec.type==='hokora'?(game.tatari||0)*80:0;}
+// ===== DDDV市：クレイジータクシー風「街モード」 =====
+// 碁盤の目の街。道の中心線は k*TG（k=0..TN）、区画(i,j)はその間。車は線路（P）を使わず自由に走り、建物の箱に当たる。
+const TG=88,TN=11,TROAD=16,TSIDE=3,TMAX=TG*TN;
+const TOWN_LM={ // 目的地になる建物（区画 i,j と、客を降ろす側 N/S/E/W）
+  station:{i:5,j:5,s:'S',name:'DDDV駅前'},tower:{i:6,j:3,s:'W',name:'DDDVタワー'},hosp:{i:3,j:4,s:'E',name:'市民病院'},univ:{i:8,j:7,s:'S',name:'DDDV大学'},
+  onsen:{i:1,j:9,s:'E',name:'月見の湯'},port:{i:0,j:2,s:'E',name:'港の倉庫'},dome:{i:9,j:9,s:'W',name:'DDDVドーム'},cityhall:{i:4,j:6,s:'N',name:'市役所'},
+  arcade:{i:6,j:6,s:'N',name:'ゲームセンター'},park:{i:2,j:7,s:'N',name:'中央公園'},ramen:{i:9,j:2,s:'W',name:'ラーメン横丁'},school:{i:7,j:10,s:'S',name:'DDDV高校'},
+  mall:{i:3,j:1,s:'N',name:'ショッピングモール'},shrine:{i:10,j:5,s:'W',name:'月見神社'}};
+function townZone(i,j){for(const k in TOWN_LM){const L=TOWN_LM[k];if(L.i===i&&L.j===j)return k;}
+  if((i===2&&j===7)||(i===8&&j===3))return 'park';if(i===0)return 'portw';if(j===6&&i>=1&&i<=9)return 'shops';if(Math.max(Math.abs(i-5),Math.abs(j-5))<=2)return 'office';return 'house';}
+const townRect=(i,j)=>({x0:i*TG+TROAD/2,x1:(i+1)*TG-TROAD/2,z0:j*TG+TROAD/2,z1:(j+1)*TG-TROAD/2});
+function townAddr(i,j,s){const R=townRect(i,j),cx=(R.x0+R.x1)/2,cz=(R.z0+R.z1)/2;
+  return s==='N'?{x:cx,z:R.z1+4.5}:s==='S'?{x:cx,z:R.z0-4.5}:s==='E'?{x:R.x1+4.5,z:cz}:{x:R.x0-4.5,z:cz};}
+let TOWN={boxes:[],cars:[],cust:[],grp:null};
+function buildTown(G){TOWN.boxes=[];const rnd=(()=>{let a=11;return()=>(a=(a*16807)%2147483647)/2147483647;})();
+  // 地面（道路）と歩道・公園
+  {const g=new THREE.Mesh(new THREE.PlaneGeometry(TMAX+400,TMAX+400),new THREE.MeshLambertMaterial({color:0x1c1f26}));g.rotation.x=-Math.PI/2;g.position.set(TMAX/2,-.02,TMAX/2);G.add(g);
+   const sea=new THREE.Mesh(new THREE.PlaneGeometry(900,TMAX+1400),new THREE.MeshPhongMaterial({color:0x0a1830,emissive:0x040a16,specular:0x6f86c8,shininess:60}));sea.rotation.x=-Math.PI/2;sea.position.set(-470,-.4,TMAX/2);G.add(sea);}
+  const walk=new THREE.MeshLambertMaterial({color:0x4a4c52}),grass=new THREE.MeshLambertMaterial({color:0x1d3322}),plaza=new THREE.MeshLambertMaterial({color:0x5a5852});
+  for(let i=0;i<TN;i++)for(let j=0;j<TN;j++){const R=townRect(i,j),z=townZone(i,j),m=new THREE.Mesh(new THREE.BoxGeometry(R.x1-R.x0,.18,R.z1-R.z0),z==='park'?grass:z==='station'?plaza:walk);m.position.set((R.x0+R.x1)/2,.09,(R.z0+R.z1)/2);G.add(m);}
+  // 白線（中央の破線）と横断歩道
+  {const dash=new THREE.InstancedMesh(new THREE.PlaneGeometry(.25,3).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xd8d8d0}),TN*(TN+1)*2*8),o=new THREE.Object3D();let k=0;
+   for(let a=0;a<=TN;a++)for(let b=0;b<TN;b++)for(let t=0;t<8;t++){const L=b*TG+TROAD/2+5+t*((TG-TROAD-6)/8);o.position.set(a*TG,.02,L);o.rotation.set(0,0,0);o.updateMatrix();dash.setMatrixAt(k++,o.matrix);o.position.set(L,.02,a*TG);o.rotation.set(0,Math.PI/2,0);o.updateMatrix();dash.setMatrixAt(k++,o.matrix);}
+   dash.count=k;G.add(dash);
+   const zb=new THREE.InstancedMesh(new THREE.PlaneGeometry(.7,4).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xcfcfc6}),(TN+1)*(TN+1)*4*6);k=0;
+   for(let a=0;a<=TN;a++)for(let b=0;b<=TN;b++)for(const [dx,dz,rot] of [[0,-TROAD/2-2.4,1],[0,TROAD/2+2.4,1],[-TROAD/2-2.4,0,0],[TROAD/2+2.4,0,0]])for(let t=-2.5;t<=2.5;t++){
+     const x=a*TG+dx+(rot?t*1.6*1.5:0),z=b*TG+dz+(rot?0:t*1.6*1.5);if(x<-1||z<-1||x>TMAX+1||z>TMAX+1)continue;o.position.set(x,.025,z);o.rotation.set(0,rot?Math.PI/2:0,0);o.updateMatrix();if(k<zb.instanceMatrix.count)zb.setMatrixAt(k++,o.matrix);}
+   zb.count=k;G.add(zb);}
+  // 建物
+  const list=[],houses=[],shops=[],box=(x0,z0,x1,z1)=>TOWN.boxes.push({x0,z0,x1,z1});
+  for(let i=0;i<TN;i++)for(let j=0;j<TN;j++){const R=townRect(i,j),z=townZone(i,j),cx=(R.x0+R.x1)/2,cz=(R.z0+R.z1)/2,W=R.x1-R.x0-TSIDE*2;
+    if(z==='park'){for(let t=0;t<26;t++)houses.push({tree:1,x:R.x0+6+rnd()*(W-6),z:R.z0+6+rnd()*(W-6)});continue;}
+    if(z==='station'){box(cx-26,R.z1-TSIDE-16,cx+26,R.z1-TSIDE);list.push({x:cx,z:R.z1-TSIDE-8,y:0,w:52,d:16,h:16,r:0});continue;}
+    box(R.x0+TSIDE,R.z0+TSIDE,R.x1-TSIDE,R.z1-TSIDE);
+    if(z==='office'||z==='cityhall'||z==='hosp'||z==='univ'||z==='mall'){const n=z==='office'?2:1;for(let a=0;a<n;a++)for(let b=0;b<n;b++){const w=W/n,x=R.x0+TSIDE+w*(a+.5),zz=R.z0+TSIDE+w*(b+.5);
+        list.push({x,z:zz,y:0,w:w-4,d:w-4,h:z==='office'?30+rnd()*rnd()*120:z==='mall'?18:z==='univ'?22:z==='hosp'?34:40,r:0});}}
+    else if(z==='shops'||z==='arcade'||z==='ramen'){for(let a=0;a<5;a++){const w=W/5;shops.push({x:R.x0+TSIDE+w*(a+.5),z:cz,w:w-1,d:W-2,h:7+rnd()*6,k:(i*5+a)%12});}}
+    else if(z==='portw'||z==='port'){for(let a=0;a<2;a++)list.push({x:cx,z:R.z0+TSIDE+W*(a*.5+.25),y:0,w:W-6,d:W/2-6,h:12+rnd()*6,r:0});}
+    else if(z==='house'||z==='onsen'||z==='school'||z==='shrine'||z==='dome'||z==='tower'){
+      if(z==='house'){for(let a=0;a<3;a++)for(let b=0;b<3;b++)houses.push({x:R.x0+TSIDE+W*(a+.5)/3,z:R.z0+TSIDE+W*(b+.5)/3,w:13+rnd()*4,d:12+rnd()*4,h:5+rnd()*4});}
+      else houses.push({x:cx,z:cz,lm:z,W});}}
+  cityBlocks(G,list);
+  // 家（壁＋切妻屋根）と木
+  {const gable=new THREE.BufferGeometry();gable.setAttribute('position',new THREE.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,1,0,-.5,0,-.5,.5,1,0,-.5,1,0,-.5,0,.5,-.5,1,0,.5,1,0,-.5,0,.5,.5,1,0,.5,0,.5,-.5,0,-.5,-.5,1,0,-.5,0,.5,.5,0,-.5,.5,0,.5,.5,1,0],3));gable.computeVertexNormals();
+   const hs=houses.filter(h=>!h.tree&&!h.lm),tr=houses.filter(h=>h.tree),o=new THREE.Object3D(),c=new THREE.Color();
+   const body=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1).translate(0,.5,0),new THREE.MeshLambertMaterial({color:0xffffff}),Math.max(1,hs.length)),roof=new THREE.InstancedMesh(gable,new THREE.MeshLambertMaterial({color:0xffffff,side:THREE.DoubleSide}),Math.max(1,hs.length)),
+     win=new THREE.InstancedMesh(new THREE.BoxGeometry(1.4,1,.1),new THREE.MeshBasicMaterial({color:0xffd58a}),Math.max(1,hs.length*4));let wn=0;
+   const WC=[0x6e695f,0x5c564c,0x67645e,0x77726a,0x564a40],RC=[0x1e2533,0x2a2828,0x3e241c,0x203440,0x2e2e2e];
+   hs.forEach((h,k)=>{o.position.set(h.x,0,h.z);o.rotation.set(0,0,0);o.scale.set(h.w,h.h,h.d);o.updateMatrix();body.setMatrixAt(k,o.matrix);c.setHex(WC[k%5]);body.setColorAt(k,c);
+     o.position.set(h.x,h.h,h.z);o.scale.set(h.w*1.1,2.2+h.w*.1,h.d*1.1);o.updateMatrix();roof.setMatrixAt(k,o.matrix);c.setHex(RC[(k*7)%5]);roof.setColorAt(k,c);
+     for(const sd of [-1,1])for(const q of [-.25,.25])if(rnd()<.55&&wn<win.instanceMatrix.count){o.position.set(h.x+q*h.w,h.h*.5,h.z+sd*(h.d/2+.04));o.rotation.set(0,0,0);o.scale.set(1,1,1);o.updateMatrix();win.setMatrixAt(wn++,o.matrix);}});
+   body.count=roof.count=hs.length;win.count=wn;G.add(body,roof,win);
+   const cone=new THREE.InstancedMesh(new THREE.ConeGeometry(1,1,6).translate(0,.5,0),new THREE.MeshLambertMaterial({color:0x1f3a2a}),Math.max(1,tr.length));
+   tr.forEach((t,k)=>{const s=4+rnd()*3;o.position.set(t.x,0,t.z);o.rotation.set(0,0,0);o.scale.set(s*.5,s*1.7,s*.5);o.updateMatrix();cone.setMatrixAt(k,o.matrix);});cone.count=tr.length;G.add(cone);
+   // 商店：看板つき
+   const SH=['たこ焼','喫茶','古本','パン','精肉','鮮魚','玩具','餃子','花屋','和菓子','串カツ','ゲーセン'],shopM=new THREE.MeshLambertMaterial({color:0x3a3530});
+   const signT=SH.map((t,k)=>canvasTex(256,96,(g,w,h)=>{const hue=(k*47)%360;g.fillStyle=`hsl(${hue},70%,45%)`;g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 56px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,w/2,h/2+3);}));
+   shops.forEach(s=>{const m=new THREE.Mesh(new THREE.BoxGeometry(s.w,s.h,s.d),shopM);m.position.set(s.x,s.h/2,s.z);G.add(m);
+     for(const sd of [-1,1]){const sg=new THREE.Mesh(new THREE.PlaneGeometry(s.w*.9,s.w*.34),new THREE.MeshBasicMaterial({map:signT[s.k]}));sg.position.set(s.x,4.2,s.z+sd*(s.d/2+.06));sg.rotation.y=sd>0?0:Math.PI;G.add(sg);
+       const lit=new THREE.Mesh(new THREE.PlaneGeometry(s.w*.8,2.4),new THREE.MeshBasicMaterial({color:0xffe2a8}));lit.position.set(s.x,1.5,s.z+sd*(s.d/2+.05));lit.rotation.y=sd>0?0:Math.PI;G.add(lit);}});}
+  // 名所の建物
+  houses.filter(h=>h.lm).forEach(h=>{const g=new THREE.Group();g.position.set(h.x,0,h.z);G.add(g);const W=h.W;
+    const M=(c,e)=>new THREE.MeshLambertMaterial({color:c,emissive:e||0});
+    if(h.lm==='tower'){[[14,10,30],[10,7,40],[7,5,40],[3,2,30]].reduce((y,[r0,r1,hh])=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,hh,8,1,true),new THREE.MeshLambertMaterial({color:0xd84a2a,emissive:0x301008,wireframe:true}));m.position.y=y+hh/2;g.add(m);return y+hh;},0);
+      const top=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xff5040,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));top.scale.set(10,10,1);top.position.y=142;g.add(top);
+      const deck=new THREE.Mesh(new THREE.CylinderGeometry(9,9,6,12),M(0x9fb0c0,0x202830));deck.position.y=74;g.add(deck);}
+    else if(h.lm==='dome'){const d=new THREE.Mesh(new THREE.SphereGeometry(W/2-2,24,10,0,Math.PI*2,0,Math.PI/2),M(0xd8dde4,0x22262c));d.scale.y=.45;g.add(d);}
+    else if(h.lm==='onsen'){const b=new THREE.Mesh(new THREE.BoxGeometry(W-8,9,W-14),M(0x5a3a28));b.position.y=4.5;g.add(b);const r=new THREE.Mesh(new THREE.BoxGeometry(W-4,1.2,W-10),M(0x22262c));r.position.y=9.6;g.add(r);
+      for(let t=0;t<4;t++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xbfd0e0,transparent:true,opacity:.35,depthWrite:false}));s.scale.set(14,14,1);s.position.set((t-1.5)*9,14+t%2*4,0);g.add(s);}}
+    else if(h.lm==='shrine'){const b=new THREE.Mesh(new THREE.BoxGeometry(22,10,16),M(0x7a2a1e));b.position.y=5;g.add(b);const t1=new THREE.Mesh(new THREE.BoxGeometry(1.2,12,1.2),M(0xd8301c,0x401008)),t2=t1.clone(),bar=new THREE.Mesh(new THREE.BoxGeometry(14,1.2,1.4),M(0xd8301c,0x401008));
+      t1.position.set(-5,6,-W/2+6);t2.position.set(5,6,-W/2+6);bar.position.set(0,11.5,-W/2+6);g.add(t1,t2,bar);}
+    else{const b=new THREE.Mesh(new THREE.BoxGeometry(W-6,14,W-6),M(0x6a6a70,0x14141a));b.position.y=7;g.add(b);}
+  });
+  // 名所の看板（建物の前、道路側）
+  for(const k in TOWN_LM){const L=TOWN_LM[k],a=townAddr(L.i,L.j,L.s),R=townRect(L.i,L.j),tx=canvasTex(512,128,(g,w,h)=>{g.fillStyle='#0c1f3a';g.fillRect(0,0,w,h);g.strokeStyle='#ffd23f';g.lineWidth=8;g.strokeRect(6,6,w-12,h-12);g.fillStyle='#fff';g.font='bold 60px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(L.name,w/2,h/2+4);});
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(12,3),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));const ox=L.s==='E'?-3:L.s==='W'?3:0,oz=L.s==='N'?-3:L.s==='S'?3:0;
+    sg.position.set(a.x+ox*2.2,7,a.z+oz*2.2);sg.rotation.y=L.s==='N'?0:L.s==='S'?Math.PI:L.s==='E'?Math.PI/2:-Math.PI/2;G.add(sg);}
+  // 街灯（交差点の角）
+  {const pole=new THREE.InstancedMesh(new THREE.CylinderGeometry(.12,.15,8,6).translate(0,4,0),new THREE.MeshLambertMaterial({color:0x5b6068}),(TN+1)*(TN+1)),o=new THREE.Object3D();let k=0;
+   const hm=new THREE.SpriteMaterial({map:haloT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}),pm=new THREE.MeshBasicMaterial({map:poolT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+   for(let a=0;a<=TN;a++)for(let b=0;b<=TN;b++){const x=a*TG+TROAD/2+1.2,z=b*TG+TROAD/2+1.2;o.position.set(x,0,z);o.updateMatrix();pole.setMatrixAt(k++,o.matrix);
+     const s=new THREE.Sprite(hm);s.scale.set(3.2,3.2,1);s.position.set(x-1.2,8.2,z-1.2);G.add(s);const pl=new THREE.Mesh(new THREE.PlaneGeometry(18,18),pm);pl.rotation.x=-Math.PI/2;pl.position.set(x-3,.04,z-3);G.add(pl);}
+   pole.count=k;G.add(pole);}
+}
+// ---- 走行：建物の箱と街の端に当たる ----
+function townPhys(dt,racing,vf){
+  const L=(spec.len||4.2),R=(spec.halfW||.92)+.25,f=[Math.sin(car.yaw),Math.cos(car.yaw)],pts=L>5?[0,(L/2-1),-(L/2-1)]:[0];
+  for(const o of pts){const px=car.x+f[0]*o,pz=car.z+f[1]*o;
+    for(const b of TOWN.boxes){if(px<b.x0-R-1||px>b.x1+R+1||pz<b.z0-R-1||pz>b.z1+R+1)continue;
+      const cx=Math.max(b.x0,Math.min(b.x1,px)),cz=Math.max(b.z0,Math.min(b.z1,pz));let dx=px-cx,dz=pz-cz,d=Math.hypot(dx,dz);
+      if(d===0){const l=[px-b.x0,b.x1-px,pz-b.z0,b.z1-pz],m=Math.min(...l),k=l.indexOf(m);dx=k===0?-1:k===1?1:0;dz=k===2?-1:k===3?1:0;d=0;const pen=m+R;car.x+=dx*pen;car.z+=dz*pen;townHit(dx,dz,racing);continue;}
+      if(d<R){const nx=dx/d,nz=dz/d,pen=R-d;car.x+=nx*pen;car.z+=nz*pen;townHit(nx,nz,racing);}}}
+  const lo=-7,hi=TMAX+7;if(car.x<lo){car.x=lo;townHit(1,0,racing);}if(car.x>hi){car.x=hi;townHit(-1,0,racing);}if(car.z<lo){car.z=lo;townHit(0,1,racing);}if(car.z>hi){car.z=hi;townHit(0,-1,racing);}
+  car.y=0;car.pitch=0;car.wall=false;car.s=0;
+  const v=Math.max(0,vf);let g=1;while(g<6&&v>GEARS[g])g++;car.gear=g;const lo2=GEARS[g-1],hi2=GEARS[g];car.rpm=Math.min(1,.18+(v-lo2)/(hi2-lo2)*.82);
+}
+function townHit(nx,nz,racing){const vn=-(car.vx*nx+car.vz*nz);if(vn<=0)return;car.vx+=nx*vn*1.08;car.vz+=nz*vn*1.08;const sc=Math.max(.6,1-vn*.03);car.vx*=sc;car.vz*=sc;car.wall=true;
+  if(vn>4&&racing){game.hits++;damage((vn-3)*1.2);game.shake=Math.min(.6,vn*.045);hitSound();spark(car.x-nx,car.y+.5,car.z-nz);endChain(false);car.drifting=false;if(game.town)game.town.combo=0;}
+  else if(vn>1.2)game.shake=Math.max(game.shake,.12);}
+// ---- 一般車：道路の左側車線を走って、交差点で曲がる ----
+const TOWN_TRAF=[['taxi',0x1c2a55,4.4],['kei',0xd8d8d8,3.4],['nbox',0xc9ccd2,3.4],['tanto',0xe6e2d8,3.4],['hiace',0xdcdcdc,4.8],['noah',0xc9ccd2,4.7],['alto',0x7ec4ea,3.4],['move',0xb8b0d8,3.4],['citybus',0x2c8a4a,10.5],['demae',0xd03030,2]];
+function townSpawnCars(n){const rnd=Math.random;for(let k=0;k<n;k++){const t=TOWN_TRAF[k%TOWN_TRAF.length];const m=makeCar({top:t[1],bot:0x222222,shape:'hatch',sprite:t[0],len:t[2]},false);
+    const ax=rnd()<.5?'x':'z',line=1+Math.floor(rnd()*(TN-1)),dir=rnd()<.5?1:-1,pos=TG*(1+Math.floor(rnd()*(TN-1)))+TG/2;
+    TOWN.cars.push({mesh:m,ax,line,dir,pos,v:9+rnd()*4,vt:9+rnd()*4,x:0,z:0,yaw:0,stun:0,len:t[2],nm:0});}}
+function townCarPose(c){const lane=4,L=c.line*TG;if(c.ax==='x'){c.x=c.pos;c.z=L+(c.dir>0?-lane:lane);c.yaw=c.dir>0?Math.PI/2:-Math.PI/2;}else{c.z=c.pos;c.x=L+(c.dir>0?lane:-lane);c.yaw=c.dir>0?0:Math.PI;}}
+function townStepCars(dt){for(const c of TOWN.cars){
+    if(c.stun>0){c.stun-=dt;c.v=Math.max(0,c.v-12*dt);}else{
+      // 前にプレイヤーがいたら減速
+      townCarPose(c);const f=[Math.sin(c.yaw),Math.cos(c.yaw)],dx=car.x-c.x,dz=car.z-c.z,ahead=dx*f[0]+dz*f[1],side=Math.abs(-dx*f[1]+dz*f[0]);
+      const want=ahead>0&&ahead<16&&side<3?0:c.vt;c.v+=(want-c.v)*Math.min(1,dt*(want<c.v?4:1));}
+    const old=c.pos;c.pos+=c.dir*c.v*dt;
+    // 交差点を通り過ぎたら、まっすぐ／左／右
+    const cell=Math.floor((old)/TG),cell2=Math.floor(c.pos/TG);if(cell!==cell2){const X=(c.dir>0?cell2:cell)*TG,K=X/TG;
+      const opts=[];if(K>0&&K<TN)opts.push('s','s','s');const cross=c.line;['l','r'].forEach(t=>opts.push(t));let pick2=opts[Math.random()*opts.length|0];
+      if(pick2==='s'&&(K<=0||K>=TN))pick2='l';
+      if(pick2!=='s'){const nd=(pick2==='l')===(c.ax==='x')?(c.dir>0?-1:1):(c.dir>0?1:-1);const nl=K;let ndir=nd;const np=cross*TG;
+        if(nl<=0||nl>=TN){/* 端の道は曲がらない */}else{const ok=(np+ndir*TG/2)>0&&(np+ndir*TG/2)<TMAX;if(!ok)ndir=-ndir;c.ax=c.ax==='x'?'z':'x';c.line=nl;c.pos=np;c.dir=ndir;}}
+      else if(c.pos<TG*.5||c.pos>TMAX-TG*.5){c.dir=-c.dir;}}
+    if(c.pos<4)c.dir=1;if(c.pos>TMAX-4)c.dir=-1;
+    townCarPose(c);c.mesh.g.position.set(c.x,0,c.z);c.mesh.g.rotation.set(0,c.yaw,0);updateSprite(c.mesh,c.yaw,false);
+    // プレイヤーとの接触・ニアミス
+    const dx=car.x-c.x,dz=car.z-c.z,d=Math.hypot(dx,dz),rr=(spec.halfW||.92)+1.4+(c.len>6?1.5:0);
+    if(d<rr&&d>0){const nx=dx/d,nz=dz/d;car.x+=nx*(rr-d);car.z+=nz*(rr-d);const vn=-(car.vx*nx+car.vz*nz);if(vn>0){car.vx+=nx*vn*1.3;car.vz+=nz*vn*1.3;}
+      if(vn>3&&game.state==='race'){game.hits++;damage(vn*.8);hitSound();game.shake=Math.min(.5,vn*.04);c.stun=1.6;spark(c.x,1,c.z);if(game.town){game.town.combo=0;}}}
+    else if(game.town&&game.town.ride&&d<4.5&&d>rr&&Math.hypot(car.vx,car.vz)>14&&game.t>c.nm){c.nm=game.t+2.5;townTip('ニアミス！',150);}
+  }}
+// ---- 客と目的地 ----
+const TCOL=[[300,0xff4040,'#ff5a5a'],[500,0xff9a30,'#ffa64a'],[750,0xffe040,'#ffe45a'],[1e9,0x40ff80,'#5be37d']];
+function townPerson(col){const g=new THREE.Group(),skin=new THREE.MeshLambertMaterial({color:0xf0c8a0}),cl=new THREE.MeshLambertMaterial({color:[0x2a4a8a,0x8a2a3a,0x3a7a4a,0x6a4a8a,0xcaa040][Math.random()*5|0]});
+  const b=new THREE.Mesh(new THREE.CylinderGeometry(.35,.42,1.2,8),cl);b.position.y=.95;const h=new THREE.Mesh(new THREE.SphereGeometry(.28,10,8),skin);h.position.y=1.8;const lg=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.5,8),new THREE.MeshLambertMaterial({color:0x22262c}));lg.position.y=.25;g.add(b,h,lg);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(2.6,.14,6,32),new THREE.MeshBasicMaterial({color:col}));ring.rotation.x=Math.PI/2;ring.position.y=.12;g.add(ring);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,26,12,1,true),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=13;g.add(beam);
+  g.userData.ring=ring;scene.add(g);return g;}
+const TOWN_DEST=Object.keys(TOWN_LM);
+function townNewCust(dmin,dmax){const T=game.town;let tries=0;while(tries++<80){const i=Math.random()*TN|0,j=Math.random()*TN|0,z=townZone(i,j);if(z==='park')continue;const s='NSEW'[Math.random()*4|0],R=townRect(i,j);
+    const a=townAddr(i,j,s),px=s==='E'?R.x1-1.2:s==='W'?R.x0+1.2:a.x+(Math.random()-.5)*30,pz=s==='N'?R.z1-1.2:s==='S'?R.z0+1.2:a.z+(Math.random()-.5)*30;
+    {const dc=Math.hypot(px-car.x,pz-car.z);if(dc<(dmin||60)||(dmax&&dc>dmax))continue;}if(T.cust.some(c=>Math.hypot(c.x-px,c.z-pz)<40))continue;
+    let dk,dd,n=0;do{dk=TOWN_DEST[Math.random()*TOWN_DEST.length|0];const L=TOWN_LM[dk],q=townAddr(L.i,L.j,L.s);dd=Math.abs(q.x-px)+Math.abs(q.z-pz);n++;}while((dd<180)&&n<20);
+    const cls=TCOL.findIndex(c=>dd<c[0]),g=townPerson(TCOL[cls][1]);g.position.set(px,0,pz);T.cust.push({x:px,z:pz,g,dest:dk,dist:dd,cls});return;}}
+function townClear(){TOWN.cars.forEach(c=>scene.remove(c.mesh.g));TOWN.cars=[];if(game.town){game.town.cust.forEach(c=>scene.remove(c.g));if(game.town.mark)scene.remove(game.town.mark);}}
+function townDestMark(x,z){const g=new THREE.Group();const ring=new THREE.Mesh(new THREE.TorusGeometry(10,.35,6,40),new THREE.MeshBasicMaterial({color:0x40ff80}));ring.rotation.x=Math.PI/2;ring.position.y=.15;
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(9,9,60,24,1,true),new THREE.MeshBasicMaterial({color:0x40ff80,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=30;g.add(ring,beam);g.position.set(x,0,z);scene.add(g);return g;}
+function setupTown(){townClear();const T=game.town={time:60,money:0,fares:0,tips:0,count:0,cust:[],ride:null,combo:0,best:+(store.get('touge_town_best')||0),dchain:0,pop:null,end:false};
+  const s=townAddr(5,5,'S');Object.assign(car,{x:s.x,z:s.z-3,y:0,yaw:Math.PI/2,vx:0,vz:0,yr:0,steer:0});
+  townSpawnCars(34);for(let k=0;k<3;k++)townNewCust(70,180);for(let k=0;k<7;k++)townNewCust();
+  setTimeout(()=>say({name:'無線',col:0xffd23f},'DDDVタクシー、営業開始！ 光の柱の下にいるお客さんの前で止まって乗せよう。時間は運ぶたびに増えるぞ。',4.5),600);}
+function townTip(t,y){const T=game.town;if(!T)return;T.combo++;const v=y*Math.min(5,T.combo);T.money+=v;T.tips+=v;townPop(t+' ¥'+v+(T.combo>1?'（'+T.combo+'連）':''),'#ffd23f');}
+function townPop(t,col){const e=$('thPop');e.textContent=t;e.style.color=col||'#fff';e.classList.remove('show');void e.offsetWidth;e.classList.add('show');}
+function stepTown(dt){const T=game.town;if(!T)return;townStepCars(dt);if(T.end){if(game.t>=T.endAt&&game.state==='race')finish();return;}
+  if(T.endAt){if(game.t>=T.endAt&&game.state==='race')finish();return;}
+  T.time-=dt;if(T.time<=0){T.time=0;T.end=true;T.endAt=game.t+1.4;townPop(T.ride?'時間切れ… お客さんは降りてしまった':'営業終了！','#ff5a5a');return;}
+  const sp=Math.hypot(car.vx,car.vz);
+  T.cust.forEach(c=>{c.g.userData.ring.rotation.z+=dt*1.5;});
+  if(!T.ride){for(let k=0;k<T.cust.length;k++){const c=T.cust[k];if(Math.hypot(c.x-car.x,c.z-car.z)<8&&sp<3.5){
+        scene.remove(c.g);T.cust.splice(k,1);const L=TOWN_LM[c.dest],q=townAddr(L.i,L.j,L.s),lim=Math.round(c.dist/15+10);
+        T.ride={dest:c.dest,x:q.x,z:q.z,lim,t:lim,dist:c.dist,cls:c.cls};T.mark=townDestMark(q.x,q.z);townPop('乗車！ 「'+L.name+'まで！」','#5dd6ff');if(ac)beep(1200,.08);
+        say({name:'お客さん',col:0x9fd3ea},pick([''+L.name+'まで、急いで！',''+L.name+'まで頼むよ！','すみません、'+L.name+'まで！ 飛ばして！']),2.4);townNewCust();break;}}}
+  else{const R=T.ride;R.t-=dt;
+    if(car.drifting&&sp>12){T.dchain+=dt;if(T.dchain>1){T.dchain=0;townTip('クレイジードリフト！',80);}}else T.dchain=0;
+    if(R.t<=0){townPop('「もういい、ここで降りる！」','#ff5a5a');scene.remove(T.mark);T.mark=null;T.ride=null;T.combo=0;return;}
+    if(Math.hypot(R.x-car.x,R.z-car.z)<11&&sp<5){const fare=Math.round((300+R.dist*2.2)/10)*10,rate=R.t/R.lim,bonus=rate>.5?5:rate>.2?3:1,lab=rate>.5?'SPEEDY!':rate>.2?'NORMAL':'SLOW…';
+      T.money+=fare;T.fares+=fare;T.count++;T.time+=bonus+Math.min(6,Math.round(R.dist/220));scene.remove(T.mark);T.mark=null;T.ride=null;
+      townPop(lab+'　¥'+fare.toLocaleString()+'　+'+(bonus+Math.min(6,Math.round(R.dist/220)))+'秒',rate>.5?'#5be37d':rate>.2?'#ffd23f':'#ff9a5a');if(ac){beep(988,.12);setTimeout(()=>beep(1318,.18),130);}
+      say({name:'お客さん',col:0x9fd3ea},pick(['ありがとう、助かった！','うおお…生きてる…ありがとう。','最高のタクシーだったよ！','また乗せてね！']),2);}}}
+function townHud(ge){const T=game.town;if(!T)return;$('townHud').hidden=false;document.body.classList.add('town');ge.textContent='DDDVタクシー';
+  const tm=$('thTime');tm.querySelector('b').textContent=Math.ceil(T.time);tm.className=T.time<10?'low':'';$('thMoney').innerHTML='¥<b>'+T.money.toLocaleString()+'</b><small>'+T.count+'人</small>';
+  const ar=$('thArrow'),rd=$('thRide');let tgt=null;
+  if(T.ride){const L=TOWN_LM[T.ride.dest];tgt=T.ride;rd.hidden=false;const d=Math.round(Math.hypot(T.ride.x-car.x,T.ride.z-car.z));
+    rd.innerHTML='<small>行き先</small><b>'+L.name+'</b><span>'+d+' m</span><span class="'+(T.ride.t<6?'bad':'')+'">あと <i>'+Math.ceil(T.ride.t)+'</i> 秒</span>';}
+  else{rd.hidden=false;rd.innerHTML='<small>空車</small><b>お客さんを探そう</b><span>光の柱の下で止まる</span>';let bd=1e9;T.cust.forEach(c=>{const d=Math.hypot(c.x-car.x,c.z-car.z);if(d<bd){bd=d;tgt=c;}});}
+  if(tgt){const dx=tgt.x-car.x,dz=tgt.z-car.z,f=[Math.sin(car.yaw),Math.cos(car.yaw)],r=[-Math.cos(car.yaw),Math.sin(car.yaw)],a=Math.atan2(dx*r[0]+dz*r[1],dx*f[0]+dz*f[1]);
+    ar.hidden=false;ar.style.transform='translateX(-50%) rotate('+a.toFixed(3)+'rad)';ar.className=T.ride?'ride':'';}else ar.hidden=true;}
+function drawTownMini(){const T=game.town;mg.clearRect(0,0,240,240);const S=200/TMAX,O=20,m=(x,z)=>[240-(O+x*S),O+z*S];
+  mg.strokeStyle='rgba(159,182,255,.35)';mg.lineWidth=3;for(let k=0;k<=TN;k++){let [a,b]=m(k*TG,0),[c,d]=m(k*TG,TMAX);mg.beginPath();mg.moveTo(a,b);mg.lineTo(c,d);mg.stroke();[a,b]=m(0,k*TG);[c,d]=m(TMAX,k*TG);mg.beginPath();mg.moveTo(a,b);mg.lineTo(c,d);mg.stroke();}
+  if(T){T.cust.forEach(c=>{const [x,z]=m(c.x,c.z);mg.fillStyle=TCOL[c.cls][2];mg.beginPath();mg.arc(x,z,5,0,7);mg.fill();});
+    if(T.ride){const [x,z]=m(T.ride.x,T.ride.z);mg.fillStyle='#5be37d';mg.fillRect(x-7,z-7,14,14);}}
+  const [cx,cz]=m(car.x,car.z);mg.fillStyle='#ffae42';mg.strokeStyle='#070b16';mg.lineWidth=3;mg.beginPath();mg.arc(cx,cz,7,0,7);mg.fill();mg.stroke();}
+function townRecover(){let bx=car.x,bz=car.z,bd=1e9;for(let a=0;a<=TN;a++){const x=a*TG;if(Math.abs(car.x-x)<bd){bd=Math.abs(car.x-x);bx=x;bz=car.z;}const z=a*TG;if(Math.abs(car.z-z)<bd){bd=Math.abs(car.z-z);bx=car.x;bz=z;}}
+  Object.assign(car,{x:Math.max(0,Math.min(TMAX,bx)),z:Math.max(0,Math.min(TMAX,bz)),vx:0,vz:0,yr:0});}
+function finishTown(){const T=game.town||{money:0,fares:0,tips:0,count:0},earned=Math.max(100,Math.round(T.money/8));wallet+=earned;townClear();
+  const best=+(store.get('touge_town_best')||0);if(T.money>best)store.set('touge_town_best',String(T.money));
+  $('resKick').textContent='DDDV市 ／ クレイジータクシー';$('resHead').textContent='¥'+T.money.toLocaleString();$('resHead').className='res-big '+(T.money>best?'win':'lose');
+  $('resSub').textContent=(T.money>best?'自己ベスト更新！ ':'')+'お客さん '+T.count+'人を運んだ。'+(T.count>=10?'街一番のタクシー運転手。':T.count>=5?'なかなかの稼ぎ。':'近くのお客さんから、早く運ぶのがコツ。');
+  addRows([['運賃（'+T.count+'人）',Math.round(T.fares/8)],['チップ（ドリフト・ニアミス）',Math.round(T.tips/8)]]);addTotal(earned);$('btnRetry').textContent='もう一回営業';$('btnMenu').hidden=false;
+  $('townHud').hidden=true;document.body.classList.remove('town');}
+
 // ===== 電車でGO風：DDDV電鉄 =====
 const DEN_LINES=[{id:'dentetsu',name:'月見線',st:DEN_ST.map(q=>q[0]),spd:15.5,sched:[0,63,116,176,237],col:'#e8a33a'}] /* 定刻：自動運転（制限ぎりぎり）で各駅8秒ほど早く着く設定 */; // 旧路線（山手線・大阪環状線・湖畔線など車道に線路を敷いたもの）は2026-11-06に外した。コースは hidden のまま残っている
 let denLine=store.get('touge_den_line')||'dentetsu';if(!DEN_LINES.some(l=>l.id===denLine))denLine='dentetsu';let denPrev=null;
@@ -3806,13 +4018,13 @@ function finish(){if(ONLINE&&ONLINE.racing&&!ONLINE.finished){if(car.siren)setSi
   if(mode==='battle'&&!senseiMatch&&curFmt()==='cat'&&!game.retired&&game.state==='race'){const c=cpus[0],g=c?GOAL_I-c.s:0;if(bHeat===1){catHeatEnd(g);return;}if(catRes&&catRes.g2==null)catRes.g2=g;}
   if(car.siren)setSiren(false);stopCopSiren();
   game.state='done';endChain(true);$('drift').classList.remove('show');
-  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&!(mode==='battle'&&curFmt()!=='race'&&!senseiMatch)&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
+  if(mode!=='collect'&&mode!=='escape'&&mode!=='free'&&mode!=='school'&&mode!=='densha'&&mode!=='town'&&!(mode==='battle'&&curFmt()!=='race'&&!senseiMatch)&&!game.retired&&(!bestT||game.t<bestT)){bestT=game.t;store.set('touge_best_'+course.id,bestT.toFixed(2));}
   showBest();
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
   $('btnPA').hidden=true;$('btnQuit').hidden=true;$('spBox').hidden=true;
   if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
-  if(mode==='free')finishFree();else if(mode==='densha')finishDen();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
+  if(mode==='free')finishFree();else if(mode==='town')finishTown();else if(mode==='densha')finishDen();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
 }
