@@ -235,6 +235,24 @@ body.is-touch #total{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 #spBox u{display:block;height:100%;width:100%;background:var(--sodium);text-decoration:none}#spBox .spr+.spr u{background:#ff5a5a}
 #kyo{top:calc(46px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--panel);padding:4px 12px;border-radius:4px;font-family:var(--f-body);font-size:13px;border-left:3px solid #5dd6ff}
 #kyo b{font-size:18px;color:#5dd6ff}
+#denPanel{left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:16px;align-items:start;width:min(800px,96vw);box-sizing:border-box;padding:10px 18px 12px;background:rgba(5,9,20,.9);border:1px solid rgba(255,255,255,.14);border-top:3px solid #e8a33a;border-radius:8px;color:#fff;font-family:var(--f-body)}
+#denPanel small{display:block;font-size:13px;color:#cfd8f0;letter-spacing:.06em;margin-bottom:2px}
+#dpSt{display:block;font-size:30px;line-height:1.1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dpRow{font-size:15px;margin-top:6px;color:#e9eefb;white-space:nowrap}.dpRow b{font-family:var(--f-num);font-size:24px;margin:0 3px}
+.dpRow .ok{color:#5be37d}.dpRow .warn{color:#ffc94a}.dpRow .bad{color:#ff5a5a}
+#dpDist{font-family:var(--f-num);line-height:1}#dpDist b{font-size:54px;color:#ffd23f}#dpDist i{font-style:normal;font-size:20px;margin-left:4px;color:#e9eefb}#dpDist.near b{color:#5dd6ff}#dpDist.past b{color:#ff5a5a}
+#dpBar{position:relative;height:14px;margin-top:8px;background:#26304a;border-radius:7px;overflow:hidden}
+#dpZone{position:absolute;top:0;bottom:0;background:rgba(91,227,125,.35)}#dpStop{position:absolute;top:-2px;bottom:-2px;width:3px;background:#fff}
+#dpPred{position:absolute;top:1px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#ffd23f;box-shadow:0 0 6px #ffd23f}#dpPred.good{background:#5be37d;box-shadow:0 0 8px #5be37d}#dpPred.far{background:#ff5a5a;box-shadow:0 0 8px #ff5a5a}
+#dpHint{font-size:14px;margin-top:6px;color:#e9eefb;min-height:1.3em;white-space:nowrap}#dpHint b{color:#ffd23f;font-size:17px}#dpHint .bad{color:#ff5a5a}
+#dpSpd{font-family:var(--f-num);line-height:1;text-align:right}#dpSpd b{font-size:46px}#dpSpd i{font-style:normal;font-size:16px;margin-left:4px;color:#cfd8f0}#dpSpd.over b{color:#ff5a5a}
+.dpR .dpRow{text-align:right}
+#dpNotch{display:flex;gap:3px;justify-content:flex-end;margin-top:8px}#dpNotch span{min-width:20px;padding:2px 0;text-align:center;font:700 12px var(--f-num);border-radius:3px;background:#202942;color:#7e88a6}
+#dpNotch span.on{background:#ff8a2a;color:#fff}#dpNotch span.p.on{background:#3cc46a}#dpNotch span.n.on{background:#8d97b3;color:#111}#dpNotch span.eb.on{background:#ff3030}
+body.den #dash,body.den #total{display:none}
+body.den #radio{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+@media (max-width:640px){body.den #radio{bottom:calc(128px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:640px){#denPanel{gap:8px;padding:8px 10px;grid-template-columns:1fr 1.15fr .95fr}#dpSt{font-size:20px}#dpDist b{font-size:38px}#dpSpd b{font-size:32px}.dpRow{font-size:12px}.dpRow b{font-size:18px}#dpHint{font-size:11px;white-space:normal}#dpNotch span{min-width:13px;font-size:10px}#denPanel small{font-size:11px}}
 #kyo.low{top:auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));font-size:15px;padding:8px 16px;border-left-width:4px;text-align:center;white-space:nowrap}
 #kyo.low b{font-size:26px}#kyo.low .sm{display:block;font-size:12px;color:var(--dim);margin-top:2px}
 body.is-touch #kyo.low{bottom:calc(180px + env(safe-area-inset-bottom,0px))}#kyo.bad b{color:#ff5a5a}#kyo[hidden],#meter[hidden]{display:none}
@@ -411,6 +429,11 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
 <div class="hud" id="drift"><b>DRIFT</b><span id="dpts">0</span></div>
 <div class="hud" id="count"></div>
 <div class="hud" id="msg"></div>
+<div class="hud" id="denPanel" hidden>
+  <div class="dpL"><small>次は</small><b id="dpSt">-</b><div id="dpTime" class="dpRow"></div></div>
+  <div class="dpC"><small>停止位置まで</small><div id="dpDist"><b>-</b><i>m</i></div><div id="dpBar"><span id="dpZone"></span><span id="dpStop"></span><span id="dpPred"></span></div><div id="dpHint"></div></div>
+  <div class="dpR"><div id="dpSpd"><b>0</b><i>km/h</i></div><div id="dpLim" class="dpRow"></div><div id="dpNext" class="dpRow"></div><div id="dpNotch"></div></div>
+</div>
 <div class="hud" id="kyo" hidden>教習 <b id="kyoPt">100</b>点　制限 <span id="kyoLim">50</span> km/h</div>
 <div class="hud" id="meter" hidden><small>賃走</small><b id="meterV">500</b><span>P</span></div>
 <div class="hud" id="radio" hidden><b id="radioName"></b><span id="radioText"></span></div>
@@ -480,7 +503,7 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
       <div class="courseList" id="escList"></div></div>
     </section>
     <section class="pane" id="pane-densha" role="tabpanel" hidden>
-      <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士（山手線・大阪環状線も）</b><span id="denBest">BEST --</span></div>
+      <div class="cup"><div class="cupHead"><b>DDDV電鉄 運転士（月見線）</b><span id="denBest">BEST --</span></div>
       <p class="lede" style="font-size:12px">峠の電車の運転士になって、駅に<b>停止位置ぴったり</b>で止めよう。ダイヤ（定刻）どおりに着くとさらに加点。止まるとドアが開いて、発車ベルのあと次の駅へ。</p>
       <p class="lede" style="font-size:12px">アクセルで加速、ブレーキは本物の電車と同じノッチ式：<b>↓（ブレーキ）を押すたびに B1→B8 と1段ずつ強く、↑（アクセル）で1段ずつ弱く</b>なる（押しっぱなしで連続）。B0 の時だけ ↑ で加速。画面下に「このノッチのままだと何 m 手前で止まるか」が出るので、ピッタリになるようにノッチを合わせよう。<b>N で非常ブレーキ</b>（強く止まるが減点）。停止位置を20 m以上行きすぎると「通過」で大減点。カーブの制限速度を超えすぎると脱線する。この面だけは、持っていなくても電車を借りて運転できる。</p>
       <div class="courseList" id="denList"></div></div>
@@ -566,6 +589,9 @@ const DOWN_SEGS=[
 ];
 const LAKE_SEGS=[['S',160,.01],['C',120,45,.01],['C',90,-60,.015],['S',120,.01],['C',60,80,.02],['S',80,.01],['C',150,-40,0],['C',45,-70,.02],['S',140,.01],['C',75,95,.015],['C',110,-50,.01],['S',100,0],['C',38,110,.02],['S',90,.01],['C',90,-75,.01],['C',130,30,0],['S',200,.01],['C',55,-80,.015],['S',120,.01]];
 // 4つ目以降の値に'T'があればトンネル、'V'があれば高架橋（ループ橋）
+// DDDV電鉄 月見線（電車モード専用の路線）
+const DEN_SEGS=[['S',166,0],['C',504,22,0.004],['S',187,0.006],['C',324,-34,0.006],['S',108,0.004],['S',137,0.002],['C',230,40,0.008],['S',65,0.006],['S',108,0.01,'V'],['S',50,0.006],['C',360,-18,0.006],['S',144,0.004],['C',187,-38,-0.012],['S',58,-0.015],['S',187,-0.02,'T'],['C',274,24,-0.02,'T'],['S',65,-0.015],['C',432,-15,-0.01],['S',144,-0.004],['C',122,58,-0.02],['S',86,-0.018],['C',158,-46,-0.02],['S',108,-0.012],['C',576,14,-0.006],['S',187,0],['S',43,0]];
+const DEN_ST=[['月見台','つきみだい','Tsukimidai',130],['白樺','しらかば','Shirakaba',969],['川向','かわむこう','Kawamuko',1610],['星見','ほしみ','Hoshimi',2416],['月見温泉','つきみおんせん','Tsukimi-Onsen',3188]];
 const KYUDO_SEGS=[['S',80,0.04],['C',25,70,0.05],['S',30,0.06],['C',14,-120,0.05],['S',25,0.06],['C',18,95,0.05],['C',30,-40,0.05],['S',40,0.06],['C',12,160,0.04],['S',35,0.06],['C',22,-80,0.05],['S',20,0.06],['C',16,110,0.05],['S',30,0.06],['C',13,-150,0.04],['S',40,0.06],['C',35,50,0.05],['C',20,-90,0.05],['S',25,0.06],['C',15,130,0.05],['S',30,0.06],['C',25,-60,0.05],['C',12,-110,0.04],['S',45,0.06],['C',18,140,0.05],['S',30,0.06],['C',28,-70,0.05],['S',20,0.06],['C',14,165,0.04],['S',35,0.06],['C',20,-100,0.05],['C',30,45,0.05],['S',30,0.06],['C',13,-160,0.04],['S',40,0.06],['C',22,85,0.05],['S',25,0.06],['C',16,-120,0.05],['C',40,35,0.05],['S',60,0.05],['C',18,100,0.05],['S',30,0.06],['C',25,-75,0.05],['S',40,0.05],['C',14,140,0.04],['S',30,0.06],['C',20,-95,0.05],['C',26,60,0.05],['S',35,0.06],['C',12,-155,0.04],['S',45,0.06],['C',30,70,0.05],['S',100,0.04]];
 const LOOPB_SEGS=[['S',120,0.03],['C',90,30,0.04],['S',100,0.04],['C',60,-60,0.05],['S',80,0.04,'T'],['C',120,25,0.04,'T'],['S',90,0.04,'T'],['C',70,50,0.05],['S',90,0.05],['C',45,-80,0.05],['S',60,0.05],['C',35,95,0.05],['S',70,0.04],['S',40,0.03,'V'],['C',38,-750,0.045,'V'],['S',60,0.03,'V'],['C',60,40,0.05],['S',80,0.05],['C',30,-110,0.05],['S',70,0.05],['C',50,70,0.05],['C',80,-40,0.04],['S',160,0.03]];
 const IROHA_SEGS=[['S',80,0.05],['C',70,-30,0.05],['C',70,30,0.05],['S',30,0.06],['S',25,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',25,0.075],['C',20,180,0.055],['S',44,0.085],['C',19,-180,0.055],['S',28,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',28,0.075],['C',21,180,0.055],['S',20,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',20,0.075],['C',20,-180,0.055],['S',52,0.085],['C',18,180,0.055],['S',23,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',23,0.075],['C',20,-180,0.055],['S',29,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',29,0.075],['C',19,180,0.055],['S',42,0.085],['C',21,-180,0.055],['S',25,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',25,0.075],['C',20,180,0.055],['S',54,0.085],['C',18,-180,0.055],['S',20,0.075],['C',40,40,0.07],['C',40,-40,0.07],['S',20,0.075],['C',20,180,0.055],['S',28,0.075],['C',40,-40,0.07],['C',40,40,0.07],['S',28,0.075],['C',19,-180,0.055],['S',48,0.07],['C',60,-40,0.05],['S',110,0.04]];
@@ -615,6 +641,7 @@ const COURSES=[
   {id:'up',name:'月見峠 上り',sub:'登り坂でパワーが試される',from:'down',reverse:true,lampStep:72},
   {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72},
   {id:'tsuzura',name:'つづら折り峠',sub:'ヘアピンが7つ続く急な下り',segs:TSUZURA_SEGS,y0:300,lampStep:60},
+  {id:'dentetsu',name:'DDDV電鉄 月見線',sub:'田んぼと川とトンネルを抜けて温泉へ向かう、夜のローカル線',segs:DEN_SEGS,y0:40,half:2.4,env:'rail',hidden:true,railMax:95,railA:3.2,denStart:130,stations:DEN_ST,xings:[453, 1778, 2821]},
   {id:'kyudo',name:'峠の旧道',sub:'すれ違えないほど細い旧道。カーブ番号の標識が続く。車幅が広いほど壁が近い',segs:KYUDO_SEGS,y0:200,half:2.9,lampStep:150,signs:'num'},
   {id:'loopb',name:'ループ橋峠',sub:'山道とトンネルを抜けて、2回転する巨大なループ橋をぐるぐる下る',segs:LOOPB_SEGS,y0:140,lampStep:60},
   {id:'iroha',name:'いろは坂 下り',sub:'ヘアピンとS字が続く紅葉の坂。28のカーブに「い・ろ・は…」の看板',segs:IROHA_SEGS,y0:230,lampStep:64,signs:'iroha',signSkip:[0,1,30],koyo:true},
@@ -808,13 +835,16 @@ const trackGroup=new THREE.Group();scene.add(trackGroup);
 const railGroup=new THREE.Group();scene.add(railGroup);railGroup.visible=false;
 const railTex=canvasTex(64,32,(g,w,h)=>{g.fillStyle='#cfd3d6';g.fillRect(0,0,w,h);g.fillStyle='#9aa0a6';g.fillRect(0,6,w,3);g.fillRect(0,22,w,3);g.fillStyle='#ffae42';g.fillRect(28,12,8,8);},true);
 const poolT=glowTex('rgba(255,170,70,.55)'),haloT=glowTex('rgba(255,200,130,.9)');
+// 電鉄の路線用：バラスト（砂利）と田んぼ
+const ballastTex=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#5a5852';g.fillRect(0,0,w,h);for(let i=0;i<1400;i++){const v=60+Math.random()*70|0;g.fillStyle=`rgb(${v},${v-3},${v-8})`;g.fillRect(Math.random()*w,Math.random()*h,2+Math.random()*3,2+Math.random()*3);}},true);
+const fieldTex=canvasTex(256,256,(g,w,h)=>{g.fillStyle='#1d2c22';g.fillRect(0,0,w,h);for(let y=0;y<2;y++)for(let x=0;x<2;x++){const c=Math.random()<.5?'#203a2a':'#1a2f34';g.fillStyle=c;g.fillRect(x*128+5,y*128+5,118,118);for(let k=0;k<160;k++){g.fillStyle='rgba(120,170,110,.18)';g.fillRect(x*128+8+Math.random()*112,y*128+8+Math.random()*112,1,3);}}g.fillStyle='#3a3f2c';g.fillRect(0,0,w,5);g.fillRect(0,0,5,h);g.fillRect(0,128,w,5);g.fillRect(128,0,5,h);},true);
 function clearGroup(gr){gr.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material.dispose)o.material.dispose();});while(gr.children.length)gr.remove(gr.children[0]);}
 function buildScenery(){
   clearGroup(trackGroup);clearGroup(railGroup);
   const G=trackGroup;
   // road
   {const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
-   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'?roadTexCity:roadTex,color:course.snow?0xc8d4e4:0xffffff})));}
+   G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='rail'?ballastTex:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'?roadTexCity:roadTex,color:course.snow?0xc8d4e4:0xffffff})));}
   if(course.env==='highway')buildHighway(G);
   else if(course.env==='city')buildCity(G);
   else if(course.env==='school')buildSchool(G);
@@ -824,6 +854,7 @@ function buildScenery(){
   if(course.toll)buildToll(G,course.toll);
   if(course.osakaMark)buildOsaka(G);
   if(course.snow)buildSnow(G);
+  else if(course.env==='rail')buildRailLine(G);
   else{
   // 高架橋（ループ橋）のまわりは崖や木を控えめにする
   const vPts=[];for(let i=0;i<N;i+=8)if(P[i].V)vPts.push(P[i]);
@@ -975,8 +1006,82 @@ function buildHighway(G){
      gr.position.set(p.x,p.y,p.z);gr.rotation.y=p.h;G.add(gr);}}
 }
 // 吊り橋：2本の主塔と、ライトの並んだメインケーブル
+// DDDV電鉄の路線：盛土と田んぼ、民家、遠くの山、鉄橋の川とトラス、トンネルの山、踏切
+const denX=[];
+function buildRailLine(G){denX.length=0;const E=HALF,rnd=(()=>{let a=7;return()=>(a=(a*16807)%2147483647)/2147483647;})();
+  const near=(i,f,r)=>{for(let j=Math.max(0,i-r);j<Math.min(N,i+r);j+=3)if(f(P[j]))return true;return false;};
+  const stI=(course.stations||[]).map(q=>q[3]),xI=course.xings||[];
+  // 盛土と田んぼ
+  const fM=new THREE.MeshLambertMaterial({map:fieldTex,vertexColors:true});
+  for(const s of [-1,1]){let rows=[];const flush=()=>{if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{vc:true}),fM));rows=[];};
+    for(let i=0;i<N;i+=STEP){const p=P[i];if(near(i,q=>q.V||q.T,8)){flush();continue;}
+      const w=Math.min(70,Math.max(8,width[s][i]+2)),prof=[[E,-.02,.36,.35,.32],[E+1.4,-.4,.2,.27,.18],[E+3.2,-1.3,.2,.3,.2],[E+w,-1.4,.75,.8,.75],[E+w+40,-1.2,.45,.5,.48]];
+      rows.push(prof.map(([o,h,r,g,b])=>{const x=p.x+p.rx*s*o,z=p.z+p.rz*s*o;return [x,p.y+h,z,x/24,z/24,r,g,b];}));}
+    flush();}
+  // 川（鉄橋の下）
+  {let a=-1,b=-1;for(let i=0;i<N;i++)if(P[i].V){if(a<0)a=i;b=i;}
+   if(a>=0){const m=P[(a+b)>>1],len=b-a+30,wat=new THREE.Mesh(new THREE.PlaneGeometry(len,500),new THREE.MeshLambertMaterial({color:0x0c1628,emissive:0x03060c}));
+     wat.rotation.set(-Math.PI/2,0,m.h+Math.PI/2);wat.position.set(m.x,m.y-7.5,m.z);G.add(wat);
+     // 土手
+     [-1,1].forEach(sd=>{const q=P[sd<0?a-6:b+6]||m,bk=new THREE.Mesh(new THREE.BoxGeometry(500,7,10),new THREE.MeshLambertMaterial({color:0x22301f}));bk.position.set(q.x,q.y-4.6,q.z);bk.rotation.y=q.h+Math.PI/2;G.add(bk);});
+     // トラス（赤い鉄橋）
+     const tm=new THREE.MeshLambertMaterial({color:0x8e2a22}),bx=new THREE.BoxGeometry(.32,.32,1),cnt=Math.ceil((b-a)/6)*2*5+8,im=new THREE.InstancedMesh(bx,tm,cnt),o=new THREE.Object3D();let k=0;
+     const put=(x1,y1,z1,x2,y2,z2)=>{const dx=x2-x1,dy=y2-y1,dz=z2-z1,l=Math.hypot(dx,dy,dz);o.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);o.scale.set(1,1,l);o.lookAt(x2,y2,z2);o.updateMatrix();if(k<cnt)im.setMatrixAt(k++,o.matrix);};
+     for(const sd of [-1,1]){const off=E+1.25;for(let i=a;i<b;i+=6){const p=P[i],q=P[Math.min(b,i+6)];const A=[p.x+p.rx*sd*off,p.z+p.rz*sd*off],B=[q.x+q.rx*sd*off,q.z+q.rz*sd*off];
+         put(A[0],p.y+.3,A[1],B[0],q.y+.3,B[1]);put(A[0],p.y+5.6,A[1],B[0],q.y+5.6,B[1]);put(A[0],p.y+.3,A[1],A[0],p.y+5.6,A[1]);put(A[0],p.y+.3,A[1],B[0],q.y+5.6,B[1]);
+         if(sd>0)put(p.x-p.rx*off,p.y+5.6,p.z-p.rz*off,p.x+p.rx*off,p.y+5.6,p.z+p.rz*off);}}
+     im.count=k;G.add(im);}}
+  // トンネルの山
+  {let i=0;const hm=new THREE.MeshLambertMaterial({color:0x1b2a1c});while(i<N){if(!P[i].T){i++;continue;}let j=i;while(j<N&&P[j].T)j++;
+     for(let k=i+34;k<j-30;k+=16){const p=P[k],d=new THREE.Mesh(new THREE.SphereGeometry(30,10,6,0,Math.PI*2,0,Math.PI/2),hm);d.scale.set(1.3,.75,1.3);d.position.set(p.x,p.y-2,p.z);G.add(d);}
+     i=j;}}
+  // 民家（窓の明かり）と木
+  {const nH=260,gable=new THREE.BufferGeometry();
+   gable.setAttribute('position',new THREE.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,1,0, -.5,0,-.5,.5,1,0,-.5,1,0, -.5,0,.5,-.5,1,0,.5,1,0, -.5,0,.5,.5,1,0,.5,0,.5, -.5,0,-.5,-.5,1,0,-.5,0,.5, .5,0,-.5,.5,0,.5,.5,1,0],3));gable.computeVertexNormals();
+   const body=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1).translate(0,.5,0),new THREE.MeshLambertMaterial({color:0xffffff}),nH),
+     roof=new THREE.InstancedMesh(gable,new THREE.MeshLambertMaterial({color:0xffffff,side:THREE.DoubleSide}),nH),
+     win=new THREE.InstancedMesh(new THREE.BoxGeometry(1,.8,.08),new THREE.MeshBasicMaterial({color:0xffd58a}),nH*3),o=new THREE.Object3D(),c=new THREE.Color();let h=0,wn=0;
+   const WC=[0x6e695f,0x5c564c,0x67645e,0x77726a,0x564a40],RC=[0x1e2533,0x2a2828,0x3e241c,0x203440,0x2e2e2e];
+   for(let i=10;i<N-10&&h<nH;i+=7){if(near(i,q=>q.V||q.T,40))continue;for(const sd of [-1,1]){if(h>=nH||rnd()>.3)continue;
+       if(stI.some(a=>i>a-150&&i<a+30&&sd<0))continue;if(xI.some(a=>Math.abs(i-a)<14))continue;
+       const p=P[i],w=width[sd][i];const off=E+12+rnd()*Math.max(1,Math.min(38,w-8));if(off>E+w)continue;
+       const x=p.x+p.rx*sd*off,z=p.z+p.rz*sd*off,bw=6+rnd()*4,bd=6+rnd()*3,bh=2.8+rnd()*2.4,y=p.y-1.4,yaw=p.h;
+       o.position.set(x,y,z);o.rotation.set(0,yaw,0);o.scale.set(bd,bh,bw);o.updateMatrix();body.setMatrixAt(h,o.matrix);c.setHex(WC[rnd()*WC.length|0]);body.setColorAt(h,c);
+       o.position.set(x,y+bh,z);o.scale.set(bd*1.12,1.6+bw*.12,bw*1.12);o.updateMatrix();roof.setMatrixAt(h,o.matrix);c.setHex(RC[rnd()*RC.length|0]);roof.setColorAt(h,c);
+       // 線路側の壁に窓（明かりがついている窓だけ）
+       const fx=-p.rx*sd,fz=-p.rz*sd;for(let q=-1;q<=1;q++)if(rnd()<.5&&wn<nH*3){const lx=q*bw*.28;
+         o.position.set(x+fx*(bd/2+.03)+Math.sin(yaw)*lx,y+bh*.5,z+fz*(bd/2+.03)+Math.cos(yaw)*lx);o.rotation.set(0,yaw,0);o.scale.set(1,1,1);o.updateMatrix();win.setMatrixAt(wn++,o.matrix);}
+       h++;}}
+   body.count=roof.count=h;win.count=wn;G.add(body,roof,win);
+   const nT=520,cone=new THREE.InstancedMesh(new THREE.ConeGeometry(1,1,6).translate(0,.5,0),new THREE.MeshLambertMaterial({color:0x1f3a2a}),nT);let t=0;
+   for(let i=0;i<N&&t<nT;i+=5){if(near(i,q=>q.V,30))continue;for(const sd of [-1,1]){if(t>=nT||rnd()>.35)continue;if(stI.some(a=>i>a-150&&i<a+30&&sd<0))continue;
+       const p=P[i],w=width[sd][i],off=E+16+rnd()*Math.max(1,Math.min(55,w));if(off>E+w+30)continue;const sc=4+rnd()*5;
+       o.position.set(p.x+p.rx*sd*off,p.y-1.4,p.z+p.rz*sd*off);o.rotation.set(0,0,0);o.scale.set(sc*.45,sc*1.6,sc*.45);o.updateMatrix();cone.setMatrixAt(t++,o.matrix);}}
+   cone.count=t;G.add(cone);
+   // 遠くの山なみ
+   const mt=new THREE.MeshLambertMaterial({color:0x101a18});for(let i=0;i<N;i+=110){for(const sd of [-1,1]){const p=P[i],d=230+rnd()*200,m=new THREE.Mesh(new THREE.ConeGeometry(90+rnd()*90,60+rnd()*80,7),mt);m.position.set(p.x+p.rx*sd*d,p.y+10,p.z+p.rz*sd*d);G.add(m);}}}
+  // 踏切
+  xI.forEach(xi=>{const p=P[xi];if(!p)return;const rd=new THREE.Mesh(new THREE.PlaneGeometry(80,6),new THREE.MeshLambertMaterial({map:roadTexCity}));rd.rotation.set(-Math.PI/2,0,p.h+Math.PI/2);rd.position.set(p.x,p.y+.04,p.z);G.add(rd);
+    const pst=new THREE.MeshLambertMaterial({color:0x1d1d1d}),yel=new THREE.MeshLambertMaterial({color:0xf2c200}),X={i:xi,booms:[],lamps:[],a:0};
+    const xbT=canvasTex(128,128,(g,w,h)=>{g.translate(w/2,h/2);[1,-1].forEach(r=>{g.save();g.rotate(r*Math.PI/4);g.fillStyle='#f2c200';g.fillRect(-60,-11,120,22);g.fillStyle='#111';for(let k=-60;k<60;k+=24)g.fillRect(k,-11,12,22);g.restore();});});
+    for(const sd of [-1,1]){const gr=new THREE.Group();gr.position.set(p.x+p.rx*sd*(E+2.2),p.y,p.z+p.rz*sd*(E+2.2));gr.rotation.y=p.h;G.add(gr);
+      const pz=-sd*3.6,post=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,3.4,8),pst);post.position.set(0,1.7,pz);gr.add(post);
+      const xb=new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.3),new THREE.MeshBasicMaterial({map:xbT,transparent:true,side:THREE.DoubleSide}));xb.position.set(0,3.25,pz);xb.rotation.y=Math.PI/2;gr.add(xb);
+      [-.32,.32].forEach(dz=>{const l=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xff3a2a,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.15}));l.scale.set(1.3,1.3,1);l.position.set(0,2.55,pz+dz);gr.add(l);X.lamps.push(l);
+        const hd=new THREE.Mesh(new THREE.CircleGeometry(.17,12),new THREE.MeshBasicMaterial({color:0x3a0a08,side:THREE.DoubleSide}));hd.position.set(0,2.55,pz+dz);hd.rotation.y=Math.PI/2;gr.add(hd);X.lamps.push(hd);});
+      const piv=new THREE.Group();piv.position.set(0,1.0,pz);gr.add(piv);const bm=new THREE.Group();piv.add(bm);
+      for(let k=0;k<7;k++){const seg=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,1),k%2?pst:yel);seg.position.set(0,0,sd*(k+.5));bm.add(seg);}
+      X.booms.push({piv,sd});}
+    denX.push(X);});
+}
+function stepCrossings(dt){if(!denX.length)return;const t=performance.now()/1000;let ring=0;
+  denX.forEach(X=>{const d=X.i-(car.s||0),on=d<280&&d>-22;X.a+=((on?1:0)-X.a)*Math.min(1,dt*2.4);
+    X.booms.forEach(b=>{b.piv.rotation.x=b.sd*(1-X.a)*1.35;});const bl=on&&(t*2.2|0)%2;
+    X.lamps.forEach((l,k)=>{const lit=on&&((k>>1)%2===(bl?1:0));if(l.isSprite)l.material.opacity=lit?.95:.12;else l.material.color.setHex(lit?0xff3a22:0x3a0a08);});
+    if(on&&Math.abs(d)<240)ring=Math.max(ring,1-Math.abs(d)/240);});
+  if(ring>0&&ac){const k=(t*2.6|0);if(k!==stepCrossings.k){stepCrossings.k=k;{const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=k%2?740:880;g.gain.setValueAtTime(.015+ring*.05,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.25);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.26);}}}}
 // 高架橋（ループ橋）：橋桁の裏・側面・両側の欄干・橋脚
-function buildViaduct(G){let minY=1e9;P.forEach(p=>minY=Math.min(minY,p.y));const gy=minY-45,E=HALF+1.6;
+function buildViaduct(G){let minY=1e9;P.forEach(p=>minY=Math.min(minY,p.y));let vy=1e9;P.forEach(p=>{if(p.V)vy=Math.min(vy,p.y);});const gy=course.env==='rail'?vy-8.5:minY-45,E=HALF+1.6;
   const conc=new THREE.MeshLambertMaterial({color:0x8a8e94,emissive:0x15171a,side:THREE.DoubleSide});
   let i=0;while(i<N){if(!P[i].V){i++;continue;}let j=i;while(j<N&&P[j].V)j++;const a=Math.max(0,i-4),b=Math.min(N-1,j+4);
     const und=[],sl=[],sr=[],rl=[];
@@ -1350,9 +1455,9 @@ function buildRails(){
   railGroup.add(new THREE.Mesh(ribbon(bal,{}),new THREE.MeshLambertMaterial({color:0x4a4a48,polygonOffset:true,polygonOffsetFactor:-1})));
   {const step=30,n=Math.floor(N/step),pm=new THREE.MeshLambertMaterial({color:0x7d858e});
    const pole=new THREE.InstancedMesh(new THREE.BoxGeometry(.28,6.2,.28).translate(0,3.1,0),pm,n),arm=new THREE.InstancedMesh(new THREE.BoxGeometry(4.4,.14,.14),pm,n),o2=new THREE.Object3D();
-   for(let k=0;k<n;k++){const p=P[k*step+5];if(!p)break;if(p.T){o2.position.set(0,-9999,0);o2.updateMatrix();pole.setMatrixAt(k,o2.matrix);arm.setMatrixAt(k,o2.matrix);continue;}const po=course.env?HALF+.9:3.9,bx=p.x-p.rx*po,bz=p.z-p.rz*po;
+   for(let k=0;k<n;k++){const p=P[k*step+5];if(!p)break;if(p.T){o2.position.set(0,-9999,0);o2.updateMatrix();pole.setMatrixAt(k,o2.matrix);arm.setMatrixAt(k,o2.matrix);continue;}const ps=course.env==='rail'?1:-1,po=course.env?HALF+.9:3.9,bx=p.x+p.rx*ps*po,bz=p.z+p.rz*ps*po;
      o2.position.set(bx,p.y,bz);o2.rotation.set(0,p.h,0);o2.updateMatrix();pole.setMatrixAt(k,o2.matrix);
-     o2.position.set(p.x-p.rx*(po-.45)/2,p.y+6,p.z-p.rz*(po-.45)/2);o2.scale.set((po+.5)/4.4,1,1);o2.updateMatrix();arm.setMatrixAt(k,o2.matrix);o2.scale.set(1,1,1);}
+     o2.position.set(p.x+p.rx*ps*(po-.45)/2,p.y+6,p.z+p.rz*ps*(po-.45)/2);o2.scale.set((po+.5)/4.4,1,1);o2.updateMatrix();arm.setMatrixAt(k,o2.matrix);o2.scale.set(1,1,1);}
    railGroup.add(pole,arm);
    const wr=[];for(let i=0;i<N;i+=STEP){const p=P[i];wr.push([[p.x-p.rx*.03,p.y+5.75,p.z-p.rz*.03,0,0],[p.x+p.rx*.03,p.y+5.75,p.z+p.rz*.03,1,0]]);}
    railGroup.add(new THREE.Mesh(ribbon(wr,{}),new THREE.MeshBasicMaterial({color:0x22262c,side:THREE.DoubleSide})));}
@@ -2059,7 +2164,7 @@ function resetRace(){
   } else if(mode==='collect'){
     ps={s:START_I-6,lat:0};
   } else if(mode==='densha'){
-    ps={s:START_I,lat:0};
+    ps={s:course.denStart||START_I,lat:0};
   } else if(mode==='free'||mode==='school'){
     ps={s:mode==='school'?START_I-14:START_I,lat:0};
   } else if(mode==='escape'){
@@ -2097,7 +2202,7 @@ function resetRace(){
   if(spec.type==='broom')setTimeout(()=>ast(['今夜は箒で。…たまには、ね。','しっかり掴まっていなさい。…私が、よ。','月が近いわ。少しだけ、高く飛びたくなる。'],true),1800);
   if(spec.type==='ita'||spec.type==='umicar')setTimeout(()=>umi(['今夜はどこまで行けるかな？ 旅のはじまりです！','わあ、夜景がきれい…！ 行きましょう！','安全運転で…いえ、全力でいきます！'],true),1800);
   if(spec.type==='hokora')setTimeout(()=>shii(['祠、発進なのじゃ〜！','わらわの運転、とくと見るがよいのじゃ！','安全運転…は約束できんのじゃ♪','今宵もかっ飛ばすのじゃ〜！'],true),1800);
-  game.kyo=spec.type==='kyoshu'||mode==='school'?{score:100,cd:0,aux:0,wallT:0,chat:8,stops:(mode==='school'&&course.stopI||[]).map(o=>({i:o.i,t:o.t,done:false,stopped:false}))}:null;if(mode==='school')setTimeout(()=>say(KYO,schoolGreet(),3.5),700);if(!$('kyoPt')){$('kyo').innerHTML='教習 <b id="kyoPt">100</b>点　制限 <span id="kyoLim">50</span> km/h';}$('kyo').hidden=!game.kyo&&spec.type!=='amb'&&spec.type!=='demae';$('meter').hidden=spec.type!=='taxi';game.fareShown=0;
+  $('denPanel').hidden=true;document.body.classList.remove('den');game.kyo=spec.type==='kyoshu'||mode==='school'?{score:100,cd:0,aux:0,wallT:0,chat:8,stops:(mode==='school'&&course.stopI||[]).map(o=>({i:o.i,t:o.t,done:false,stopped:false}))}:null;if(mode==='school')setTimeout(()=>say(KYO,schoolGreet(),3.5),700);if(!$('kyoPt')){$('kyo').innerHTML='教習 <b id="kyoPt">100</b>点　制限 <span id="kyoLim">50</span> km/h';}$('kyo').hidden=!game.kyo&&spec.type!=='amb'&&spec.type!=='demae';$('meter').hidden=spec.type!=='taxi';game.fareShown=0;
   game.fb=mode==='free'?{phase:'cruise',next:10,rival:null,me:100,riv:100,wins:0,lost:0,earn:0,enc:0,log:[]}:null;$('spBox').hidden=true;$('btnPA').hidden=mode!=='free';$('btnQuit').hidden=false;
   if(cpus.length){const c=pick(cpus);const hl=spec.type==='hearse'&&!c.def.cop?pick(['…縁起でもねえな。','なんで霊柩車が峠に来てんだよ…','後ろにつかれたくねえ…']):pick(c.def.pre);setTimeout(()=>say(c.def,hl,3.2),500);}
 }
@@ -2367,7 +2472,7 @@ function startFromMenu(){
   bHeat=1;catRes=null;tsuiPts=0;catNext=0;
   resetRace();
 }
-function toMenu(){if(ONLINE&&ONLINE.racing&&!ONLINE.finished&&game.state!=='title'){olAct({type:'leave'});ONLINE.racing=false;spec=buildSpec(selId);olClearGhosts();if(ONLINE.prevMode!=null){mode=ONLINE.prevMode;ONLINE.prevMode=null;}}clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
+function toMenu(){$('denPanel').hidden=true;document.body.classList.remove('den');if(ONLINE&&ONLINE.racing&&!ONLINE.finished&&game.state!=='title'){olAct({type:'leave'});ONLINE.racing=false;spec=buildSpec(selId);olClearGhosts();if(ONLINE.prevMode!=null){mode=ONLINE.prevMode;ONLINE.prevMode=null;}}clearPuddles();$('btnQuit').hidden=true;$('kyo').className='hud';clearStations();if(denPrev){const id=denPrev;denPrev=null;swapCar(owned.includes(id)?id:'86');}if(senseiMatch){senseiMatch=false;}$('kyo').hidden=true;$('meter').hidden=true;$('btnPA').hidden=true;$('spBox').hidden=true;if(repoId){const id=repoId;repoId=null;if(!owned.includes(selId)||selId===id)swapCar(owned.includes('86')?'86':owned[0]);}if(car.siren)setSiren(false);stopCopSiren();$('result').hidden=true;game.state='title';clearCpus();demo.s=START_I;demo.v=0;focusId=selId;
   $('title').hidden=false;$('count').textContent='';$('drift').classList.remove('show');setTab(tab);renderAll();}
 
 // 耐久：減るほどパワーが落ち、0で大破リタイア
@@ -3574,8 +3679,8 @@ function stampBonus(){if(spec.type!=='umicar'||game.retired||mode==='free')retur
 function fanBonus(){return spec.type==='ita'&&!game.retired?Math.round((game.dTotal||0)*.1):0;}
 function tatariBonus(){return spec.type==='hokora'?(game.tatari||0)*80:0;}
 // ===== 電車でGO風：DDDV電鉄 =====
-const DEN_LINES=[{id:'yamanote',name:'山手線',st:['東京','有楽町','新橋','浜松町','田町','高輪ゲートウェイ','品川'],spd:18,col:'#7ac943'},{id:'kanjo',name:'大阪環状線',st:['大阪','天満','桜ノ宮','京橋','大阪城公園','森ノ宮','玉造'],spd:18,col:'#f08a24'},{id:'lake',name:'湖畔線',st:['湖畔口','白樺台','月見ヶ浜','湖畔温泉'],spd:20},{id:'ridge',name:'稜線トンネル線',st:['稜線口','風穴','星見峠','稜線終点'],spd:19},{id:'down',name:'月見峠線',st:['月見峠','九十九折','ヘアピン前','峠の麓'],spd:10}];
-let denLine=store.get('touge_den_line')||'lake';if(!DEN_LINES.some(l=>l.id===denLine))denLine='lake';let denPrev=null;
+const DEN_LINES=[{id:'dentetsu',name:'月見線',st:DEN_ST.map(q=>q[0]),spd:15.5,sched:[0,63,116,176,237],col:'#e8a33a'}] /* 定刻：自動運転（制限ぎりぎり）で各駅8秒ほど早く着く設定 */; // 旧路線（山手線・大阪環状線・湖畔線など車道に線路を敷いたもの）は2026-11-06に外した。コースは hidden のまま残っている
+let denLine=store.get('touge_den_line')||'dentetsu';if(!DEN_LINES.some(l=>l.id===denLine))denLine='dentetsu';let denPrev=null;
 const stationGroup=new THREE.Group();scene.add(stationGroup);
 function clearStations(){while(stationGroup.children.length){const o=stationGroup.children[0];stationGroup.remove(o);o.traverse&&o.traverse(q=>{if(q.geometry)q.geometry.dispose();});}}
 function renderDen(){const l=$('denList');l.innerHTML='';const st=sj('touge_den',{});
@@ -3583,9 +3688,10 @@ function renderDen(){const l=$('denList');l.innerHTML='';const st=sj('touge_den'
     b.querySelector('b').textContent=L.name;sm[0].textContent=L.st.join(' → ');sm[1].textContent=st[L.id]?'最高 '+st[L.id].toLocaleString()+' 点':'まだ運転していない';
     b.addEventListener('click',()=>{denLine=L.id;store.set('touge_den_line',L.id);loadCourse(L.id);renderDen();syncStart();});l.appendChild(b);});
   const tot=Object.values(st).reduce((a,b)=>a+b,0);$('denBest').textContent=tot?'合計 '+tot.toLocaleString()+' 点':'BEST --';}
-function setupDen(){const L=DEN_LINES.find(l=>l.id===course.id)||DEN_LINES[0],n=L.st.length,a=START_I+40,b=GOAL_I-10,stops=[];
-  let t=0,prev=START_I;for(let k=1;k<n;k++){const i=Math.round(a+(b-a)*k/(n-1));t+=(i-prev)/L.spd+(k>1?7:0);stops.push({i,name:L.st[k],sched:t+6,done:false,res:null});prev=i;}
-  game.den={L,stops,score:0,cur:0,last:L.st[0]};game.dwell=0;game.ebN=0;
+function setupDen(){const L=DEN_LINES.find(l=>l.id===course.id)||DEN_LINES[0],n=L.st.length,a=START_I+40,b=GOAL_I-10,stops=[],CS=course.stations;
+  let t=0,prev=CS?CS[0][3]:START_I;for(let k=1;k<n;k++){const i=CS?CS[k][3]:Math.round(a+(b-a)*k/(n-1));t+=(i-prev)/L.spd+(k>1?7:0);stops.push({i,name:L.st[k],sched:L.sched?L.sched[k]:t+6,done:false,res:null});prev=i;}
+  game.den={L,stops,score:0,cur:0,last:L.st[0],over:0,overOn:false};game.dwell=0;game.ebN=0;
+  if(CS){CS.forEach((q,k)=>buildDenStation(q,k,CS,L));setTimeout(()=>say({name:'車掌',col:0x9fd3ea},'本日もDDDV電鉄 '+L.name+'をご利用いただきありがとうございます。次は'+stops[0].name+'、'+stops[0].name+'です。',4),900);return;}
   const platM=new THREE.MeshLambertMaterial({color:0x8d8a84}),edgeM=new THREE.MeshBasicMaterial({color:0xf2c200}),poleM=new THREE.MeshLambertMaterial({color:0x6b7078});
   const mkStation=(i,name,isStart)=>{const W=2.2;for(let j=Math.max(0,i-80);j<i+6;j+=2){const p=P[Math.min(N-1,j)],x=p.x-p.rx*(W+1.6),z=p.z-p.rz*(W+1.6);
       const m=new THREE.Mesh(new THREE.BoxGeometry(3.2,1.0,2.1),platM);m.position.set(x,p.y+.5,z);m.rotation.y=p.h;stationGroup.add(m);
@@ -3598,9 +3704,47 @@ function setupDen(){const L=DEN_LINES.find(l=>l.id===course.id)||DEN_LINES[0],n=
     for(const pz of [nb]){const p2=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,2.6,6),poleM);p2.position.set(nx,q.y+1.9,nz);stationGroup.add(p2);}};
   mkStation(START_I+4,L.st[0],true);stops.forEach(o=>mkStation(o.i,o.name,false));
   setTimeout(()=>say({name:'車掌',col:0x9fd3ea},(L.col?'本日も'+L.name+'をご利用いただきありがとうございます。次は'+stops[0].name+'、'+stops[0].name+'。':'本日もDDDV電鉄をご利用いただきありがとうございます。次は'+stops[0].name+'です。'),4),900);}
+// 駅（ホーム・屋根・駅名標・駅舎・停止位置目標）
+function buildDenStation(q,k,CS,L){const [name,kana,roma,i]=q,E=HALF,G=stationGroup,a=Math.max(1,i-112),b=Math.min(N-2,i+12);
+  const rib=(o1,o2,y1,y2,mat,vert)=>{const rows=[];for(let j=a;j<=b;j+=2){const p=P[j];rows.push(vert?[[p.x-p.rx*o1,p.y+y1,p.z-p.rz*o1,0,0],[p.x-p.rx*o1,p.y+y2,p.z-p.rz*o1,1,0]]:[[p.x-p.rx*o1,p.y+y1,p.z-p.rz*o1,0,0],[p.x-p.rx*o2,p.y+y1,p.z-p.rz*o2,1,0]]);}G.add(new THREE.Mesh(ribbon(rows,{}),mat));};
+  const conc=new THREE.MeshLambertMaterial({color:0x6a6862,side:THREE.DoubleSide}),edge=new THREE.MeshBasicMaterial({color:0xe8e4da}),tact=new THREE.MeshBasicMaterial({color:0xe8b800});
+  rib(E+.25,E+4.6,1.05,0,conc);rib(E+.25,0,0,1.05,conc,true);rib(E+4.6,0,0,1.05,conc,true);rib(E+.25,E+.5,1.06,0,edge);rib(E+1.05,E+1.35,1.065,0,tact);
+  {const rows=[];for(let j=a;j<=b;j+=2){const p=P[j];rows.push([[p.x-p.rx*(E+4.6),p.y+1.05,p.z-p.rz*(E+4.6),0,0],[p.x-p.rx*(E+4.6),p.y+2.1,p.z-p.rz*(E+4.6),1,0]]);}G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({color:0x2a2f38,side:THREE.DoubleSide})));}
+  // 屋根と蛍光灯
+  const ra=i-78,rb=i-14;{const rows=[];for(let j=ra;j<=rb;j+=2){const p=P[j];rows.push([[p.x-p.rx*(E+.7),p.y+4.3,p.z-p.rz*(E+.7),0,0],[p.x-p.rx*(E+4.4),p.y+4.0,p.z-p.rz*(E+4.4),1,0]]);}G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({color:0x4a505a,side:THREE.DoubleSide})));}
+  const pm=new THREE.MeshLambertMaterial({color:0x6b7078}),fl=new THREE.MeshBasicMaterial({color:0xf4fbff}),pool=new THREE.MeshBasicMaterial({map:poolT,color:0x56657a,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+  for(let j=ra;j<=rb;j+=8){const p=P[j],x=p.x-p.rx*(E+3.7),z=p.z-p.rz*(E+3.7);const c=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,3,6),pm);c.position.set(x,p.y+2.6,z);G.add(c);
+    const f=new THREE.Mesh(new THREE.BoxGeometry(.18,.06,1.4),fl);f.position.set(p.x-p.rx*(E+2),p.y+4.1,p.z-p.rz*(E+2));f.rotation.y=p.h;G.add(f);
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(7,9),pool);pl.rotation.set(-Math.PI/2,0,p.h);pl.position.set(p.x-p.rx*(E+1.5),p.y+1.08,p.z-p.rz*(E+1.5));G.add(pl);
+    const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xdff0ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.8}));hl.scale.set(2.6,1.6,1);hl.position.set(p.x-p.rx*(E+2),p.y+3.95,p.z-p.rz*(E+2));G.add(hl);}
+  for(let j=a+6;j<=b;j+=16){if(j>ra-4&&j<rb+4)continue;const p=P[j],x=p.x-p.rx*(E+3.9),z=p.z-p.rz*(E+3.9);const c=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,3.4,6),pm);c.position.set(x,p.y+2.75,z);G.add(c);
+    const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xdff0ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));hl.scale.set(2.2,2.2,1);hl.position.set(x,p.y+4.4,z);G.add(hl);
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(6,6),pool);pl.rotation.set(-Math.PI/2,0,p.h);pl.position.set(p.x-p.rx*(E+2.2),p.y+1.08,p.z-p.rz*(E+2.2));G.add(pl);}
+  // 駅名標（JR風：ひらがな・駅名・ローマ字、下の帯に前後の駅）
+  const prv=k>0?CS[k-1][0]:'',nxt=k<CS.length-1?CS[k+1][0]:'';
+  const tex=canvasTex(1024,360,(g,w,h)=>{g.fillStyle='#f6f6f2';g.fillRect(0,0,w,h);g.fillStyle='#1b1b1b';g.textAlign='center';g.textBaseline='middle';
+    g.font='bold 54px "Zen Kaku Gothic New",sans-serif';g.fillText(kana,w/2,60);g.font='bold 130px "Zen Kaku Gothic New",sans-serif';g.fillText(name,w/2,165);g.font='bold 40px "Chakra Petch",sans-serif';g.fillStyle='#444';g.fillText(roma,w/2,252);
+    g.fillStyle=L.col||'#e8a33a';g.fillRect(0,288,w,72);g.fillStyle='#fff';g.font='bold 40px "Zen Kaku Gothic New",sans-serif';g.textAlign='left';if(prv)g.fillText('◀ '+prv,24,324);g.textAlign='right';if(nxt)g.fillText(nxt+' ▶',w-24,324);});
+  [i-34,i-96].forEach(j=>{const p=P[Math.max(1,j)];if(!p)return;const x=p.x-p.rx*(E+2.7),z=p.z-p.rz*(E+2.7);const bd=new THREE.Mesh(new THREE.PlaneGeometry(3.6,1.27),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+    bd.position.set(x,p.y+3.05,z);bd.rotation.y=p.h-Math.PI/2;G.add(bd);[-1.5,1.5].forEach(o=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,2,6),pm);c.position.set(x+Math.sin(p.h)*o,p.y+2.05,z+Math.cos(p.h)*o);G.add(c);});});
+  // 停止位置目標（ホームの端）
+  if(k>0){const p=P[i],x=p.x-p.rx*(E+.8),z=p.z-p.rz*(E+.8);const tx=canvasTex(128,160,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#d8141c';g.fillRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font='bold 40px "Zen Kaku Gothic New",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('停止',w/2,52);g.fillText('位置',w/2,100);g.font='bold 30px sans-serif';g.fillText('2両',w/2,136);});
+    const c=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,1.3,6),pm);c.position.set(x,p.y+1.7,z);G.add(c);const sg=new THREE.Mesh(new THREE.PlaneGeometry(.7,.88),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));sg.position.set(x,p.y+2.7,z);sg.rotation.y=p.h+Math.PI;G.add(sg);}
+  // 駅舎
+  {const p=P[i-46],x=p.x-p.rx*(E+11),z=p.z-p.rz*(E+11),bl=new THREE.Mesh(new THREE.BoxGeometry(16,5,8),new THREE.MeshLambertMaterial({color:0xb8b0a0}));bl.position.set(x,p.y+1.2,z);bl.rotation.y=p.h;G.add(bl);
+   const rf=new THREE.Mesh(new THREE.BoxGeometry(17,.5,9),new THREE.MeshLambertMaterial({color:0x2c3446}));rf.position.set(x,p.y+3.95,z);rf.rotation.y=p.h;G.add(rf);
+   for(let w=-6;w<=6;w+=3){const wd=new THREE.Mesh(new THREE.PlaneGeometry(1.8,1.4),new THREE.MeshBasicMaterial({color:0xffe2a8}));wd.position.set(x+Math.sin(p.h)*w+p.rx*4.02,p.y+1.6,z+Math.cos(p.h)*w+p.rz*4.02);wd.rotation.y=p.h-Math.PI/2;G.add(wd);}}
+  // 場内信号（駅の手前250m、緑）
+  if(k>0){const p=P[Math.max(1,i-250)],x=p.x+p.rx*(E+1.6),z=p.z+p.rz*(E+1.6),c=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,4.4,6),pm);c.position.set(x,p.y+2.2,z);G.add(c);
+    const hd=new THREE.Mesh(new THREE.BoxGeometry(.5,1.3,.3),new THREE.MeshLambertMaterial({color:0x1a1a1a}));hd.position.set(x,p.y+4.6,z);hd.rotation.y=p.h;G.add(hd);
+    const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0x40ff90,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));gl.scale.set(1.4,1.4,1);gl.position.set(x,p.y+4.2,z);G.add(gl);}}
+// 制限速度（表示用。脱線しやすさは railSafe のまま）
+function denLim(i){let m=0;for(let j=Math.max(0,i);j<Math.min(N,i+14);j++)m=Math.max(m,Math.abs(P[j].k));const v=m>0?Math.sqrt((course.railA||10.5)/m)*3.6:999;return Math.max(25,Math.floor(Math.min(course.railMax||130,v)/5)*5);}
+function denNextLim(i){const cur=denLim(i);for(let j=i+15;j<Math.min(N,i+420);j+=5){const l=denLim(j);if(l<cur)return {lim:l,d:j-i};}return null;}
 function denDec(n){return .7+n*.45;} // B1=1.15 … B8=4.3 m/s²
 function denChime(){if(!ac)return;[0,.35].forEach((d,k)=>setTimeout(()=>beep(k?784:988,.5),d*1000));}
-function stepDen(dt,info){const D=game.den;if(!D)return;
+function stepDen(dt,info){const D=game.den;if(!D)return;stepCrossings(dt);
+  if(!game.dwell&&course.stations){const lim=denLim(Math.floor(car.s||0)),kmh=(car.v||0)*3.6;if(kmh>lim+2){D.over+=dt;if(!D.overOn){D.overOn=true;flash('速度超過！ 制限 '+lim+' km/h');if(ac)beep(520,.25);}}else D.overOn=false;}
   if(game.dwell>0&&game.t>=game.dwell){game.dwell=0;if(D.cur>=D.stops.length){finish();return;}car.notch=0;car.upLock=false;flash('発車！ ブレーキ緩解（B0）');}
   if(game.dwell)return;const o=D.stops[D.cur];if(!o)return;const gap=o.i-car.s,v=car.v||0;
   if(gap<-20&&!o.done){o.done=true;o.res={d:null,late:game.t-o.sched,pts:-500};D.score-=500;flash('通過！ '+o.name+'に止まれなかった −500');say({name:'車掌',col:0x9fd3ea},'ちょっ…'+o.name+'、通過しちゃいましたよ！',3);D.cur++;D.last=o.name;if(D.cur>=D.stops.length)setTimeout(finish,1200);return;}
@@ -3610,15 +3754,34 @@ function stepDen(dt,info){const D=game.den;if(!D)return;
     flash((d<.3?'ピッタリ停止！':d<1?'ほぼピッタリ':d<5?'停止位置から '+d.toFixed(1)+' m':'ずれすぎ… '+d.toFixed(1)+' m')+'　'+(Math.abs(late)<5?'定刻':late>0?Math.round(late)+'秒遅れ':Math.round(-late)+'秒早着')+'　+'+pts);
     denChime();game.dwell=game.t+(D.cur>=D.stops.length?2:6);
     setTimeout(()=>{if(D.cur<D.stops.length){say({name:'車掌',col:0x9fd3ea},o.name+'、'+o.name+'です。次は'+D.stops[D.cur].name+'に止まります。',3.5);if(ac)setTimeout(()=>{[0,.12,.24,.36,.48,.6].forEach(dd=>setTimeout(()=>beep(1900,.07),dd*1000));},2400);}},600);}}
-function denHud(ge){const D=game.den;if(!D)return;const o=D.stops[D.cur];const lim=Math.round(Math.min(130,railSafe(Math.max(0,Math.floor(car.s)))*3.6)),k=$('kyo');k.hidden=false;
-  if(!o){ge.textContent='終点到着';ge.className='lead';k.className='hud low';k.innerHTML='終点 <b>'+D.last+'</b>';return;}
-  {const gp=o.i-car.s,rm=o.sched-game.t;k.className='hud low'+(gp<25&&gp>-20?' bad':'');k.innerHTML=(game.dwell?'停車中　':'')+'次は '+o.name+'　停止位置まで <b>'+(gp>=0?(gp<10?gp.toFixed(1):Math.round(gp)):'-'+Math.round(-gp))+'</b> m<span class="sm">定刻まで '+(rm>=0?Math.round(rm)+' 秒':'遅れ '+Math.round(-rm)+' 秒')+'　／　制限 '+lim+' km/h　／　'+Math.round((car.v||0)*3.6)+' km/h</span>'+(()=>{const v=car.v||0,n=car.notch||0;if(game.dwell||gp>160||gp<-20||v<.3)return '';let rec=0;for(let k=1;k<=8;k++)if(v*v/(2*denDec(k))<=gp){rec=k;break;}if(!n)return '<span class="sm">ブレーキ <b style="font-size:15px">B0</b>　'+(rec?'今から止めるなら B'+rec+' 以上':'<b style="font-size:15px;color:#ff5a5a">B8でも止まれない！ 非常ブレーキ(N)</b>')+'</span>';const dec=denDec(n),sd=v*v/(2*dec),off=gp-sd;return '<span class="sm">ブレーキ <b style="font-size:15px">B'+n+'</b>　このままだと '+(Math.abs(off)<.3?'<b style="font-size:15px;color:#5dff8a">ピッタリ</b>':off>0?'手前 '+off.toFixed(1)+' m':'<b style="font-size:15px;color:#ff5a5a">行きすぎ '+(-off).toFixed(1)+' m</b>')+'</span>';})();}
-  const gap=o.i-car.s,rem=o.sched-game.t;ge.textContent=(game.dwell?'停車中…　':'')+'次は '+o.name+'　'+(gap>0?Math.round(gap*10)/10+' m':'行きすぎ '+Math.round(-gap*10)/10+' m')+'　定刻まで '+(rem>=0?Math.round(rem)+'秒':'遅れ '+Math.round(-rem)+'秒')+'　制限 '+lim;ge.className=gap<30&&gap>-1?'':'lead';}
-function finishDen(){const D=game.den||{stops:[],score:0,L:{name:''}},eb=(game.ebN||0)*50,der=game.retired?0:0,score=Math.max(0,D.score-eb-game.hits*100);
+function denHud(ge){const D=game.den;if(!D)return;const o=D.stops[D.cur],pn=$('denPanel');$('kyo').hidden=true;pn.hidden=false;document.body.classList.add('den');
+  const si=Math.max(0,Math.floor(car.s||0)),lim=course.stations?denLim(si):Math.round(Math.min(130,railSafe(si)*3.6)),v=car.v||0,kmh=Math.round(v*3.6),n=car.notch||0;
+  ge.textContent='DDDV電鉄 '+D.L.name;ge.className='lead';
+  // 速度・制限・この先の制限・ノッチ
+  $('dpSpd').className=kmh>lim+2?'over':'';$('dpSpd').querySelector('b').textContent=kmh;
+  $('dpLim').innerHTML='制限<b class="'+(kmh>lim+2?'bad':'')+'">'+lim+'</b>km/h';
+  const nx=course.stations&&o?denNextLim(si):null;$('dpNext').innerHTML=nx?'この先 <b class="warn">'+nx.lim+'</b><span style="font-size:13px">（'+Math.round(nx.d/10)*10+'m先）</span>':'';
+  {const eb=input.nitro,acc=!game.dwell&&!n&&(input.up||input.gas);let h='<span class="p'+(acc?' on':'')+'">P</span><span class="n'+(!acc&&!n&&!eb?' on':'')+'">N</span>';for(let k=1;k<=8;k++)h+='<span class="'+(n===k&&!eb?'on':'')+'">'+k+'</span>';h+='<span class="eb'+(eb?' on':'')+'">EB</span>';$('dpNotch').innerHTML=h;}
+  if(!o){$('dpSt').textContent='終点 '+D.last;$('dpTime').innerHTML='';const dd=$('dpDist');dd.className='';dd.querySelector('b').textContent='--';$('dpHint').textContent='おつかれさまでした';return;}
+  $('dpSt').textContent=o.name;
+  const rm=o.sched-game.t;$('dpTime').innerHTML=game.dwell?'<span class="ok">停車中…</span>':rm>=0?'定刻まで<b class="'+(rm<10?'warn':'ok')+'">'+Math.round(rm)+'</b>秒':'<b class="bad">'+Math.round(-rm)+'</b><span class="bad">秒 遅れ</span>';
+  const gp=o.i-(car.s||0),dd=$('dpDist');dd.className=gp<-0.5?'past':gp<50?'near':'';dd.querySelector('b').textContent=gp>=0?(gp<20?gp.toFixed(1):Math.round(gp)):'-'+(-gp).toFixed(1);
+  // バー：残り200mを表示。白線＝停止位置、緑＝±1m、丸＝今のノッチのままだと止まる位置
+  const span=200,X=d=>Math.max(0,Math.min(100,(1-(d)/span)*92));$('dpStop').style.left=X(0)+'%';const z=$('dpZone');z.style.left=X(1)+'%';z.style.width=Math.max(0,X(-1)-X(1))+'%';
+  const pr=$('dpPred'),hint=$('dpHint');
+  if(game.dwell){pr.style.display='none';hint.innerHTML='ドアが閉まると発車します';return;}
+  if(v<.3){pr.style.display='none';hint.innerHTML=gp>30?'<b>↑</b> で加速（B0の時）':gp>-20?'あと少し…':'';return;}
+  const sd=n?v*v/(2*denDec(n)):null,off=sd!=null?gp-sd:null;
+  if(off!=null&&gp<span+50){pr.style.display='';pr.style.left=X(gp-sd+(0))+'%';pr.style.left=X(off)+'%';pr.className=Math.abs(off)<1?'good':Math.abs(off)>10?'far':'';}else pr.style.display='none';
+  let rec=0;for(let k=1;k<=8;k++)if(v*v/(2*denDec(k))<=gp){rec=k;break;}
+  if(gp>320)hint.innerHTML=kmh>lim+2?'<span class="bad">制限速度を超えています！</span>':'';
+  else if(!n)hint.innerHTML=rec?'今止めるなら <b>B'+rec+'</b> 以上':'<span class="bad">B8でも止まれない！ 非常ブレーキ（N）</span>';
+  else hint.innerHTML=Math.abs(off)<1?'<b style="color:#5be37d">ピッタリ止まる位置！</b>':off>0?'このままだと <b>'+off.toFixed(1)+' m</b> 手前で止まる':'<span class="bad">このままだと '+(-off).toFixed(1)+' m 行きすぎる</span>';}
+function finishDen(){const D=game.den||{stops:[],score:0,L:{name:''}},eb=(game.ebN||0)*50,der=game.retired?0:0,ov=Math.round((D.over||0)*30),score=Math.max(0,D.score-eb-ov-game.hits*100);
   const earned=Math.max(100,Math.round(score*.8));wallet+=earned;const st=sj('touge_den',{});if(!st[course.id]||score>st[course.id]){st[course.id]=score;store.set('touge_den',JSON.stringify(st));}
   $('resKick').textContent='DDDV電鉄 ／ '+D.L.name;$('resHead').textContent=game.retired?'運転打ち切り':score.toLocaleString()+' 点';$('resHead').className='res-big '+(score>=2000?'win':'lose');
   $('resSub').textContent=game.retired?'脱線しすぎて車両が大破した。':'終点まで乗務完了。'+(score>=3000?'ベテラン運転士の腕前。':score>=1500?'安定した運転。':'停止位置と定刻を意識してみよう。');
-  addRows(D.stops.map(o=>[o.name+(o.res?(o.res.d==null?'　通過':'　'+Math.abs(o.res.d).toFixed(1)+' m／'+(Math.abs(o.res.late)<5?'定刻':o.res.late>0?Math.round(o.res.late)+'秒遅れ':Math.round(-o.res.late)+'秒早着')):'　未到着'),o.res?o.res.pts:0]).concat(eb?[['非常ブレーキ '+game.ebN+'回',-eb]]:[],game.hits?[['脱線・衝撃 '+game.hits+'回',-game.hits*100]]:[]));
+  addRows(D.stops.map(o=>[o.name+(o.res?(o.res.d==null?'　通過':'　'+Math.abs(o.res.d).toFixed(1)+' m／'+(Math.abs(o.res.late)<5?'定刻':o.res.late>0?Math.round(o.res.late)+'秒遅れ':Math.round(-o.res.late)+'秒早着')):'　未到着'),o.res?o.res.pts:0]).concat(eb?[['非常ブレーキ '+game.ebN+'回',-eb]]:[],ov?[['速度超過 '+Math.round(D.over)+'秒',-ov]]:[],game.hits?[['脱線・衝撃 '+game.hits+'回',-game.hits*100]]:[]));
   addTotal(earned);$('btnRetry').textContent='もう一回乗務';$('btnMenu').hidden=false;}
 function soryaBonus(){return spec.type==='dashi'?(game.soryaN||0)*12+(game.maxCombo||0)*20:0;}
 function zanCalc(){const ids=zanList();if(!ids.length){game.zanC=null;return null;}const L=zanM[spec.id],lost=1-car.hp/spec.hpMax,sat=L&&L.d>0&&lost>.05?Math.round(lost*(spec.id==='alph'?3000:Math.max(1000,(CARS.find(c=>c.id===spec.id)||{price:0}).price*.2))/100)*100:0;
