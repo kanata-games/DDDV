@@ -254,13 +254,13 @@ body.den #dash,body.den #total{display:none}
 #thTime{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);text-align:center;font-family:var(--f-num);line-height:1;text-shadow:0 2px 8px #000}
 #thTime small{display:block;font-size:13px;color:#cfd8f0;letter-spacing:.2em}#thTime b{font-size:64px;color:#ffd23f}#thTime.low b{color:#ff5a5a}
 #thArrow{position:absolute;top:calc(92px + env(safe-area-inset-top,0px));left:50%;width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:64px solid #ffd23f;transform-origin:50% 70%;filter:drop-shadow(0 2px 6px #000)}#thArrow.ride{border-bottom-color:#5be37d}
-#thRide{position:absolute;top:calc(166px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(5,9,20,.85);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 16px;text-align:center;font-family:var(--f-body);color:#fff;white-space:nowrap}
+#thRide{position:absolute;top:calc(96px + env(safe-area-inset-top,0px));left:16px;background:rgba(5,9,20,.85);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 14px;text-align:left;font-family:var(--f-body);color:#fff;white-space:nowrap}
 #thRide small{display:block;font-size:12px;color:#cfd8f0}#thRide b{display:block;font-size:24px}#thRide span{font-size:15px;margin:0 6px;color:#e9eefb}#thRide i{font-style:normal;font-family:var(--f-num);font-size:22px;color:#5dd6ff}#thRide .bad i{color:#ff5a5a}
 #thMoney{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));font-family:var(--f-num);font-size:22px;color:#fff;text-shadow:0 2px 6px #000}#thMoney b{font-size:40px;color:#5be37d;margin-left:2px}#thMoney small{display:block;font-size:14px;color:#cfd8f0;font-family:var(--f-body)}
 #thPop{position:absolute;top:47%;left:50%;transform:translate(-50%,-50%);font-family:var(--f-body);font-weight:700;font-size:34px;text-shadow:0 3px 10px #000,0 0 2px #000;opacity:0;white-space:nowrap}
 #thPop.show{animation:thPop 1.6s ease-out}@keyframes thPop{0%{opacity:0;transform:translate(-50%,-30%) scale(1.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
 body.town #tl,body.town #total,body.town #meter{display:none}
-@media (max-width:640px){#thTime b{font-size:44px}#thArrow{top:calc(70px + env(safe-area-inset-top,0px));border-left-width:22px;border-right-width:22px;border-bottom-width:46px}#thRide{top:calc(124px + env(safe-area-inset-top,0px));padding:4px 10px}#thRide b{font-size:18px}#thMoney b{font-size:28px}#thPop{font-size:22px}}
+@media (max-width:640px){#thTime b{font-size:44px}#thArrow{top:calc(70px + env(safe-area-inset-top,0px));border-left-width:22px;border-right-width:22px;border-bottom-width:46px}#thRide{top:calc(78px + env(safe-area-inset-top,0px));left:10px;padding:4px 10px}#thRide b{font-size:18px}#thMoney b{font-size:28px}#thPop{font-size:22px}}
 body.den #radio{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 @media (max-width:640px){body.den #radio{bottom:calc(128px + env(safe-area-inset-bottom,0px))}}
 @media (max-width:640px){#denPanel{gap:8px;padding:8px 10px;grid-template-columns:1fr 1.15fr .95fr}#dpSt{font-size:20px}#dpDist b{font-size:38px}#dpSpd b{font-size:32px}.dpRow{font-size:12px}.dpRow b{font-size:18px}#dpHint{font-size:11px;white-space:normal}#dpNotch span{min-width:13px;font-size:10px}#denPanel small{font-size:11px}}
@@ -463,7 +463,7 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
     <h1><em>DDDV</em><span class="h1sub">デスドライブダークヴェイル</span><span class="h1en">DEATH DRIVE DARKVEIL</span></h1>
     <p class="lede">大会を勝ち上がって賞金をため、車を買ってパーツで強くしよう。峠バトルでは1対1の勝負もできる。</p>
     <div class="topbar"><div class="tabs" role="tablist" aria-label="メニュー">
-      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect">回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button><button type="button" role="tab" data-tab="densha">電車</button><button type="button" role="tab" data-tab="town">タクシー</button>
+      <button type="button" role="tab" data-tab="gp">グランプリ</button><button type="button" role="tab" data-tab="battle">峠バトル</button><button type="button" role="tab" data-tab="garage">ガレージ</button><button type="button" role="tab" data-tab="parts">パーツ</button><button type="button" role="tab" data-tab="collect" hidden>回収</button><button type="button" role="tab" data-tab="escape">逃走</button><button type="button" role="tab" data-tab="free">首都高</button><button type="button" role="tab" data-tab="school">教習所</button><button type="button" role="tab" data-tab="densha">電車</button><button type="button" role="tab" data-tab="town">街</button>
     </div><span class="wallet">所持 <b id="wallet">0</b> P</span></div>
     <p class="lede" id="saveWarn" hidden style="color:var(--tail);font-size:12px">このブラウザでは保存ができないため、ページを閉じたり再読み込みしたりするとポイントと買った車が消えます。</p>
     <section class="pane" id="pane-gp" role="tabpanel"><div id="cupBox"></div></section>
@@ -515,9 +515,10 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
       <div class="courseList" id="escList"></div></div>
     </section>
     <section class="pane" id="pane-town" role="tabpanel" hidden>
-      <div class="cup"><div class="cupHead"><b>DDDV市 クレイジータクシー</b><span id="townBest">BEST --</span></div>
-      <p class="lede" style="font-size:12px">夜の街を走り回って、お客さんを目的地まで運ぼう。<b>光の柱の下にいるお客さんの前で止まる</b>と乗車。画面上の<b>矢印</b>が行き先を指す。行き先の緑の輪の中で止まれば運賃ゲット。早く着くほど持ち時間が増える（SPEEDY! なら＋5秒以上）。</p>
-      <p class="lede" style="font-size:12px">お客さんを乗せている間の<b>ドリフト</b>と一般車への<b>ニアミス</b>はチップ（続けるほど倍増）。ぶつけると連続が切れる。柱の色は距離の目安：<span style="color:#ff5a5a">赤＝近い</span>・<span style="color:#ffa64a">橙</span>・<span style="color:#ffe45a">黄</span>・<span style="color:#5be37d">緑＝遠い（高い）</span>。持ち時間が0になったら営業終了。どの車でも営業できる（電車は除く）。</p>
+      <div class="cup"><div class="cupHead"><b>DDDV市 ／ 街のお仕事</b><span id="townBest">BEST --</span></div>
+      <div class="courseList" id="townJobs"></div>
+      <p class="lede" style="font-size:12px" id="townDesc"></p>
+      <p class="lede" style="font-size:12px">画面の上に浮かぶ<b>矢印</b>が、次に行く場所の方向へ向く。光の柱はビルの向こうでも透けて見える。どの車でも走れる（電車は除く）。</p>
       </div>
     </section>
     <section class="pane" id="pane-densha" role="tabpanel" hidden>
@@ -2319,6 +2320,7 @@ const RACE_PTS=[10,6,4,2,1];
 let cleared=sj('touge_cleared',[]);
 const cupOpen=c=>!c.req||cleared.includes(c.req);
 let cupStates=sj('touge_cups',{});if(!cupStates.D&&sj('touge_cup',null))cupStates.D=sj('touge_cup',null);
+if(store.get('touge_mode')==='collect'){store.set('touge_mode','town');store.set('touge_town_job','collect');}
 let mode=['battle','collect','escape','free','school','densha','town'].includes(store.get('touge_mode'))?store.get('touge_mode'):'cup',tab=mode==='cup'?'gp':mode;
 let cupIdx=Math.max(0,CUPS.findIndex(c=>c.id===store.get('touge_cupId')));if(!cupOpen(CUPS[cupIdx]))cupIdx=0;
 let cupState=cupStates[CUPS[cupIdx].id]||null;
@@ -2454,6 +2456,13 @@ function renderEsc(){const l=$('escList');l.innerHTML='';const st=sj('touge_esc'
     b.innerHTML='<b></b><small></small>';b.querySelector('b').textContent=c.name;b.querySelector('small').textContent=st[id]?'逃げ切り '+st[id]+'回':'まだ逃げ切っていない';
     b.addEventListener('click',()=>{escCourse=id;store.set('touge_esc_course',id);loadCourse(id);renderEsc();syncStart();});l.appendChild(b);});
   const tot=Object.values(st).reduce((a,b)=>a+b,0);$('escBest').textContent='逃げ切り 合計 '+tot+'回';}
+const TOWN_DESC={taxi:'<b>タクシー</b>：光の柱の下にいるお客さんの前で止まると乗車。行き先の緑の輪の中で止まれば運賃。早く着くほど持ち時間が増える（SPEEDY! で＋10秒〜）。乗せている間のドリフトとニアミスはチップ（続けるほど倍増）。柱の色は距離の目安：<span style="color:#ff5a5a">赤＝近い</span>→<span style="color:#ffa64a">橙</span>→<span style="color:#ffe45a">黄</span>→<span style="color:#5be37d">緑＝遠い</span>。',
+  collect:'<b>夜の回収便</b>：緑の光のゴミ集積所で止まって回収（＋8秒）。<b>ゴミ収集車は6か所ぶん</b>、ほかの車は3か所ぶん積める。いっぱいになったら<b>港の清掃工場</b>で降ろす（＋時間とお金）。ゴミ収集車だと回収もとても速い。',
+  escape:'<b>深夜の逃走劇</b>：パトカーが街中で追いかけてくる。くっつかれると捕獲ゲージがたまり、満タンで確保。オレンジの光の<b>隠れ家</b>に逃げ込むと賞金、すぐ次の隠れ家へ。時間がたつと応援のパトカーが増える。'};
+function renderTown(){const l=$('townJobs');l.innerHTML='';Object.keys(TOWN_JOBS).forEach(k=>{const b=document.createElement('button');b.type='button';b.className='courseBtn'+(k===townJob?' sel':'');const best=+(store.get('touge_town_best_'+k)||0);
+    b.innerHTML='<b></b><small></small>';b.querySelector('b').textContent=TOWN_JOBS[k];b.querySelector('small').textContent=best?'BEST ¥'+best.toLocaleString():'まだ遊んでいない';
+    b.addEventListener('click',()=>{townJob=k;store.set('touge_town_job',k);renderTown();syncStart();});l.appendChild(b);});
+  $('townDesc').innerHTML=TOWN_DESC[townJob];const best=+(store.get('touge_town_best_'+townJob)||0);$('townBest').textContent=best?'BEST ¥'+best.toLocaleString():'BEST --';}
 function syncStart(){
   const b=$('btnStart');
   if(typeof ONLINE!=='undefined'&&ONLINE&&ONLINE.st){const g=ONLINE.st,n=g.order.filter(id=>g.players[id].car).length;b.textContent=ONLINE.host?'スタート（'+n+'台・'+g.courseName+'）':'ホストのスタート待ち';b.disabled=!ONLINE.host;return;}
@@ -2463,14 +2472,14 @@ function syncStart(){
   else if(mode==='collect')b.textContent='回収スタート（ネオン街）';
   else if(mode==='free')b.textContent={c1ring:'首都高へ出る（C1 実寸）',bigring:'首都高へ出る（湾岸ループ 実寸）',bayring:'首都高へ出る（東京ベイ大周回 実寸）'}[freeMap()]||'首都高へ出る（夜の環状）';
   else if(mode==='densha')b.textContent='乗務開始（'+DEN_LINES.find(l=>l.id===denLine).name+'）';
-  else if(mode==='town')b.textContent='営業開始（DDDV市）';
+  else if(mode==='town')b.textContent={taxi:'タクシー営業開始',collect:'回収便、出発',escape:'逃走開始'}[townJob]+'（DDDV市）';
   else if(mode==='school')b.textContent='検定を受ける（'+courseOf(schoolStage).name+'）';
   else b.textContent='峠バトル開始（'+courseOf(battleCourse).name+'）';
 }
 function setTab(t){tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
   ['gp','battle','garage','parts','collect','escape','free','school','densha','town'].forEach(k=>$('pane-'+k).hidden=k!==t);
-  if(t==='town'){mode='town';store.set('touge_mode','town');if(!course||course.id!=='town')loadCourse('town');const b=+(store.get('touge_town_best')||0);$('townBest').textContent=b?'BEST ¥'+b.toLocaleString():'BEST --';}
+  if(t==='town'){mode='town';store.set('touge_mode','town');if(!course||course.id!=='town')loadCourse('town');renderTown();}
   if(t==='densha'){mode='densha';store.set('touge_mode','densha');if(!course||course.id!==denLine)loadCourse(denLine);renderDen();}
   if(t==='school'){mode='school';store.set('touge_mode','school');if(!course||course.id!==schoolStage)loadCourse(schoolStage);renderSchool();}
   if(t==='free'){mode='free';store.set('touge_mode','free');if(!course||course.id!==freeMap())loadCourse(freeMap());freeMapUI();const b=sj('touge_free_best',null);$('freeBest').textContent=b?'BEST '+b.w+'勝 ／ '+b.km.toFixed(1)+' km':'BEST --';}
@@ -2672,7 +2681,7 @@ function stepCar(dt,racing){
   const sp=Math.hypot(car.vx,car.vz);
   // ハンドル：キー入力でもじわっと切れる。速いほど切れ角を絞る
   let steerIn=(input.right-input.left);
-  if(car.sleep&&spec.type==='bed'&&racing){const sp0=Math.hypot(car.vx,car.vz),q=P[Math.min(N-1,car.idx+Math.round(7+sp0*.45))];const want=Math.atan2(q.x-car.x,q.z-car.z);const e=((want-car.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;steerIn=Math.max(-1,Math.min(1,-e*2.4));let m=0;for(let j=car.idx;j<Math.min(N,car.idx+10+Math.round(sp0*1.6));j++)m=Math.max(m,Math.abs(P[j].k));car.sleepGas=sp0<(m>0?Math.sqrt(8*spec.grip/m):99)?1:0;}
+  if(car.sleep&&spec.type==='bed'&&racing){const sp0=Math.hypot(car.vx,car.vz),q=P[Math.min(N-1,car.idx+Math.round(7+sp0*.45))];const want=Math.atan2(q.x-car.x,q.z-car.z);const e=wrapPI(want-car.yaw);steerIn=Math.max(-1,Math.min(1,-e*2.4));let m=0;for(let j=car.idx;j<Math.min(N,car.idx+10+Math.round(sp0*1.6));j++)m=Math.max(m,Math.abs(P[j].k));car.sleepGas=sp0<(m>0?Math.sqrt(8*spec.grip/m):99)?1:0;}
   const rate=steerIn?(Math.sign(steerIn)!==Math.sign(car.steer)&&car.steer?6:3.2):5;
   car.steer+=(steerIn-car.steer)*Math.min(1,dt*rate);
   const steer=car.steer;
@@ -2823,7 +2832,7 @@ function stepCar(dt,racing){
       car.vx-=p.rx*s*vn*1.08;car.vz-=p.rz*s*vn*1.08;
       const sc=Math.max(.7,1-vn*.022);car.vx*=sc;car.vz*=sc;
       // 車体の向きを道に沿わせる
-      const fwd=Math.cos(car.yaw-p.h)>=0?p.h:p.h+Math.PI;let dy=((fwd-car.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;
+      const fwd=Math.cos(car.yaw-p.h)>=0?p.h:p.h+Math.PI;let dy=wrapPI(fwd-car.yaw);
       if(vn>1.5){car.yaw+=dy*Math.min(.4,(vn-1.5)*.04);car.yr*=Math.max(.6,1-(vn-1.5)*.06);}
       if(vn>4&&racing){game.hits++;damage((vn-3)*1.6);game.shake=Math.min(.6,vn*.045);hitSound();spark(car.x+p.rx*s*.9,car.y,car.z+p.rz*s*.9);endChain(false);car.drifting=false;}
       else if(vn>1.2)game.shake=Math.max(game.shake,.12);
@@ -2847,7 +2856,7 @@ function stepVehicle(dt,racing){
   if(!RAIL(spec.type))return stepCar(dt,racing);
   if(car.derail){
     const r=stepCar(dt,racing);car.derailT+=dt;car.drifting=r.sp>4;
-    const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz,dy=Math.abs(((car.yaw-p.h+Math.PI*3)%(Math.PI*2))-Math.PI);
+    const p=P[car.idx],lat=(car.x-p.x)*p.rx+(car.z-p.z)*p.rz,dy=Math.abs(wrapPI(car.yaw-p.h));
     if(((Math.abs(lat)<1.1&&dy<.3&&!input.hand)||r.sp<4)&&car.derailT>.6){
       const good=r.sp>=4;car.derail=false;car.drifting=false;car.s=p.d;car.v=Math.max(0,r.vf);
       if(good&&racing){game.dChain+=500;car.nitro=Math.min(1,car.nitro+.3);game.chainT=.6;flash('再レール成功！ +500');beep(880,.15);setTimeout(()=>beep(1320,.2),120);}
@@ -2981,6 +2990,7 @@ function drawSpeed(v,dt){
     sg.strokeStyle='rgba(220,230,255,'+al.toFixed(3)+')';sg.lineWidth=1.5;
     sg.beginPath();sg.moveTo(cx+Math.cos(s.a)*r1,cy+Math.sin(s.a)*r1);sg.lineTo(cx+Math.cos(s.a)*r2,cy+Math.sin(s.a)*r2);sg.stroke();return true;});
 }
+function wrapPI(a){return a-Math.PI*2*Math.round(a/(Math.PI*2));}
 const camPos=new THREE.Vector3(),camLook=new THREE.Vector3();let camInit=false;
 function frame(now){
   if(catNext===-1)catNext=now+2600;else if(catNext&&now>=catNext){catNext=0;if(game.state==='done'&&mode==='battle'&&bHeat===1){bHeat=2;$('count').textContent='';resetRace();flash('2本目：今度はあなたが先行。引き離せ！');}}
@@ -3143,7 +3153,7 @@ function frame(now){
     if((game.state==='race'||game.state==='count')&&course.env==='arcade')inT=true; // 商店街のアーケード屋根の下も同じ
     else if(game.state==='race'||game.state==='count')for(let k=ci;k<Math.min(N,(car.idx|0)+28);k+=2)if(P[k]&&P[k].T){inT=true;break;}
     game.tunB=(game.tunB||0)+((inT?1:0)-(game.tunB||0))*Math.min(1,dt*3.5);if(game.tunB>.01)tunY=Math.min(car.y,P[ci]?P[ci].y:car.y)+4.3;}
-  if(game.state==='title'&&tab==='garage'||game.state==='done'){ // ガレージと、ゴール後は車のまわりをぐるっと回って見せる
+  if(game.state==='title'&&tab==='garage'||game.state==='done'&&mode!=='town'){ // 街モードは終わってもカメラは後ろのまま // ガレージと、ゴール後は車のまわりをぐるっと回って見せる
     const tx=game.state==='title'?demo.x:car.x,ty=game.state==='title'?demo.y:car.y,tz=game.state==='title'?demo.z:car.z,ty0=game.state==='title'?demo.yaw:car.yaw;
     game.orb=(game.orb==null?Math.PI*.75:game.orb)+dt*.45;const d=game.state==='title'?6.2:7,a=ty0+game.orb;
     camPos.set(tx+Math.sin(a)*d,ty+(game.state==='title'?1.7:2.2),tz+Math.cos(a)*d);camLook.set(tx,ty+.7,tz);
@@ -3160,7 +3170,7 @@ function frame(now){
     if(!camInit){camera.position.copy(camPos);camInit=true;}camera.position.lerp(camPos,Math.min(1,dt*6));camera.lookAt(camLook);
     if(cockpitOn){cockpitOn=false;$('cockpit').hidden=true;}wheelRig.visible=false;setCam(false,62);
   } else if(game.view===0){game.orb=null;
-    const vy=info.sp>4?Math.atan2(car.vx,car.vz):car.yaw;const cy=car.kd?vy:car.yaw+((vy-car.yaw+Math.PI*3)%(Math.PI*2)-Math.PI)*.35;
+    const vy=info.sp>4?Math.atan2(car.vx,car.vz):car.yaw;const cy=car.kd?vy:car.yaw+(wrapPI(vy-car.yaw))*.35;
     const cm=CAMD[camDist],cd=(spec.cam?spec.cam[0]:5.2)*cm,ch=(spec.cam?spec.cam[1]:3.1)*(cm<.7?.3+.7*cm:.6+.4*cm)+(car.lift?4.5:0),cl=spec.cam?spec.cam[2]||0:0;
     const clT=cl*(1-(game.tunB||0)*.8);camPos.set(car.x-Math.sin(cy)*cd-Math.cos(cy)*clT,car.y+ch,car.z-Math.cos(cy)*cd+Math.sin(cy)*clT);
     if(tunY<1e8)camPos.y=Math.min(camPos.y,camPos.y+(tunY-camPos.y)*game.tunB);
@@ -3259,6 +3269,7 @@ function frame(now){
   if(tailCar){tailCar.g.visible=game.state!=='title';updateSprite(tailCar,tailCar.g.rotation.y,false);}
   cpus.forEach(c=>updateSprite(c.mesh,c.yaw,false));
   if(ONLINE)olStep(dt,now);
+  if(TOWN.arrow)townArrowUpdate();
   renderer.render(scene,camera);
 }
 
@@ -3586,7 +3597,7 @@ function ostKick(){if(game.state!=='race')return;if(car.kickCd>game.t){flash('�
 function paceNote(){if(game.state!=='race')return;if(car.noteCd>game.t){flash('ナビ「…ちょっと待って、ノート見てる」 あと '+Math.ceil(car.noteCd-game.t)+' 秒');return;}
   car.noteCd=game.t+7;car.noteT=game.t+4;let j=-1,mk=0;for(let i=car.idx+6;i<Math.min(N-12,car.idx+80);i++){const k=Math.abs(P[i].k||0);if(k>mk){mk=k;j=i;}}
   let msg;if(j<0||mk<1/400)msg='しばらくストレート、全開！';
-  else{let dh=P[Math.min(N-1,j+10)].h-P[Math.max(0,j-10)].h;dh=((dh+Math.PI*3)%(Math.PI*2))-Math.PI;const R0=1/mk,dir=dh<0?'右':'左';
+  else{let dh=P[Math.min(N-1,j+10)].h-P[Math.max(0,j-10)].h;dh=wrapPI(dh);const R0=1/mk,dir=dh<0?'右':'左';
     const lv=R0<25?'ヘアピン':R0<45?'1':R0<70?'2':R0<100?'3':R0<150?'4':R0<220?'5':'6';const dist=Math.max(10,Math.round((P[j].d-P[car.idx].d)/10)*10);
     msg=dist+'メートル先、'+dir+lv+(lv==='ヘアピン'||lv==='1'?'、ブレーキ！':lv==='5'||lv==='6'?'、踏める！':'！');}
   say({name:'コ・ドライバー',col:0xd8dde6},msg,2.4);if(ac)beep(980,.05);}
@@ -3712,7 +3723,7 @@ const TOWN_LM={ // 目的地になる建物（区画 i,j と、客を降ろす�
   station:{i:5,j:5,s:'S',name:'DDDV駅前'},tower:{i:6,j:3,s:'W',name:'DDDVタワー'},hosp:{i:3,j:4,s:'E',name:'市民病院'},univ:{i:8,j:7,s:'S',name:'DDDV大学'},
   onsen:{i:1,j:9,s:'E',name:'月見の湯'},port:{i:0,j:2,s:'E',name:'港の倉庫'},dome:{i:9,j:9,s:'W',name:'DDDVドーム'},cityhall:{i:4,j:6,s:'N',name:'市役所'},
   arcade:{i:6,j:6,s:'N',name:'ゲームセンター'},park:{i:2,j:7,s:'N',name:'中央公園'},ramen:{i:9,j:2,s:'W',name:'ラーメン横丁'},school:{i:7,j:10,s:'S',name:'DDDV高校'},
-  mall:{i:3,j:1,s:'N',name:'ショッピングモール'},shrine:{i:10,j:5,s:'W',name:'月見神社'}};
+  mall:{i:3,j:1,s:'N',name:'ショッピングモール'},shrine:{i:10,j:5,s:'W',name:'月見神社'},plant:{i:0,j:8,s:'E',name:'清掃工場'}};
 function townZone(i,j){for(const k in TOWN_LM){const L=TOWN_LM[k];if(L.i===i&&L.j===j)return k;}
   if((i===2&&j===7)||(i===8&&j===3))return 'park';if(i===0)return 'portw';if(j===6&&i>=1&&i<=9)return 'shops';if(Math.max(Math.abs(i-5),Math.abs(j-5))<=2)return 'office';return 'house';}
 const townRect=(i,j)=>({x0:i*TG+TROAD/2,x1:(i+1)*TG-TROAD/2,z0:j*TG+TROAD/2,z1:(j+1)*TG-TROAD/2});
@@ -3743,7 +3754,7 @@ function buildTown(G){TOWN.boxes=[];const rnd=(()=>{let a=11;return()=>(a=(a*168
         list.push({x,z:zz,y:0,w:w-4,d:w-4,h:z==='office'?30+rnd()*rnd()*120:z==='mall'?18:z==='univ'?22:z==='hosp'?34:40,r:0});}}
     else if(z==='shops'||z==='arcade'||z==='ramen'){for(let a=0;a<5;a++){const w=W/5;shops.push({x:R.x0+TSIDE+w*(a+.5),z:cz,w:w-1,d:W-2,h:7+rnd()*6,k:(i*5+a)%12});}}
     else if(z==='portw'||z==='port'){for(let a=0;a<2;a++)list.push({x:cx,z:R.z0+TSIDE+W*(a*.5+.25),y:0,w:W-6,d:W/2-6,h:12+rnd()*6,r:0});}
-    else if(z==='house'||z==='onsen'||z==='school'||z==='shrine'||z==='dome'||z==='tower'){
+    else if(z==='house'||z==='onsen'||z==='school'||z==='shrine'||z==='dome'||z==='tower'||z==='plant'){
       if(z==='house'){for(let a=0;a<3;a++)for(let b=0;b<3;b++)houses.push({x:R.x0+TSIDE+W*(a+.5)/3,z:R.z0+TSIDE+W*(b+.5)/3,w:13+rnd()*4,d:12+rnd()*4,h:5+rnd()*4});}
       else houses.push({x:cx,z:cz,lm:z,W});}}
   cityBlocks(G,list);
@@ -3771,6 +3782,8 @@ function buildTown(G){TOWN.boxes=[];const rnd=(()=>{let a=11;return()=>(a=(a*168
     if(h.lm==='tower'){[[14,10,30],[10,7,40],[7,5,40],[3,2,30]].reduce((y,[r0,r1,hh])=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,hh,8,1,true),new THREE.MeshLambertMaterial({color:0xd84a2a,emissive:0x301008,wireframe:true}));m.position.y=y+hh/2;g.add(m);return y+hh;},0);
       const top=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xff5040,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));top.scale.set(10,10,1);top.position.y=142;g.add(top);
       const deck=new THREE.Mesh(new THREE.CylinderGeometry(9,9,6,12),M(0x9fb0c0,0x202830));deck.position.y=74;g.add(deck);}
+    else if(h.lm==='plant'){const b=new THREE.Mesh(new THREE.BoxGeometry(W-10,16,W-14),M(0x8a8f98,0x14161a));b.position.y=8;g.add(b);const ch=new THREE.Mesh(new THREE.CylinderGeometry(2.2,3,70,12),M(0xd8dde4,0x22262c));ch.position.set(W/2-14,35,-W/2+14);g.add(ch);
+      [20,40,60,70].forEach(y=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xff3020,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));s.scale.set(4,4,1);s.position.set(W/2-14,y,-W/2+14);g.add(s);});}
     else if(h.lm==='dome'){const d=new THREE.Mesh(new THREE.SphereGeometry(W/2-2,24,10,0,Math.PI*2,0,Math.PI/2),M(0xd8dde4,0x22262c));d.scale.y=.45;g.add(d);}
     else if(h.lm==='onsen'){const b=new THREE.Mesh(new THREE.BoxGeometry(W-8,9,W-14),M(0x5a3a28));b.position.y=4.5;g.add(b);const r=new THREE.Mesh(new THREE.BoxGeometry(W-4,1.2,W-10),M(0x22262c));r.position.y=9.6;g.add(r);
       for(let t=0;t<4;t++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,color:0xbfd0e0,transparent:true,opacity:.35,depthWrite:false}));s.scale.set(14,14,1);s.position.set((t-1.5)*9,14+t%2*4,0);g.add(s);}}
@@ -3801,6 +3814,8 @@ function townPhys(dt,racing,vf){
   car.y=0;car.pitch=0;car.wall=false;car.s=0;
   const v=Math.max(0,vf);let g=1;while(g<6&&v>GEARS[g])g++;car.gear=g;const lo2=GEARS[g-1],hi2=GEARS[g];car.rpm=Math.min(1,.18+(v-lo2)/(hi2-lo2)*.82);
 }
+function townPush(o,R){for(const b of TOWN.boxes){if(o.x<b.x0-R-1||o.x>b.x1+R+1||o.z<b.z0-R-1||o.z>b.z1+R+1)continue;const cx=Math.max(b.x0,Math.min(b.x1,o.x)),cz=Math.max(b.z0,Math.min(b.z1,o.z)),dx=o.x-cx,dz=o.z-cz,d=Math.hypot(dx,dz);
+    if(d<R){if(d<1e-3){o.x=cx<(b.x0+b.x1)/2?b.x0-R:b.x1+R;}else{o.x+=dx/d*(R-d);o.z+=dz/d*(R-d);}o.hit=true;}}o.x=Math.max(-7,Math.min(TMAX+7,o.x));o.z=Math.max(-7,Math.min(TMAX+7,o.z));}
 function townHit(nx,nz,racing){const vn=-(car.vx*nx+car.vz*nz);if(vn<=0)return;car.vx+=nx*vn*1.08;car.vz+=nz*vn*1.08;const sc=Math.max(.6,1-vn*.03);car.vx*=sc;car.vz*=sc;car.wall=true;
   if(vn>4&&racing){game.hits++;damage((vn-3)*1.2);game.shake=Math.min(.6,vn*.045);hitSound();spark(car.x-nx,car.y+.5,car.z-nz);endChain(false);car.drifting=false;if(game.town)game.town.combo=0;}
   else if(vn>1.2)game.shake=Math.max(game.shake,.12);}
@@ -3836,7 +3851,8 @@ const TCOL=[[300,0xff4040,'#ff5a5a'],[500,0xff9a30,'#ffa64a'],[750,0xffe040,'#ff
 function townPerson(col){const g=new THREE.Group(),skin=new THREE.MeshLambertMaterial({color:0xf0c8a0}),cl=new THREE.MeshLambertMaterial({color:[0x2a4a8a,0x8a2a3a,0x3a7a4a,0x6a4a8a,0xcaa040][Math.random()*5|0]});
   const b=new THREE.Mesh(new THREE.CylinderGeometry(.35,.42,1.2,8),cl);b.position.y=.95;const h=new THREE.Mesh(new THREE.SphereGeometry(.28,10,8),skin);h.position.y=1.8;const lg=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.5,8),new THREE.MeshLambertMaterial({color:0x22262c}));lg.position.y=.25;g.add(b,h,lg);
   const ring=new THREE.Mesh(new THREE.TorusGeometry(2.6,.14,6,32),new THREE.MeshBasicMaterial({color:col}));ring.rotation.x=Math.PI/2;ring.position.y=.12;g.add(ring);
-  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,26,12,1,true),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=13;g.add(beam);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,220,12,1,true),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=110;g.add(beam);
+  const glow=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,220,12,1,true),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.2,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));glow.position.y=110;glow.renderOrder=5;g.add(glow); // ビル越しにも見える
   g.userData.ring=ring;scene.add(g);return g;}
 const TOWN_DEST=Object.keys(TOWN_LM);
 function townNewCust(dmin,dmax){const T=game.town;let tries=0;while(tries++<80){const i=Math.random()*TN|0,j=Math.random()*TN|0,z=townZone(i,j);if(z==='park')continue;const s='NSEW'[Math.random()*4|0],R=townRect(i,j);
@@ -3844,53 +3860,126 @@ function townNewCust(dmin,dmax){const T=game.town;let tries=0;while(tries++<80){
     {const dc=Math.hypot(px-car.x,pz-car.z);if(dc<(dmin||60)||(dmax&&dc>dmax))continue;}if(T.cust.some(c=>Math.hypot(c.x-px,c.z-pz)<40))continue;
     let dk,dd,n=0;do{dk=TOWN_DEST[Math.random()*TOWN_DEST.length|0];const L=TOWN_LM[dk],q=townAddr(L.i,L.j,L.s);dd=Math.abs(q.x-px)+Math.abs(q.z-pz);n++;}while((dd<180)&&n<20);
     const cls=TCOL.findIndex(c=>dd<c[0]),g=townPerson(TCOL[cls][1]);g.position.set(px,0,pz);T.cust.push({x:px,z:pz,g,dest:dk,dist:dd,cls});return;}}
-function townClear(){TOWN.cars.forEach(c=>scene.remove(c.mesh.g));TOWN.cars=[];if(game.town){game.town.cust.forEach(c=>scene.remove(c.g));if(game.town.mark)scene.remove(game.town.mark);}}
-function townDestMark(x,z){const g=new THREE.Group();const ring=new THREE.Mesh(new THREE.TorusGeometry(10,.35,6,40),new THREE.MeshBasicMaterial({color:0x40ff80}));ring.rotation.x=Math.PI/2;ring.position.y=.15;
-  const beam=new THREE.Mesh(new THREE.CylinderGeometry(9,9,60,24,1,true),new THREE.MeshBasicMaterial({color:0x40ff80,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=30;g.add(ring,beam);g.position.set(x,0,z);scene.add(g);return g;}
-function setupTown(){townClear();const T=game.town={time:60,money:0,fares:0,tips:0,count:0,cust:[],ride:null,combo:0,best:+(store.get('touge_town_best')||0),dchain:0,pop:null,end:false};
+function townClear(){TOWN.cars.forEach(c=>scene.remove(c.mesh.g));TOWN.cars=[];if(TOWN.arrow)TOWN.arrow.visible=false;if(game.town){const T=game.town;T.cust.forEach(c=>scene.remove(c.g));(T.spots||[]).forEach(q=>scene.remove(q.g));(T.cops||[]).forEach(c=>scene.remove(c.mesh.g));if(T.mark)scene.remove(T.mark);if(T.job==='escape')stopCopSiren();}}
+function townDestMark(x,z,col){const g=new THREE.Group();const ring=new THREE.Mesh(new THREE.TorusGeometry(10,.35,6,40),new THREE.MeshBasicMaterial({color:col||0x40ff80}));ring.rotation.x=Math.PI/2;ring.position.y=.15;
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(9,9,240,24,1,true),new THREE.MeshBasicMaterial({color:col||0x40ff80,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=120;
+  const glow=new THREE.Mesh(new THREE.CylinderGeometry(6,6,240,16,1,true),new THREE.MeshBasicMaterial({color:col||0x40ff80,transparent:true,opacity:.2,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));glow.position.y=120;glow.renderOrder=5;g.add(ring,beam,glow);g.position.set(x,0,z);scene.add(g);return g;}
+const TOWN_JOBS={taxi:'タクシー',collect:'夜の回収便',escape:'深夜の逃走劇'};let townJob=store.get('touge_town_job')||'taxi';if(!TOWN_JOBS[townJob])townJob='taxi';
+function setupTown(){townClear();const job=townJob,T=game.town={job,time:60,money:0,fares:0,tips:0,count:0,cust:[],ride:null,combo:0,dchain:0,end:false,spots:[],load:0,unl:0,cprog:0,cops:[],bust:0,goals:0,goal:null,reinf:0};
   const s=townAddr(5,5,'S');Object.assign(car,{x:s.x,z:s.z-3,y:0,yaw:Math.PI/2,vx:0,vz:0,yr:0,steer:0});
-  townSpawnCars(34);for(let k=0;k<3;k++)townNewCust(70,180);for(let k=0;k<7;k++)townNewCust();
-  setTimeout(()=>say({name:'無線',col:0xffd23f},'DDDVタクシー、営業開始！ 光の柱の下にいるお客さんの前で止まって乗せよう。時間は運ぶたびに増えるぞ。',4.5),600);}
+  townSpawnCars(job==='escape'?26:34);
+  if(job==='taxi'){for(let k=0;k<3;k++)townNewCust(70,180);for(let k=0;k<7;k++)townNewCust();
+    setTimeout(()=>say({name:'無線',col:0xffd23f},'DDDVタクシー、営業開始！ 光の柱の下にいるお客さんの前で止まって乗せよう。時間は運ぶたびに増えるぞ。',4.5),600);}
+  if(job==='collect'){T.cap=spec.type==='packer'?6:3;for(let k=0;k<3;k++)townNewSpot(60,200);for(let k=0;k<9;k++)townNewSpot();
+    setTimeout(()=>say({name:'清掃事務所',col:0x50ff96},'回収便、出発！ 緑の光のゴミ集積所で止まって回収。'+(T.cap===6?'収集車は6か所ぶん積める。':'この車だと3か所ぶんしか積めない。')+'いっぱいになったら港の清掃工場で降ろしてね。',5),600);}
+  if(job==='escape'){T.time=0;townNewGoal();for(let k=0;k<2;k++)townAddCop(140+k*40);T.cops.forEach(c=>c.stun=4);startCopSiren();
+    setTimeout(()=>say(COP,'そこの車、止まりなさい！',2.6),600);setTimeout(()=>say({name:'仲間',col:0xff9a30},'隠れ家まで逃げ込め！ 着いたら次の隠れ家を教える！',3.2),3400);}}
+// ---- 回収便 ----
+function townNewSpot(dmin,dmax){const T=game.town;let tries=0;while(tries++<80){const i=Math.random()*TN|0,j=Math.random()*TN|0,z=townZone(i,j);if(z==='park'||z==='station'||z==='plant')continue;const sd='NSEW'[Math.random()*4|0],R=townRect(i,j),a=townAddr(i,j,sd);
+    const x=sd==='E'?R.x1+2:sd==='W'?R.x0-2:a.x+(Math.random()-.5)*36,zz=sd==='N'?R.z1+2:sd==='S'?R.z0-2:a.z+(Math.random()-.5)*36;
+    {const dc=Math.hypot(x-car.x,zz-car.z);if(dc<(dmin||60)||(dmax&&dc>dmax))continue;}if(T.spots.some(q=>Math.hypot(q.x-x,q.z-zz)<70))continue;
+    const g=new THREE.Group();const ring=new THREE.Mesh(new THREE.TorusGeometry(3.4,.18,6,32),new THREE.MeshBasicMaterial({color:0x50ff96}));ring.rotation.x=Math.PI/2;ring.position.y=.12;g.add(ring);
+    const bx=sd==='E'?-1:sd==='W'?1:0,bz=sd==='N'?-1:sd==='S'?1:0;for(let b=0;b<6;b++){const m=new THREE.Mesh(bagG,pick(bagMs));m.position.set(bx*3.2+(Math.random()-.5)*1.6,.35+(b>3?.5:0),bz*3.2+(Math.random()-.5)*1.6);g.add(m);}
+    const net=new THREE.Mesh(new THREE.BoxGeometry(2.6,.9,2.6),new THREE.MeshLambertMaterial({color:0x2a6a3a,transparent:true,opacity:.5}));net.position.set(bx*3.2,.45,bz*3.2);g.add(net);
+    [[220,.22,true],[220,.2,false]].forEach(([h,op,dt])=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(dt?1.1:2.4,dt?1.1:2.4,h,12,1,true),new THREE.MeshBasicMaterial({color:0x50ff96,transparent:true,opacity:op,depthWrite:false,depthTest:dt,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));b.position.y=h/2;if(!dt)b.renderOrder=5;g.add(b);});
+    g.position.set(x,0,zz);scene.add(g);g.userData.ring=ring;T.spots.push({x,z:zz,g});return;}}
+function stepCollectTown(dt,sp){const T=game.town;T.spots.forEach(q=>q.g.userData.ring.rotation.z+=dt);
+  const L=TOWN_LM.plant,pa=townAddr(L.i,L.j,L.s);
+  if(T.load>=T.cap){T.cprog=0;if(Math.hypot(pa.x-car.x,pa.z-car.z)<12&&sp<4){const n=T.load,y=n*(spec.type==='packer'?260:180);T.money+=y;T.unl+=n;T.load=0;const add=6+n*2;T.time+=add;
+      townPop('搬入完了！ '+n+'か所ぶん ¥'+y.toLocaleString()+'　+'+add+'秒','#5be37d');if(ac){beep(784,.12);setTimeout(()=>beep(1175,.2),110);}if(T.mark){scene.remove(T.mark);T.mark=null;}say({name:'清掃工場',col:0x50ff96},pick(['おつかれさま！ 次もよろしく！','たくさん集めてきたね！','はい、受け取りました！']),2);}
+    return;}
+  let near=null;for(const q of T.spots)if(Math.hypot(q.x-car.x,q.z-car.z)<5.5){near=q;break;}
+  if(near&&sp<3.2){T.cprog+=dt/(spec.type==='packer'?.5:1.4);if(T.cprog>=1){T.cprog=0;scene.remove(near.g);T.spots.splice(T.spots.indexOf(near),1);T.load++;T.count++;T.time+=8;const y=spec.type==='packer'?120:80;T.money+=y;
+      townPop('回収！ +8秒　¥'+y+'（'+T.load+'/'+T.cap+'）','#50ff96');if(ac){beep(784,.12);setTimeout(()=>beep(1175,.2),110);}if(spec.type==='packer')melody();townNewSpot();
+      if(T.load>=T.cap){T.mark=townDestMark(pa.x,pa.z,0x50ff96);townPop('満載！ 清掃工場へ','#ffd23f');say({name:'清掃事務所',col:0x50ff96},'もう積めないね。港の清掃工場で降ろしてきて！',2.6);}}}
+  else T.cprog=Math.max(0,T.cprog-dt*2);}
+// ---- 逃走 ----
+function townNewGoal(){const T=game.town,ks=TOWN_DEST.filter(k=>{if(k==='plant')return false;const L=TOWN_LM[k],q=townAddr(L.i,L.j,L.s);return Math.hypot(q.x-car.x,q.z-car.z)>420;});const k=ks[Math.random()*ks.length|0]||'port',L=TOWN_LM[k],q=townAddr(L.i,L.j,L.s);
+  if(T.mark)scene.remove(T.mark);T.goal={k,x:q.x,z:q.z,name:L.name+'の隠れ家'};T.mark=townDestMark(q.x,q.z,0xff9a30);}
+function townAddCop(back){const T=game.town;let x=car.x-Math.sin(car.yaw)*back,z=car.z-Math.cos(car.yaw)*back;const ix=Math.max(0,Math.min(TN,Math.round(x/TG))),iz=Math.max(0,Math.min(TN,Math.round(z/TG)));x=ix*TG;z=iz*TG;
+  const m=makeCar({top:0xffffff,bot:0x15161a,shape:'sedan',sprite:'police',type:'police'},false);T.cops.push({mesh:m,x,z,yaw:0,v:0,tx:x,tz:z,stun:0});}
+function townStepCops(dt){const T=game.town,sp=Math.hypot(car.vx,car.vz);let near=0,nd=1e9;
+  for(const c of T.cops){const dP=Math.hypot(car.x-c.x,car.z-c.z);
+    // 近ければプレイヤーへ直行、遠ければ交差点をたどってプレイヤーに近づく
+    if(dP<40){c.tx=car.x;c.tz=car.z;}else if(Math.hypot(c.tx-c.x,c.tz-c.z)<6||c.hit2){const ix=Math.round(c.x/TG),iz=Math.round(c.z/TG);let best=null,bd=1e9;
+        for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=ix+a,nz=iz+b;if(nx<0||nz<0||nx>TN||nz>TN)continue;const d=Math.abs(nx*TG-car.x)+Math.abs(nz*TG-car.z)+Math.random()*40;if(d<bd){bd=d;best=[nx*TG,nz*TG];}}
+        if(best){c.tx=best[0];c.tz=best[1];}c.hit2=false;}
+    const dx=c.tx-c.x,dz=c.tz-c.z,want=Math.atan2(dx,dz);let e=wrapPI(want-c.yaw);c.yaw+=Math.max(-3*dt,Math.min(3*dt,e));
+    c.stun=Math.max(0,c.stun-dt);const vmax=c.stun>0?0:(dP<40?Math.min(36,sp+8):30)*(Math.abs(e)>.8?.45:1);c.v+=(vmax-c.v)*Math.min(1,dt*(vmax<c.v?3:1.2));
+    c.x+=Math.sin(c.yaw)*c.v*dt;c.z+=Math.cos(c.yaw)*c.v*dt;c.hit=false;townPush(c,1.4);if(c.hit){c.v*=.6;c.hit2=true;}
+    const dd=Math.hypot(car.x-c.x,car.z-c.z),rr=(spec.halfW||.92)+1.5;if(dd<rr&&dd>0){const nx=(car.x-c.x)/dd,nz=(car.z-c.z)/dd;car.x+=nx*(rr-dd)*.6;car.z+=nz*(rr-dd)*.6;c.x-=nx*(rr-dd)*.4;c.z-=nz*(rr-dd)*.4;const vn=-(car.vx*nx+car.vz*nz);if(vn>0){car.vx+=nx*vn*1.1;car.vz+=nz*vn*1.1;}if(vn>6){c.stun=1.2;hitSound();game.hits++;damage(vn*.6);}}
+    c.mesh.g.position.set(c.x,0,c.z);c.mesh.g.rotation.set(0,c.yaw,0);updateSprite(c.mesh,c.yaw,false);
+    nd=Math.min(nd,dd);if(dd<5.5)near++;}
+  if(near)T.bust+=dt*Math.min(2,near)*(sp<8?.28:sp<16?.11:sp<24?.04:0);else T.bust=Math.max(0,T.bust-dt*.2);
+  if(copSirenG&&ac)copSirenG.gain.setTargetAtTime(.09*Math.max(0,1-nd/160),ac.currentTime,.1);
+  if(T.reinf<4&&T.time>20+T.reinf*20){T.reinf++;townAddCop(160);flash('パトカーの応援が来た！');say(COP,pick(['応援到着！包囲しろ！','逃がすな！','回り込め！']),2);}
+  if(T.bust>=1){T.bust=1;T.busted=true;T.end=true;T.endAt=game.t+1.2;townPop('確保！','#ff5a5a');}
+  if(T.goal&&Math.hypot(T.goal.x-car.x,T.goal.z-car.z)<11){T.goals++;const y=1500+T.goals*500;T.money+=y;townPop('隠れ家に到着！ ¥'+y.toLocaleString(),'#ffa64a');if(ac){beep(988,.12);setTimeout(()=>beep(1318,.18),130);}
+    say({name:'仲間',col:0xff9a30},pick(['ここもバレてる！ 次の隠れ家へ！','よし…いや、サイレンが近い！ 次へ行け！','休んでる暇はない、次だ！']),2.6);T.bust=Math.max(0,T.bust-.3);townNewGoal();}}
 function townTip(t,y){const T=game.town;if(!T)return;T.combo++;const v=y*Math.min(5,T.combo);T.money+=v;T.tips+=v;townPop(t+' ¥'+v+(T.combo>1?'（'+T.combo+'連）':''),'#ffd23f');}
 function townPop(t,col){const e=$('thPop');e.textContent=t;e.style.color=col||'#fff';e.classList.remove('show');void e.offsetWidth;e.classList.add('show');}
 function stepTown(dt){const T=game.town;if(!T)return;townStepCars(dt);if(T.end){if(game.t>=T.endAt&&game.state==='race')finish();return;}
-  if(T.endAt){if(game.t>=T.endAt&&game.state==='race')finish();return;}
-  T.time-=dt;if(T.time<=0){T.time=0;T.end=true;T.endAt=game.t+1.4;townPop(T.ride?'時間切れ… お客さんは降りてしまった':'営業終了！','#ff5a5a');return;}
   const sp=Math.hypot(car.vx,car.vz);
+  if(T.job==='escape'){T.time+=dt;townStepCops(dt);return;}
+  T.time-=dt;if(T.time<=0){T.time=0;T.end=true;T.endAt=game.t+1.4;townPop(T.ride?'時間切れ… お客さんは降りてしまった':'TIME UP！','#ff5a5a');return;}
+  if(T.job==='collect'){stepCollectTown(dt,sp);return;}
   T.cust.forEach(c=>{c.g.userData.ring.rotation.z+=dt*1.5;});
   if(!T.ride){for(let k=0;k<T.cust.length;k++){const c=T.cust[k];if(Math.hypot(c.x-car.x,c.z-car.z)<8&&sp<3.5){
-        scene.remove(c.g);T.cust.splice(k,1);const L=TOWN_LM[c.dest],q=townAddr(L.i,L.j,L.s),lim=Math.round(c.dist/15+10);
-        T.ride={dest:c.dest,x:q.x,z:q.z,lim,t:lim,dist:c.dist,cls:c.cls};T.mark=townDestMark(q.x,q.z);townPop('乗車！ 「'+L.name+'まで！」','#5dd6ff');if(ac)beep(1200,.08);
+        scene.remove(c.g);T.cust.splice(k,1);const L=TOWN_LM[c.dest],q=townAddr(L.i,L.j,L.s),lim=Math.round(c.dist/13+12);
+        T.ride={dest:c.dest,x:q.x,z:q.z,lim,t:lim,dist:c.dist,cls:c.cls};T.mark=townDestMark(q.x,q.z);T.time+=2;townPop('乗車！ 「'+L.name+'まで！」 +2秒','#5dd6ff');if(ac)beep(1200,.08);
         say({name:'お客さん',col:0x9fd3ea},pick([''+L.name+'まで、急いで！',''+L.name+'まで頼むよ！','すみません、'+L.name+'まで！ 飛ばして！']),2.4);townNewCust();break;}}}
   else{const R=T.ride;R.t-=dt;
     if(car.drifting&&sp>12){T.dchain+=dt;if(T.dchain>1){T.dchain=0;townTip('クレイジードリフト！',80);}}else T.dchain=0;
     if(R.t<=0){townPop('「もういい、ここで降りる！」','#ff5a5a');scene.remove(T.mark);T.mark=null;T.ride=null;T.combo=0;return;}
-    if(Math.hypot(R.x-car.x,R.z-car.z)<11&&sp<5){const fare=Math.round((300+R.dist*2.2)/10)*10,rate=R.t/R.lim,bonus=rate>.5?5:rate>.2?3:1,lab=rate>.5?'SPEEDY!':rate>.2?'NORMAL':'SLOW…';
-      T.money+=fare;T.fares+=fare;T.count++;T.time+=bonus+Math.min(6,Math.round(R.dist/220));scene.remove(T.mark);T.mark=null;T.ride=null;
-      townPop(lab+'　¥'+fare.toLocaleString()+'　+'+(bonus+Math.min(6,Math.round(R.dist/220)))+'秒',rate>.5?'#5be37d':rate>.2?'#ffd23f':'#ff9a5a');if(ac){beep(988,.12);setTimeout(()=>beep(1318,.18),130);}
+    if(Math.hypot(R.x-car.x,R.z-car.z)<11&&sp<5){const fare=Math.round((300+R.dist*2.2)/10)*10,rate=R.t/R.lim,bonus=rate>.5?10:rate>.2?6:3,lab=rate>.5?'SPEEDY!':rate>.2?'NORMAL':'SLOW…',add=bonus+Math.min(8,Math.round(R.dist/150));
+      T.money+=fare;T.fares+=fare;T.count++;T.time+=add;scene.remove(T.mark);T.mark=null;T.ride=null;
+      townPop(lab+'　¥'+fare.toLocaleString()+'　+'+add+'秒',rate>.5?'#5be37d':rate>.2?'#ffd23f':'#ff9a5a');if(ac){beep(988,.12);setTimeout(()=>beep(1318,.18),130);}
       say({name:'お客さん',col:0x9fd3ea},pick(['ありがとう、助かった！','うおお…生きてる…ありがとう。','最高のタクシーだったよ！','また乗せてね！']),2);}}}
-function townHud(ge){const T=game.town;if(!T)return;$('townHud').hidden=false;document.body.classList.add('town');ge.textContent='DDDVタクシー';
-  const tm=$('thTime');tm.querySelector('b').textContent=Math.ceil(T.time);tm.className=T.time<10?'low':'';$('thMoney').innerHTML='¥<b>'+T.money.toLocaleString()+'</b><small>'+T.count+'人</small>';
-  const ar=$('thArrow'),rd=$('thRide');let tgt=null;
-  if(T.ride){const L=TOWN_LM[T.ride.dest];tgt=T.ride;rd.hidden=false;const d=Math.round(Math.hypot(T.ride.x-car.x,T.ride.z-car.z));
-    rd.innerHTML='<small>行き先</small><b>'+L.name+'</b><span>'+d+' m</span><span class="'+(T.ride.t<6?'bad':'')+'">あと <i>'+Math.ceil(T.ride.t)+'</i> 秒</span>';}
-  else{rd.hidden=false;rd.innerHTML='<small>空車</small><b>お客さんを探そう</b><span>光の柱の下で止まる</span>';let bd=1e9;T.cust.forEach(c=>{const d=Math.hypot(c.x-car.x,c.z-car.z);if(d<bd){bd=d;tgt=c;}});}
-  if(tgt){const dx=tgt.x-car.x,dz=tgt.z-car.z,f=[Math.sin(car.yaw),Math.cos(car.yaw)],r=[-Math.cos(car.yaw),Math.sin(car.yaw)],a=Math.atan2(dx*r[0]+dz*r[1],dx*f[0]+dz*f[1]);
-    ar.hidden=false;ar.style.transform='translateX(-50%) rotate('+a.toFixed(3)+'rad)';ar.className=T.ride?'ride':'';}else ar.hidden=true;}
+// 立体の矢印（画面の上の空中に浮かんで、目標の方向へくるっと向く）
+function townArrowMesh(){if(TOWN.arrow)return TOWN.arrow;const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:0xffd23f,depthTest:false,depthWrite:false,transparent:true}),ed=new THREE.MeshBasicMaterial({color:0x0a0f1e,depthTest:false,depthWrite:false,transparent:true});
+  const sh=new THREE.Shape();sh.moveTo(0,1.25);sh.lineTo(.62,.35);sh.lineTo(.24,.35);sh.lineTo(.24,-.95);sh.lineTo(-.24,-.95);sh.lineTo(-.24,.35);sh.lineTo(-.62,.35);sh.closePath();
+  const geo=new THREE.ExtrudeGeometry(sh,{depth:.22,bevelEnabled:false});geo.rotateX(Math.PI/2);geo.translate(0,.11,0); // 先端が +z
+  const inner=new THREE.Group(),a=new THREE.Mesh(geo,m),b=new THREE.Mesh(geo,ed);b.scale.set(1.16,.5,1.16);b.position.y=-.06;a.renderOrder=21;b.renderOrder=20;inner.add(b,a);g.add(inner);g.userData.m=m;g.userData.inner=inner;g.visible=false;scene.add(g);TOWN.arrow=g;return g;}
+function townArrowUpdate(){const ar=TOWN.arrow;if(!ar)return;const T=game.town;if(!T||mode!=='town'||game.state!=='race'||!T.tgt||T.end){ar.visible=false;return;}ar.visible=true;
+  const f=new THREE.Vector3();camera.getWorldDirection(f);const up=new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion);
+  ar.position.copy(camera.position).addScaledVector(f,7).addScaledVector(up,innerWidth<640?1.7:2.1);
+  // カメラの方へ傾けた板の上で、目標の方向へくるっと回る（真横から見て線にならないように）
+  const camYaw=Math.atan2(f.x,f.z);ar.rotation.set(-1.0,camYaw,0,'YXZ');ar.userData.inner.rotation.set(0,Math.atan2(T.tgt.x-car.x,T.tgt.z-car.z)-camYaw,0);const s=innerWidth<640?.8:1;ar.scale.set(s,s,s);ar.userData.m.color.setHex(T.tgtCol||0xffd23f);}
+function townHud(ge){const T=game.town;if(!T)return;$('townHud').hidden=false;document.body.classList.add('town');ge.textContent='DDDV市 '+TOWN_JOBS[T.job];townArrowMesh();
+  const tm=$('thTime'),rd=$('thRide');$('thArrow').hidden=true;rd.hidden=false;let tgt=null,col=0xffd23f;
+  if(T.job==='escape'){tm.querySelector('small').textContent='捕獲ゲージ';const b=Math.round(T.bust*100);tm.querySelector('b').textContent=b+'%';tm.className=T.bust>.6?'low':'';
+    $('thMoney').innerHTML='¥<b>'+T.money.toLocaleString()+'</b><small>隠れ家 '+T.goals+'か所・逃走 '+Math.floor(T.time)+'秒・パトカー '+T.cops.length+'台</small>';
+    if(T.goal){tgt=T.goal;col=0xff9a30;rd.innerHTML='<small>逃げ込め</small><b>'+T.goal.name+'</b><span>'+Math.round(Math.hypot(T.goal.x-car.x,T.goal.z-car.z))+' m</span>';}}
+  else{tm.querySelector('small').textContent='TIME';tm.querySelector('b').textContent=Math.ceil(T.time);tm.className=T.time<10?'low':'';
+    if(T.job==='collect'){$('thMoney').innerHTML='¥<b>'+T.money.toLocaleString()+'</b><small>回収 '+T.count+'か所</small>';const L=TOWN_LM.plant,pa=townAddr(L.i,L.j,L.s);
+      if(T.load>=T.cap){tgt=pa;col=0x50ff96;rd.innerHTML='<small>満載 '+T.load+'/'+T.cap+'</small><b>清掃工場へ</b><span>'+Math.round(Math.hypot(pa.x-car.x,pa.z-car.z))+' m</span>';}
+      else{let bd=1e9;T.spots.forEach(q=>{const d=Math.hypot(q.x-car.x,q.z-car.z);if(d<bd){bd=d;tgt=q;}});col=0x50ff96;
+        rd.innerHTML='<small>積載 '+T.load+'/'+T.cap+'</small><b>'+(T.cprog>0?'回収中 '+'■'.repeat(Math.ceil(T.cprog*8))+'□'.repeat(8-Math.ceil(T.cprog*8)):'ゴミ集積所へ')+'</b><span>'+(tgt?Math.round(bd)+' m':'')+'</span>';}}
+    else{$('thMoney').innerHTML='¥<b>'+T.money.toLocaleString()+'</b><small>'+T.count+'人</small>';
+      if(T.ride){const L=TOWN_LM[T.ride.dest];tgt=T.ride;col=0x5be37d;const d=Math.round(Math.hypot(T.ride.x-car.x,T.ride.z-car.z));
+        rd.innerHTML='<small>行き先</small><b>'+L.name+'</b><span>'+d+' m</span><span class="'+(T.ride.t<6?'bad':'')+'">あと <i>'+Math.ceil(T.ride.t)+'</i> 秒</span>';}
+      else{let bd=1e9;T.cust.forEach(c=>{const d=Math.hypot(c.x-car.x,c.z-car.z);if(d<bd){bd=d;tgt=c;}});rd.innerHTML='<small>空車</small><b>お客さんを探そう</b><span>光の柱の下で止まる'+(tgt?'（'+Math.round(bd)+' m）':'')+'</span>';}}}
+  T.tgt=tgt;T.tgtCol=col;}
 function drawTownMini(){const T=game.town;mg.clearRect(0,0,240,240);const S=200/TMAX,O=20,m=(x,z)=>[240-(O+x*S),O+z*S];
   mg.strokeStyle='rgba(159,182,255,.35)';mg.lineWidth=3;for(let k=0;k<=TN;k++){let [a,b]=m(k*TG,0),[c,d]=m(k*TG,TMAX);mg.beginPath();mg.moveTo(a,b);mg.lineTo(c,d);mg.stroke();[a,b]=m(0,k*TG);[c,d]=m(TMAX,k*TG);mg.beginPath();mg.moveTo(a,b);mg.lineTo(c,d);mg.stroke();}
   if(T){T.cust.forEach(c=>{const [x,z]=m(c.x,c.z);mg.fillStyle=TCOL[c.cls][2];mg.beginPath();mg.arc(x,z,5,0,7);mg.fill();});
-    if(T.ride){const [x,z]=m(T.ride.x,T.ride.z);mg.fillStyle='#5be37d';mg.fillRect(x-7,z-7,14,14);}}
+    if(T.ride){const [x,z]=m(T.ride.x,T.ride.z);mg.fillStyle='#5be37d';mg.fillRect(x-7,z-7,14,14);}
+    (T.spots||[]).forEach(q=>{const [x,z]=m(q.x,q.z);mg.fillStyle='#50ff96';mg.fillRect(x-4,z-4,8,8);});
+    if(T.job==='collect'&&T.load>=T.cap){const L=TOWN_LM.plant,pa=townAddr(L.i,L.j,L.s),[x,z]=m(pa.x,pa.z);mg.fillStyle='#50ff96';mg.fillRect(x-7,z-7,14,14);}
+    if(T.goal){const [x,z]=m(T.goal.x,T.goal.z);mg.fillStyle='#ffa64a';mg.fillRect(x-7,z-7,14,14);}
+    (T.cops||[]).forEach(c=>{const [x,z]=m(c.x,c.z);mg.fillStyle=(performance.now()/250|0)%2?'#ff3a3a':'#3a7bff';mg.beginPath();mg.arc(x,z,5,0,7);mg.fill();});}
   const [cx,cz]=m(car.x,car.z);mg.fillStyle='#ffae42';mg.strokeStyle='#070b16';mg.lineWidth=3;mg.beginPath();mg.arc(cx,cz,7,0,7);mg.fill();mg.stroke();}
 function townRecover(){let bx=car.x,bz=car.z,bd=1e9;for(let a=0;a<=TN;a++){const x=a*TG;if(Math.abs(car.x-x)<bd){bd=Math.abs(car.x-x);bx=x;bz=car.z;}const z=a*TG;if(Math.abs(car.z-z)<bd){bd=Math.abs(car.z-z);bx=car.x;bz=z;}}
   Object.assign(car,{x:Math.max(0,Math.min(TMAX,bx)),z:Math.max(0,Math.min(TMAX,bz)),vx:0,vz:0,yr:0});}
-function finishTown(){const T=game.town||{money:0,fares:0,tips:0,count:0},earned=Math.max(100,Math.round(T.money/8));wallet+=earned;townClear();
-  const best=+(store.get('touge_town_best')||0);if(T.money>best)store.set('touge_town_best',String(T.money));
-  $('resKick').textContent='DDDV市 ／ クレイジータクシー';$('resHead').textContent='¥'+T.money.toLocaleString();$('resHead').className='res-big '+(T.money>best?'win':'lose');
-  $('resSub').textContent=(T.money>best?'自己ベスト更新！ ':'')+'お客さん '+T.count+'人を運んだ。'+(T.count>=10?'街一番のタクシー運転手。':T.count>=5?'なかなかの稼ぎ。':'近くのお客さんから、早く運ぶのがコツ。');
-  addRows([['運賃（'+T.count+'人）',Math.round(T.fares/8)],['チップ（ドリフト・ニアミス）',Math.round(T.tips/8)]]);addTotal(earned);$('btnRetry').textContent='もう一回営業';$('btnMenu').hidden=false;
-  $('townHud').hidden=true;document.body.classList.remove('town');}
-
+function finishTown(){const T=game.town||{job:townJob,money:0,fares:0,tips:0,count:0,goals:0,time:0,unl:0},job=T.job,earned=Math.max(100,Math.round(T.money/8));wallet+=earned;townClear();
+  const key='touge_town_best_'+job,best=+(store.get(key)||0);if(T.money>best)store.set(key,String(T.money));
+  $('resKick').textContent='DDDV市 ／ '+TOWN_JOBS[job];$('resHead').textContent='¥'+T.money.toLocaleString();$('resHead').className='res-big '+(T.money>best?'win':'lose');
+  if(job==='taxi'){$('resSub').textContent=(T.money>best?'自己ベスト更新！ ':'')+'お客さん '+T.count+'人を運んだ。'+(T.count>=10?'街一番のタクシー運転手。':T.count>=5?'なかなかの稼ぎ。':'近くのお客さんから、早く運ぶのがコツ。');
+    addRows([['運賃（'+T.count+'人）',Math.round(T.fares/8)],['チップ（ドリフト・ニアミス）',Math.round(T.tips/8)]]);}
+  else if(job==='collect'){$('resSub').textContent=(T.money>best?'自己ベスト更新！ ':'')+'ゴミ集積所 '+T.count+'か所を回収し、清掃工場へ '+T.unl+'か所ぶん搬入した。'+(spec.type==='packer'?'':'ゴミ収集車なら6か所ぶん積めて回収も速い。');
+    addRows([['回収・搬入（'+T.count+'か所）',Math.round(T.money/8)]]);}
+  else{$('resSub').textContent=(T.busted?'確保された。':'')+'隠れ家 '+T.goals+'か所に逃げ込み、'+Math.floor(T.time)+'秒逃げ続けた。';addRows([['隠れ家 '+T.goals+'か所',Math.round(T.money/8)]]);}
+  addTotal(earned);$('btnRetry').textContent='もう一回';$('btnMenu').hidden=false;$('townHud').hidden=true;document.body.classList.remove('town');}
 // ===== 電車でGO風：DDDV電鉄 =====
 const DEN_LINES=[{id:'dentetsu',name:'月見線',st:DEN_ST.map(q=>q[0]),spd:15.5,sched:[0,63,116,176,237],col:'#e8a33a'}] /* 定刻：自動運転（制限ぎりぎり）で各駅8秒ほど早く着く設定 */; // 旧路線（山手線・大阪環状線・湖畔線など車道に線路を敷いたもの）は2026-11-06に外した。コースは hidden のまま残っている
 let denLine=store.get('touge_den_line')||'dentetsu';if(!DEN_LINES.some(l=>l.id===denLine))denLine='dentetsu';let denPrev=null;
@@ -4023,7 +4112,7 @@ function finish(){if(ONLINE&&ONLINE.racing&&!ONLINE.finished){if(car.siren)setSi
   $('rTime').textContent=fmt(game.t);$('rDrift').textContent=game.dTotal.toLocaleString();$('rHit').textContent=game.hits+'（耐久 '+Math.round(car.hp/spec.hpMax*100)+'%）';
   $('standings').innerHTML='';$('resQuote').hidden=true;
   $('btnPA').hidden=true;$('btnQuit').hidden=true;$('spBox').hidden=true;
-  if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':'GOAL';}
+  if(!game.retired){game.slowT=1.3;$('count').textContent=mode==='free'?'PA':mode==='town'?(game.town&&game.town.busted?'確保':game.town&&game.town.job==='escape'?'END':'TIME UP'):'GOAL';}
   if(mode==='free')finishFree();else if(mode==='town')finishTown();else if(mode==='densha')finishDen();else if(mode==='school')finishSchool();else if(mode==='cup')finishCup();else if(mode==='collect')finishCollect();else if(mode==='escape')finishEscape();else finishBattle();
   store.set('touge_p',wallet);
   setTimeout(()=>{$('result').hidden=false;$('count').textContent='';},game.retired?900:1700);
@@ -4061,7 +4150,7 @@ function netPts(id){if(!NETP[id]){const c=courseOf(id),pts=genGeo(c.geo,c.y0,c.l
   const g=new Map();pts.forEach((p,i)=>{if(i<w0||i>j0)return;const k=Math.floor(p.x/8)+','+Math.floor(p.z/8);(g.get(k)||g.set(k,[]).get(k)).push(i);});NETP[id]={pts,g,w0,j0};}return NETP[id];}
 function netNear(o,x,z){let bd=1e9,bi=-1;const cx=Math.floor(x/8),cz=Math.floor(z/8);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const l=o.g.get((cx+a)+','+(cz+b));if(!l)continue;for(const i of l){const d=(o.pts[i].x-x)**2+(o.pts[i].z-z)**2;if(d<bd){bd=d;bi=i;}}}return{d:Math.sqrt(bd),i:bi};}
 function netSplits(){const out=[];for(const id in NET){if(id===course.id)continue;const o=netPts(id);let shared=false,sj=0;
-    for(let i=course.loopW;i<course.loopF;i+=2){const r=netNear(o,P[i].x,P[i].z),sh=r.d<2.2&&Math.abs((((P[i].h-o.pts[r.i].h)%(Math.PI*2))+Math.PI*3)%(Math.PI*2)-Math.PI)<.4;
+    for(let i=course.loopW;i<course.loopF;i+=2){const r=netNear(o,P[i].x,P[i].z),sh=r.d<2.2&&Math.abs(wrapPI(((P[i].h-o.pts[r.i].h)%(Math.PI*2))))<.4;
       if(shared&&!sh&&i+320<N&&netNear(o,P[i+300].x,P[i+300].z).d>25&&netNear(o,P[i+150].x,P[i+150].z).d>10){const a=Math.min(N-1,i+80),q=netNear(o,P[Math.max(0,i-2)].x,P[Math.max(0,i-2)].z),qi=Math.min(o.pts.length-1,q.i+82),b=o.pts[qi];
         const side=Math.sign((b.x-P[a].x)*P[a].rx+(b.z-P[a].z)*P[a].rz)||1;
         if(!out.some(s=>Math.abs(s.i-i)<60&&s.side===side))out.push({i:i-2,id,j:q.i,side});}
@@ -4278,7 +4367,7 @@ function olGhostPos(id,d){const O=ONLINE;if(!O.racing)return;const g=O.ghosts[id
 function olClearGhosts(){const O=ONLINE;Object.values(O.ghosts).forEach(g=>scene.remove(g.mesh.g));O.ghosts={};}
 function olStep(dt,now){const O=ONLINE;if(!O||!O.racing)return;
   const pn=performance.now();Object.values(O.ghosts).forEach(g=>{if(!g.got)return;const k=Math.min(1,dt*12),la=Math.min(.25,Math.max(0,(pn-(g.lastT||pn))/1000)),sp=g.sp||0; // 届いた位置から、速さと向きで「今いるはずの位置」を先読みして表示
-    g.x+=(g.tx+Math.sin(g.tyaw)*sp*la-g.x)*k;g.y+=(g.ty-g.y)*k;g.z+=(g.tz+Math.cos(g.tyaw)*sp*la-g.z)*k;let dy=((g.tyaw-g.yaw+Math.PI*3)%(Math.PI*2))-Math.PI;g.yaw+=dy*k;
+    g.x+=(g.tx+Math.sin(g.tyaw)*sp*la-g.x)*k;g.y+=(g.ty-g.y)*k;g.z+=(g.tz+Math.cos(g.tyaw)*sp*la-g.z)*k;let dy=wrapPI(g.tyaw-g.yaw);g.yaw+=dy*k;
     g.mesh.g.position.set(g.x,g.y,g.z);g.mesh.g.rotation.set(0,g.yaw,0);updateSprite(g.mesh,g.yaw,false);});
   if(game.state==='race'&&O.st&&O.st.hit!=='off')olBump();
   if((game.state==='race'||game.state==='count')&&now-O.lastSend>90){O.lastSend=now;olAct({type:'pos',d:[car.x,car.y,car.z,car.yaw,car.idx,Math.hypot(car.vx,car.vz)]});}
