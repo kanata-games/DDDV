@@ -1031,10 +1031,11 @@ function buildRailLine(G){denX.length=0;const E=HALF,rnd=(()=>{let a=7;return()=
          put(A[0],p.y+.3,A[1],B[0],q.y+.3,B[1]);put(A[0],p.y+5.6,A[1],B[0],q.y+5.6,B[1]);put(A[0],p.y+.3,A[1],A[0],p.y+5.6,A[1]);put(A[0],p.y+.3,A[1],B[0],q.y+5.6,B[1]);
          if(sd>0)put(p.x-p.rx*off,p.y+5.6,p.z-p.rz*off,p.x+p.rx*off,p.y+5.6,p.z+p.rz*off);}}
      im.count=k;G.add(im);}}
-  // トンネルの山
-  {let i=0;const hm=new THREE.MeshLambertMaterial({color:0x1b2a1c});while(i<N){if(!P[i].T){i++;continue;}let j=i;while(j<N&&P[j].T)j++;
-     for(let k=i+34;k<j-30;k+=16){const p=P[k],d=new THREE.Mesh(new THREE.SphereGeometry(30,10,6,0,Math.PI*2,0,Math.PI/2),hm);d.scale.set(1.3,.75,1.3);d.position.set(p.x,p.y-2,p.z);G.add(d);}
-     i=j;}}
+  // トンネルの山：トンネルに沿った山形の帯（天井より必ず上なので、トンネルの中からは見えない）
+  {let i=0;const hm=new THREE.MeshLambertMaterial({color:0x1b2a1c,side:THREE.DoubleSide}),PR=[[-50,-1.6],[-32,3],[-18,9],[-8,12.5],[0,13.5],[8,12.5],[18,9],[32,3],[50,-1.6]];
+   while(i<N){if(!P[i].T){i++;continue;}let j=i;while(j<N&&P[j].T)j++;const rows=[];
+     for(let k=i;k<=Math.min(N-1,j);k+=STEP){const p=P[k],e=Math.min(1,(k-i)/14,(j-k)/14);rows.push(PR.map(([o,h])=>{const hh=Math.abs(o)<10?Math.max(8,h*(.6+.4*e)):h*(.5+.5*e);return [p.x+p.rx*o,p.y+hh,p.z+p.rz*o,o/20,k/20];}));}
+     if(rows.length>1)G.add(new THREE.Mesh(ribbon(rows,{}),hm));i=j;}}
   // 民家（窓の明かり）と木
   {const nH=260,gable=new THREE.BufferGeometry();
    gable.setAttribute('position',new THREE.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,1,0, -.5,0,-.5,.5,1,0,-.5,1,0, -.5,0,.5,-.5,1,0,.5,1,0, -.5,0,.5,.5,1,0,.5,0,.5, -.5,0,-.5,-.5,1,0,-.5,0,.5, .5,0,-.5,.5,0,.5,.5,1,0],3));gable.computeVertexNormals();
