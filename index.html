@@ -3865,7 +3865,7 @@ function townDestMark(x,z,col){const g=new THREE.Group();const ring=new THREE.Me
   const beam=new THREE.Mesh(new THREE.CylinderGeometry(9,9,240,24,1,true),new THREE.MeshBasicMaterial({color:col||0x40ff80,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.y=120;
   const glow=new THREE.Mesh(new THREE.CylinderGeometry(6,6,240,16,1,true),new THREE.MeshBasicMaterial({color:col||0x40ff80,transparent:true,opacity:.2,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));glow.position.y=120;glow.renderOrder=5;g.add(ring,beam,glow);g.position.set(x,0,z);scene.add(g);return g;}
 const TOWN_JOBS={taxi:'タクシー',collect:'夜の回収便',escape:'深夜の逃走劇'};let townJob=store.get('touge_town_job')||'taxi';if(!TOWN_JOBS[townJob])townJob='taxi';
-function setupTown(){townClear();const job=townJob,T=game.town={job,time:job==='taxi'?90:60,money:0,fares:0,tips:0,count:0,cust:[],ride:null,combo:0,dchain:0,end:false,spots:[],load:0,unl:0,cprog:0,cops:[],bust:0,goals:0,goal:null,reinf:0};
+function setupTown(){townClear();const job=townJob,T=game.town={job,time:job==='taxi'?80:60,money:0,fares:0,tips:0,count:0,cust:[],ride:null,combo:0,dchain:0,end:false,spots:[],load:0,unl:0,cprog:0,cops:[],bust:0,goals:0,goal:null,reinf:0};
   const s=townAddr(5,5,'S');Object.assign(car,{x:s.x,z:s.z-3,y:0,yaw:Math.PI/2,vx:0,vz:0,yr:0,steer:0});
   townSpawnCars(job==='escape'?26:34);
   if(job==='taxi'){for(let k=0;k<3;k++)townNewCust(70,180);for(let k=0;k<7;k++)townNewCust();
@@ -3942,12 +3942,12 @@ function stepTown(dt){const T=game.town;if(!T)return;townStepCars(dt);if(T.end){
   T.cust.forEach(c=>{c.g.userData.ring.rotation.z+=dt*1.5;});
   if(!T.ride){for(let k=0;k<T.cust.length;k++){const c=T.cust[k];if(Math.hypot(c.x-car.x,c.z-car.z)<8&&sp<3.5){
         scene.remove(c.g);T.cust.splice(k,1);const L=TOWN_LM[c.dest],q=townAddr(L.i,L.j,L.s),lim=Math.round(c.dist/9+14);
-        T.ride={dest:c.dest,x:q.x,z:q.z,lim,t:lim,dist:c.dist,cls:c.cls};T.mark=townDestMark(q.x,q.z);T.time+=4;townPop('乗車！ 「'+L.name+'まで！」 +4秒','#5dd6ff');if(ac)beep(1200,.08);
+        T.ride={dest:c.dest,x:q.x,z:q.z,lim,t:lim,dist:c.dist,cls:c.cls};T.mark=townDestMark(q.x,q.z);T.time+=2;townPop('乗車！ 「'+L.name+'まで！」 +2秒','#5dd6ff');if(ac)beep(1200,.08);
         say({name:'お客さん',col:0x9fd3ea},pick([''+L.name+'まで、急いで！',''+L.name+'まで頼むよ！','すみません、'+L.name+'まで！ 飛ばして！']),2.4);townNewCust();break;}}}
   else{const R=T.ride;R.t-=dt;
     if(car.drifting&&sp>12){T.dchain+=dt;if(T.dchain>1){T.dchain=0;townTip('クレイジードリフト！',80);}}else T.dchain=0;
     if(R.t<=0){townPop('「もういい、ここで降りる！」','#ff5a5a');scene.remove(T.mark);T.mark=null;T.ride=null;T.combo=0;return;}
-    if(Math.hypot(R.x-car.x,R.z-car.z)<11&&sp<5){const fare=Math.round((300+R.dist*2.2)/10)*10,rate=R.t/R.lim,bonus=rate>.5?8:rate>.2?5:3,lab=rate>.5?'SPEEDY!':rate>.2?'NORMAL':'SLOW…',add=bonus+Math.round(R.dist/(rate>.5?28:rate>.2?38:60));
+    if(Math.hypot(R.x-car.x,R.z-car.z)<11&&sp<5){const fare=Math.round((300+R.dist*2.2)/10)*10,rate=R.t/R.lim,bonus=rate>.5?5:rate>.2?3:1,lab=rate>.5?'SPEEDY!':rate>.2?'NORMAL':'SLOW…',add=bonus+Math.round(R.dist/(rate>.5?40:rate>.2?55:90));
       T.money+=fare;T.fares+=fare;T.count++;T.time+=add;scene.remove(T.mark);T.mark=null;T.ride=null;
       townPop(lab+'　¥'+fare.toLocaleString()+'　+'+add+'秒',rate>.5?'#5be37d':rate>.2?'#ffd23f':'#ff9a5a');if(ac){beep(988,.12);setTimeout(()=>beep(1318,.18),130);}
       if(T.cust.filter(c=>Math.hypot(c.x-car.x,c.z-car.z)<260).length<2){townNewCust(60,240);townNewCust(60,260);}
