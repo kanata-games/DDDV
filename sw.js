@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='cae67aabda';
+const VERSION='80524e9776';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -321,6 +321,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/police-cockpit.webp',
   './cars/police-diag.webp',
   './cars/police-sheet.webp',
+  './cars/probox-cockpit.webp',
+  './cars/probox-diag.webp',
+  './cars/probox-sheet.webp',
   './cars/pumpkin-cockpit.webp',
   './cars/pumpkin-diag.webp',
   './cars/pumpkin-sheet.webp',
@@ -458,6 +461,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/yakiimo-cockpit.webp',
   './cars/yakiimo-diag.webp',
   './cars/yakiimo-sheet.webp',
+  './cars/yaris-cockpit.webp',
+  './cars/yaris-diag.webp',
+  './cars/yaris-sheet.webp',
   './cars/z-cockpit.webp',
   './cars/z-diag.webp',
   './cars/z-sheet.webp'];
