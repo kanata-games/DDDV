@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='bcf4176dc1';
+const VERSION='6a64e70890';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -155,6 +155,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/fr-cockpit.webp',
   './cars/fr-diag.webp',
   './cars/fr-sheet.webp',
+  './cars/fusha-cockpit.webp',
+  './cars/fusha-diag.webp',
+  './cars/fusha-sheet.webp',
   './cars/gc8-cockpit.webp',
   './cars/gc8-diag.webp',
   './cars/gc8-sheet.webp',
@@ -416,6 +419,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/stretcher-cockpit.webp',
   './cars/stretcher-diag.webp',
   './cars/stretcher-sheet.webp',
+  './cars/suisha-cockpit.webp',
+  './cars/suisha-diag.webp',
+  './cars/suisha-sheet.webp',
   './cars/supra-cockpit.webp',
   './cars/supra-diag.webp',
   './cars/supra-sheet.webp',
