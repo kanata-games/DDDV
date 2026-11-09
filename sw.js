@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='56639423b6';
+const VERSION='1a7f13cf94';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -140,6 +140,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/fcd-cockpit.webp',
   './cars/fcd-diag.webp',
   './cars/fcd-sheet.webp',
+  './cars/finisher-cockpit.webp',
+  './cars/finisher-diag.webp',
+  './cars/finisher-sheet.webp',
   './cars/fire-cockpit.webp',
   './cars/fire-diag.webp',
   './cars/fire-sheet.webp',
@@ -341,6 +344,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/probox-cockpit.webp',
   './cars/probox-diag.webp',
   './cars/probox-sheet.webp',
+  './cars/pump-cockpit.webp',
+  './cars/pump-diag.webp',
+  './cars/pump-sheet.webp',
   './cars/pumpkin-cockpit.webp',
   './cars/pumpkin-diag.webp',
   './cars/pumpkin-sheet.webp',
