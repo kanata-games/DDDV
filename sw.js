@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='6a64e70890';
+const VERSION='d59d38456f';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -143,6 +143,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/fcd-cockpit.webp',
   './cars/fcd-diag.webp',
   './cars/fcd-sheet.webp',
+  './cars/ferris-cockpit.webp',
+  './cars/ferris-diag.webp',
+  './cars/ferris-sheet.webp',
   './cars/finisher-cockpit.webp',
   './cars/finisher-diag.webp',
   './cars/finisher-sheet.webp',
@@ -359,6 +362,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/probox-cockpit.webp',
   './cars/probox-diag.webp',
   './cars/probox-sheet.webp',
+  './cars/pulley-cockpit.webp',
+  './cars/pulley-diag.webp',
+  './cars/pulley-sheet.webp',
   './cars/pump-cockpit.webp',
   './cars/pump-diag.webp',
   './cars/pump-sheet.webp',
