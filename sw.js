@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='0583438c77';
+const VERSION='c77817c819';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -62,6 +62,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/broom-cockpit.webp',
   './cars/broom-diag.webp',
   './cars/broom-sheet.webp',
+  './cars/bucket-cockpit.webp',
+  './cars/bucket-diag.webp',
+  './cars/bucket-sheet.webp',
   './cars/camper-cockpit.webp',
   './cars/camper-diag.webp',
   './cars/camper-sheet.webp',
@@ -244,6 +247,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/leaf-cockpit.webp',
   './cars/leaf-diag.webp',
   './cars/leaf-sheet.webp',
+  './cars/library-cockpit.webp',
+  './cars/library-diag.webp',
+  './cars/library-sheet.webp',
   './cars/lmh-cockpit.webp',
   './cars/lmh-diag.webp',
   './cars/lmh-sheet.webp',
