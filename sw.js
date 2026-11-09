@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='c77817c819';
+const VERSION='21553e7763';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -354,6 +354,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/s15-cockpit.webp',
   './cars/s15-diag.webp',
   './cars/s15-sheet.webp',
+  './cars/sansui-cockpit.webp',
+  './cars/sansui-diag.webp',
+  './cars/sansui-sheet.webp',
   './cars/satvan-cockpit.webp',
   './cars/satvan-diag.webp',
   './cars/satvan-sheet.webp',
@@ -464,6 +467,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/umimi-cockpit.webp',
   './cars/umimi-diag.webp',
   './cars/umimi-sheet.webp',
+  './cars/vacuum-cockpit.webp',
+  './cars/vacuum-diag.webp',
+  './cars/vacuum-sheet.webp',
   './cars/vwbus-cockpit.webp',
   './cars/vwbus-diag.webp',
   './cars/vwbus-sheet.webp',
