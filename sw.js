@@ -1,5 +1,5 @@
 // DDDV オフライン用。更新のたびに VERSION が変わり、古い保存は消える
-const VERSION='d59d38456f';
+const VERSION='24e11bd18e';
 const CACHE='dddv-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
@@ -452,6 +452,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/taxi-cockpit.webp',
   './cars/taxi-diag.webp',
   './cars/taxi-sheet.webp',
+  './cars/testa-cockpit.webp',
+  './cars/testa-diag.webp',
+  './cars/testa-sheet.webp',
   './cars/tf-cockpit.webp',
   './cars/tf-diag.webp',
   './cars/tf-sheet.webp',
@@ -505,6 +508,9 @@ const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png',
   './cars/vacuum-cockpit.webp',
   './cars/vacuum-diag.webp',
   './cars/vacuum-sheet.webp',
+  './cars/veleno-cockpit.webp',
+  './cars/veleno-diag.webp',
+  './cars/veleno-sheet.webp',
   './cars/vwbus-cockpit.webp',
   './cars/vwbus-diag.webp',
   './cars/vwbus-sheet.webp',
