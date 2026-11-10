@@ -556,6 +556,10 @@ body.spOn #title,body.spOn .hud,body.spOn #touch,body.spOn #snd,body.spOn #btnVi
     <div class="opts">画質
       <div class="seg" id="qSeg"><button type="button" data-q="0">軽い</button><button type="button" data-q="1">標準</button><button type="button" data-q="2">きれい</button></div>
     </div>
+    <div class="opts">景観（月見峠 下り）
+      <div class="seg" id="scSeg"><button type="button" data-s="1">新しい景観</button><button type="button" data-s="0">これまで</button></div>
+      <small style="color:var(--dim);font-size:11px">空・遠くの山・谷の夜景・山の地形を作り直した試作。走りは同じ</small>
+    </div>
     <div class="opts">スマホの横画面固定
       <div class="seg" id="rotSeg"><button type="button" data-r="0">オフ</button><button type="button" data-r="1">左に倒して持つ</button><button type="button" data-r="2">右に倒して持つ</button></div>
       <small style="color:var(--dim);font-size:11px">本体の画面回転をロックしたまま、横持ちで遊べる</small>
@@ -658,7 +662,7 @@ function loopLayout(order){const cnt=x=>genPts(x,0).length-1,tn=cnt(LOOP_TUN);le
 const COURSES=[
   {id:'lake',name:'湖畔ハイウェイ',sub:'湖沿いの高速コーナーが続く',segs:LAKE_SEGS,y0:60,water:true,lampStep:55},
   {id:'up',name:'月見峠 上り',sub:'登り坂でパワーが試される',from:'down',reverse:true,lampStep:72},
-  {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72},
+  {id:'down',name:'月見峠 下り',sub:'ヘアピン4つの本番コース',segs:DOWN_SEGS,y0:180,lampStep:72,sc2:true},
   {id:'tsuzura',name:'つづら折り峠',sub:'ヘアピンが7つ続く急な下り',segs:TSUZURA_SEGS,y0:300,lampStep:60},
   {id:'town',name:'DDDV市',sub:'クレイジータクシーの街',segs:[['S',60,0]],y0:0,half:6,env:'town',hidden:true},
   {id:'dentetsu',name:'DDDV電鉄 月見線',sub:'田んぼと川とトンネルを抜けて温泉へ向かう、夜のローカル線',segs:DEN_SEGS,y0:40,half:2.4,env:'rail',hidden:true,railMax:95,railA:3.2,denStart:130,stations:DEN_ST,xings:[453, 1778, 2821]},
@@ -858,10 +862,144 @@ const poolT=glowTex('rgba(255,170,70,.55)'),haloT=glowTex('rgba(255,200,130,.9)'
 // 電鉄の路線用：バラスト（砂利）と田んぼ
 const ballastTex=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#5a5852';g.fillRect(0,0,w,h);for(let i=0;i<1400;i++){const v=60+Math.random()*70|0;g.fillStyle=`rgb(${v},${v-3},${v-8})`;g.fillRect(Math.random()*w,Math.random()*h,2+Math.random()*3,2+Math.random()*3);}},true);
 const fieldTex=canvasTex(256,256,(g,w,h)=>{g.fillStyle='#1d2c22';g.fillRect(0,0,w,h);for(let y=0;y<2;y++)for(let x=0;x<2;x++){const c=Math.random()<.5?'#203a2a':'#1a2f34';g.fillStyle=c;g.fillRect(x*128+5,y*128+5,118,118);for(let k=0;k<160;k++){g.fillStyle='rgba(120,170,110,.18)';g.fillRect(x*128+8+Math.random()*112,y*128+8+Math.random()*112,1,3);}}g.fillStyle='#3a3f2c';g.fillRect(0,0,w,5);g.fillRect(0,0,5,h);g.fillRect(0,128,w,5);g.fillRect(128,0,5,h);},true);
+// ===== 景観2（sc2）：空のグラデーション・天の川・遠くの山並み・本物の地形・谷の夜景 =====
+// コースに sc2:true を付けると有効（設定の「景観」でこれまでの見た目に戻せる）。走り（当たり判定・道の形）には一切さわらない。
+let sc2Pref=store.get('touge_sc2')!=='0';
+function sc2On(){return !!(course&&course.sc2&&sc2Pref&&!course.snow&&!course.water);}
+const SC2_FOG=0x0b1228,sc2={};
+function sc2Hash(i,j){let n=(Math.imul(i,374761393)+Math.imul(j,668265263))|0;n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;}
+function sc2Val(x,z){const i=Math.floor(x),j=Math.floor(z),fx=x-i,fz=z-j,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),a=sc2Hash(i,j),b=sc2Hash(i+1,j),c=sc2Hash(i,j+1),d=sc2Hash(i+1,j+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+function sc2Fbm(x,z){let s=0,a=.5;for(let o=0;o<4;o++){s+=a*sc2Val(x,z);x=x*2.03+17.1;z=z*2.03+9.7;a*=.5;}return s/.9375;}
+function sc2Rnd(seed){let a=seed;return()=>(a=(a*16807)%2147483647)/2147483647;}
+function sc2Step(a,b,v){const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);}
+// 空：シェーダーで描く（グラデーション・月のかすみ・流れるうす雲・天の川・遠くの山並み2枚）。色は画面に出る色そのまま
+const SC2_SKY_F=`precision highp float;varying vec3 vD;uniform float uT;uniform vec3 uMoon;
+float hs(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hs(i),hs(i+vec2(1.,0.)),f.x),mix(hs(i+vec2(0.,1.)),hs(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*vn(p);p=p*2.03+vec2(17.1,9.7);a*=.5;}return s;}
+float rdg(float a,float b,float amp,float ph){return b+amp*(.31*sin(2.*a+1.3+ph)+.25*sin(3.*a+4.1-ph)+.19*sin(5.*a+.7+ph*2.)+.13*sin(8.*a+2.9)+.09*sin(13.*a+5.3+ph)+.055*sin(21.*a+1.1)+.035*sin(34.*a+3.7)+.05*abs(sin(55.*a+ph)));}
+void main(){vec3 d=normalize(vD);float el=degrees(asin(clamp(d.y,-1.,1.))),az=atan(d.x,d.z);
+  vec3 c=mix(vec3(.125,.176,.345),vec3(.075,.118,.251),smoothstep(1.,10.,el));c=mix(c,vec3(.039,.067,.169),smoothstep(8.,28.,el));c=mix(c,vec3(.02,.035,.098),smoothstep(24.,58.,el));c=mix(c,vec3(.012,.02,.059),smoothstep(50.,90.,el));
+  float m=max(dot(d,uMoon),0.),up=smoothstep(-1.,6.,el);
+  // 天の川
+  vec3 n=normalize(vec3(.62,.35,-.7)),e1=normalize(vec3(n.y,-n.x,0.)),e2=cross(n,e1);float dn=dot(d,n),t=atan(dot(d,e2),dot(d,e1));
+  float mw=exp(-dn*dn/.045)*(.35+1.1*fbm(vec2(t*3.2,dn*9.)+3.7))*smoothstep(4.,30.,el);c+=vec3(.42,.5,.78)*mw*.085;
+  // うす雲（ゆっくり流れる。月の近くは明るい）
+  vec2 cp=d.xz/(d.y+.22);float cl=fbm(cp*vec2(.55,1.5)+vec2(uT*.006,0.))*.65+fbm(cp*vec2(1.7,4.1)+vec2(uT*.011,3.))*.35;
+  float dens=smoothstep(.5,.82,cl)*smoothstep(1.5,9.,el)*(1.-smoothstep(38.,75.,el));c+=vec3(.36,.43,.66)*dens*(.07+.5*pow(m,5.));
+  // 月のかすみ
+  c+=vec3(.3,.4,.75)*(pow(m,40.)*.3+pow(m,7.)*.12+pow(m,2.)*.035)*up;
+  c+=vec3(.2,.27,.52)*exp(-abs(el)/5.)*pow(max(dot(normalize(d.xz),normalize(uMoon.xz)),0.),3.)*.3;
+  // 遠くの山並み
+  c=mix(vec3(.094,.137,.282),c,smoothstep(0.,.07,el-rdg(az,2.0,2.2,0.)));
+  c=mix(vec3(.067,.102,.22),c,smoothstep(0.,.07,el-rdg(az,1.0,1.8,2.4)));
+  c=mix(c,vec3(.043,.071,.157),smoothstep(.4,-6.,el));
+  c+=(hs(gl_FragCoord.xy+fract(uT))-.5)/255.;gl_FragColor=vec4(c,1.);}`;
+function sc2Soft(col){return canvasTex(128,128,(g,w,h)=>{const r=g.createRadialGradient(64,64,0,64,64,64);[[0,1],[.15,.72],[.3,.45],[.45,.25],[.6,.12],[.8,.035],[1,0]].forEach(([p,a])=>r.addColorStop(p,col.replace(/[\d.]+\)$/,a.toFixed(3)+')')));g.fillStyle=r;g.fillRect(0,0,w,h);});}
+function sc2Init(){if(sc2.sky)return;
+  const u={uT:{value:0},uMoon:{value:scene.userData.moon.userData.off.clone().normalize()}};
+  const m=new THREE.Mesh(new THREE.SphereGeometry(1300,24,12),new THREE.ShaderMaterial({uniforms:u,vertexShader:'varying vec3 vD;void main(){vD=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:SC2_SKY_F,side:THREE.BackSide,fog:false,depthWrite:false,depthTest:false}));m.renderOrder=-10;m.frustumCulled=false;m.visible=false;scene.add(m);sc2.sky=m;sc2.u=u;
+  sc2.dotT=sc2Soft('rgba(255,255,255,1)');sc2.warmT=sc2Soft('rgba(255,165,90,1)');
+  const st=scene.userData.stars;st.renderOrder=-9;st.material.depthTest=false;st.material.depthWrite=false;}
+function sc2Apply(){const on=sc2On();if(on)sc2Init();if(sc2.sky)sc2.sky.visible=on;
+  const far=on?4200:1500;if(camera.far!==far){camera.far=far;camera.updateProjectionMatrix();}
+  if(on){scene.fog.color.setHex(SC2_FOG);scene.background.setHex(SC2_FOG);scene.fog.near=30;scene.fog.far=640;}}
+function sc2Frame(now){if(sc2.sky&&sc2.sky.visible){sc2.sky.position.copy(camera.position);sc2.u.uT.value=(now||0)/1000;}}
+// 2段の針葉樹（根元が原点）。1段＝5枚の三角形だけの軽い形
+function sc2TreeGeo(){const pos=[],nor=[],uv=[],S=5;
+  for(const [r,yb,yt] of [[1.95,1.0,5.4],[1.3,3.8,7.4]]){const hh=yt-yb,l=Math.hypot(r,hh),ny=r/l,nr=hh/l;
+    for(let k=0;k<S;k++){const a0=k/S*6.2832,a1=(k+1)/S*6.2832,am=(a0+a1)/2;
+      pos.push(0,yt,0, Math.sin(a0)*r,yb,Math.cos(a0)*r, Math.sin(a1)*r,yb,Math.cos(a1)*r);
+      nor.push(Math.sin(am)*nr,ny,Math.cos(am)*nr, Math.sin(a0)*nr,ny,Math.cos(a0)*nr, Math.sin(a1)*nr,ny,Math.cos(a1)*nr);uv.push(.5,1,0,0,1,0);}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));return g;}
+function sc2TreeTint(mesh,n,rnd){const c=new THREE.Color();for(let k=0;k<n;k++){const v=rnd(),w=rnd();c.setRGB(.024+v*.022+w*.008,.056+v*.036,.040+v*.016-w*.010);mesh.setColorAt(k,c);}mesh.material.color.setHex(0xffffff);if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;}
+// 地形：道から決まる斜面（崖側は上り・谷側は下り）をなめらかにつなぎ、遠くは山全体の傾き＋起伏、谷底は平らな盆地にする
+function sc2Prep(){
+  const q0=quality===0,st=q0?6:4,ns=Math.ceil(N/st),SX=new Float32Array(ns),SZ=new Float32Array(ns),SY=new Float32Array(ns),RX=new Float32Array(ns),RZ=new Float32Array(ns);
+  let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,minY=1e9,maxY=-1e9;
+  for(let k=0;k<ns;k++){const p=P[Math.min(N-1,k*st)];SX[k]=p.x;SZ[k]=p.z;SY[k]=p.y;RX[k]=p.rx;RZ[k]=p.rz;x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);z0=Math.min(z0,p.z);z1=Math.max(z1,p.z);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);}
+  const cx=(x0+x1)/2,cz=(z0+z1)/2,floorY=minY-45;
+  const ext=(s,off)=>{if(off<=46)return sideH(s,off);if(s<0){const h=sideH(-1,46);return off<130?h+(off-46)*.42:h+35.3+(off-130)*.2;}const h=sideH(1,46);return off<80?h-(off-46)*.75:h-25.5-(off-80)*.3;};
+  // 山全体の傾き：道の左右に仮の点を置いて平面を当てはめる
+  let pa,pb,pc;{let n=0,sx=0,sz=0,sh=0,sxx=0,szz=0,sxz=0,sxh=0,szh=0;
+    for(let k=0;k<ns;k+=2)for(const [s,o] of [[-1,46],[1,46],[-1,150],[1,150]]){const x=SX[k]+RX[k]*s*(o+HALF)-cx,z=SZ[k]+RZ[k]*s*(o+HALF)-cz,hh=SY[k]+ext(s,o);n++;sx+=x;sz+=z;sh+=hh;sxx+=x*x;szz+=z*z;sxz+=x*z;sxh+=x*hh;szh+=z*hh;}
+    const mx=sx/n,mz=sz/n,mh=sh/n,a=sxx-n*mx*mx,b=sxz-n*mx*mz,d=szz-n*mz*mz,e=sxh-n*mx*mh,f=szh-n*mz*mh,det=a*d-b*b||1;pb=(e*d-b*f)/det;pc=(a*f-b*e)/det;pa=mh-pb*mx-pc*mz;}
+  const far=(x,z)=>{let h=pa+pb*(x-cx)+pc*(z-cz)+(sc2Fbm(x/260+3.1,z/260+7.7)-.5)*90+(sc2Fbm(x/70+1.3,z/70+2.9)-.5)*14;
+    const top=maxY+150;if(h>top)h=top+(h-top)*.25;
+    const fl=floorY+(sc2Fbm(x/110+5,z/110+8)-.5)*5;if(h<fl)h=fl;else if(h<fl+30){const t=(h-fl)/30;h=fl+30*t*t;}
+    const r=Math.hypot(x-cx,z-cz),m=sc2Step(950,2100,r);if(m>0)h+=m*(110+300*sc2Fbm(x/430+11,z/430+5));return h;};
+  // 道から決まる高さ H(x,z)：近くの道の斜面を距離の4乗の逆数で混ぜる。dm=いちばん近い道までの距離
+  const Hq={h:0,dm:0,bk:0};
+  const H=(x,z)=>{const F=far(x,z);
+    if(x<x0-330||x>x1+330||z<z0-330||z>z1+330){Hq.dm=999;Hq.bk=0;Hq.h=F;return F;} // 道から遠い所は山全体の形だけ
+    let dm=1e18,bk=0,sw=0,sh=0;for(let k=0;k<ns;k++){const dx=x-SX[k],dz=z-SZ[k],d2=dx*dx+dz*dz;if(d2<dm){dm=d2;bk=k;}if(d2>160000)continue;
+      const d=Math.sqrt(d2),off=d>HALF?d-HALF:0,sd=d>.01?(dx*RX[k]+dz*RZ[k])/d:0;
+      let hh;if(sd<=-.5)hh=ext(-1,off);else if(sd>=.5)hh=ext(1,off);else{const t=sd+.5,tt=t*t*(3-2*t),a=ext(-1,off);hh=a+(ext(1,off)-a)*tt;}
+      const w0=1/((d2+9)*(d2+9))-3.9e-11,w=w0>0?w0:0;sw+=w;sh+=w*(SY[k]+hh);} // 400mより遠い道は数えない（重みは400mでなめらかに0になる）
+    dm=Math.sqrt(dm);Hq.dm=dm;Hq.bk=bk;if(dm>=330||sw<=0){Hq.h=F;return F;}
+    let hr=sh/sw;if(hr<floorY+1)hr=floorY+1;
+    return Hq.h=hr+(F-hr)*sc2Step(70,330,dm)+(sc2Fbm(x/55+9.1,z/55+3.3)-.5)*sc2Step(50,170,dm)*16;}; // 道から離れるほど起伏を足す
+  return {H,Hq,q0,st,ns,SX,SZ,RX,RZ,x0,x1,z0,z1,minY,maxY,cx,cz,floorY};
+}
+function sc2Terrain(G,T){
+  const {H,Hq,q0,st,SX,SZ,RX,RZ,x0,x1,z0,z1,maxY,cx,cz,floorY}=T,rnd=sc2Rnd(4711);
+  const axis=(lo,hi)=>{const c=q0?12:8.5,M=1900,a=[];for(let v=lo-120;v<=hi+120.01;v+=c)a.push(v);let s=c,v=a[a.length-1];while(v<hi+M){s*=1.22;v+=s;a.push(v);}s=c;v=a[0];while(v>lo-M){s*=1.22;v-=s;a.unshift(v);}return a;};
+  const xs=axis(x0,x1),zs=axis(z0,z1),nx=xs.length,nz=zs.length,HT=new Float32Array(nx*nz),DM=new Float32Array(nx*nz),CV=new Uint8Array(nx*nz);
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=xs[i],z=zs[j],id=j*nx+i;HT[id]=H(x,z);const dm=Hq.dm,bk=Hq.bk;DM[id]=dm;if(dm>=330)continue;
+    // 道のすぐそば（これまでの斜面の帯が覆っている所）は地形を下に沈めて、帯の下に隠す
+    const dx=x-SX[bk],dz=z-SZ[bk],lat=dx*RX[bk]+dz*RZ[bk],along=dx*RZ[bk]-dz*RX[bk],s=lat<0?-1:1,wi=width[s][Math.min(N-1,bk*st)];
+    if(Math.abs(along)<=st+3&&Math.abs(lat)-HALF<Math.max(wi-4,3))CV[id]=1;}
+  const pos=new Float32Array(nx*nz*3),uv=new Float32Array(nx*nz*2),col=new Float32Array(nx*nz*3),idx=[];
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const id=j*nx+i,h=HT[id];pos[id*3]=xs[i];pos[id*3+1]=CV[id]?h-12:h;pos[id*3+2]=zs[j];uv[id*2]=xs[i]/5;uv[id*2+1]=zs[j]/5;
+    const i0=Math.max(0,i-1),i1=Math.min(nx-1,i+1),j0=Math.max(0,j-1),j1=Math.min(nz-1,j+1),sl=Math.hypot((HT[j*nx+i1]-HT[j*nx+i0])/(xs[i1]-xs[i0]),(HT[j1*nx+i]-HT[j0*nx+i])/(zs[j1]-zs[j0]));
+    const v=.82+sc2Fbm(xs[i]/38+2,zs[j]/38+6)*.4,rk=sc2Step(.95,1.5,sl),fl=1-sc2Step(floorY+3,floorY+16,h),pk=sc2Step(maxY+60,maxY+260,h);
+    let r=.14,g2=.215,b=.135;r+=(.40-r)*rk;g2+=(.42-g2)*rk;b+=(.40-b)*rk; // 急な所は岩肌
+    r+=(.115-r)*fl;g2+=(.16-g2)*fl;b+=(.14-b)*fl; // 谷底は田畑の暗い色
+    r+=(.26-r)*pk*.6;g2+=(.29-g2)*pk*.6;b+=(.30-b)*pk*.6; // 高い峰はやや明るい岩
+    col[id*3]=r*v;col[id*3+1]=g2*v;col[id*3+2]=b*v;}
+  for(let j=0;j<nz-1;j++)for(let i=0;i<nx-1;i++){const a=j*nx+i,b=a+1,c=a+nx,d=c+1;idx.push(a,c,b,b,c,d);}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.BufferAttribute(uv,2));geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.setIndex(idx);geo.computeVertexNormals();
+  G.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({map:rockTex,vertexColors:true})));
+  // 地形の高さを引く（木や明かりを置くのに使う）
+  const find=(a,v)=>{let lo=0,hi=a.length-2;while(lo<hi){const m=(lo+hi+1)>>1;if(a[m]<=v)lo=m;else hi=m-1;}return lo;};
+  const at=(x,z)=>{const i=find(xs,x),j=find(zs,z),fx=Math.max(0,Math.min(1,(x-xs[i])/(xs[i+1]-xs[i]))),fz=Math.max(0,Math.min(1,(z-zs[j])/(zs[j+1]-zs[j]))),a=j*nx+i,b=a+1,c=a+nx,d=c+1;
+    return {h:(HT[a]*(1-fx)+HT[b]*fx)*(1-fz)+(HT[c]*(1-fx)+HT[d]*fx)*fz,dm:Math.min(DM[a],DM[b],DM[c],DM[d]),cov:CV[a]|CV[b]|CV[c]|CV[d],sl:Math.hypot((HT[b]-HT[a])/(xs[i+1]-xs[i]),(HT[c]-HT[a])/(zs[j+1]-zs[j]))};};
+  // 山の木（道の帯の外側）
+  {const cnt=q0?1100:quality===1?2600:3800,tree=new THREE.InstancedMesh(sc2TreeGeo(),new THREE.MeshLambertMaterial({color:0xffffff}),cnt),o=new THREE.Object3D();let n=0,tries=0;
+   while(n<cnt&&tries<cnt*14){tries++;const x=x0-430+rnd()*(x1-x0+860),z=z0-430+rnd()*(z1-z0+860),q=at(x,z);
+     if(q.cov||q.dm<HALF+8||q.sl>1.25||q.h<floorY+5)continue;if(rnd()>1-.8*sc2Step(140,440,q.dm))continue;if(sc2Fbm(x/45+7,z/45+1)<.34)continue; // ところどころ木のない空き地
+     const sc=(.8+rnd()*.9)*(1+sc2Step(120,420,q.dm)*.9);o.position.set(x,q.h-.3,z);o.rotation.y=rnd()*6;o.scale.set(sc,sc*(.85+rnd()*.5),sc);o.updateMatrix();tree.setMatrixAt(n,o.matrix);n++;}
+   tree.count=n;sc2TreeTint(tree,n,rnd);G.add(tree);}
+  // 谷の町の明かり（夜景）と、山あいの家の明かり
+  {const pt=[],pc2=[],C=[[1,.62,.28],[1,.72,.38],[.8,.88,1],[1,.45,.18],[1,.56,.24]];let tries=0,sx=0,sz=0,sn=0;
+   const add=(x,y,z,k,br)=>{const c=C[k];pt.push(x,y,z);pc2.push(c[0]*br,c[1]*br,c[2]*br);};
+   while(pt.length<(q0?1100:2000)*3&&tries<90000){tries++;const a=rnd()*6.283,r=200+rnd()*1500,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r,q=at(x,z);
+     if(q.h>floorY+10||q.dm<110)continue;const tn=sc2Fbm(x/340+1.7,z/340+4.2);if(tn<.5+rnd()*.12)continue;
+     const gx=Math.round(x/18)*18+(rnd()-.5)*6,gz=Math.round(z/18)*18+(rnd()-.5)*6,br=Math.max(.5,1.2-r/2300)*(.7+rnd()*.5);add(gx,q.h+2.5,gz,rnd()*5|0,br);sx+=gx;sz+=gz;sn++;}
+   for(let k=0;k<(q0?25:50)&&tries<120000;){tries++;const x=x0-380+rnd()*(x1-x0+760),z=z0-380+rnd()*(z1-z0+760),q=at(x,z);if(q.cov||q.dm<90||q.sl>.55||q.h<floorY+10)continue;add(x,q.h+3,z,rnd()<.7?0:1,.75);k++;}
+   if(pt.length){const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(pt,3));pg.setAttribute('color',new THREE.Float32BufferAttribute(pc2,3));
+     const pm=new THREE.Points(pg,new THREE.PointsMaterial({map:sc2.dotT,size:quality===0?3.6:5.2,sizeAttenuation:false,vertexColors:true,fog:false,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));pm.frustumCulled=false;G.add(pm);}
+   if(sn>40){const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:sc2.warmT,opacity:.32,transparent:true,depthWrite:false,fog:false,blending:THREE.AdditiveBlending}));gl.scale.set(1700,420,1);gl.position.set(sx/sn,floorY+70,sz/sn);G.add(gl);}}
+  sc2.info={nx,nz,floorY};
+}
+// 道ばたの小物：反射板（視線誘導標）・急カーブの矢印板・街灯の光のすじ
+const sc2ChevT=[0,1].map(fl=>canvasTex(128,64,(g,w,h)=>{g.fillStyle='#d8b418';g.fillRect(0,0,w,h);if(fl){g.translate(w,0);g.scale(-1,1);}g.fillStyle='#14120a';for(let k=0;k<3;k++){const x=8+k*40;g.beginPath();g.moveTo(x,6);g.lineTo(x+16,6);g.lineTo(x+32,32);g.lineTo(x+16,58);g.lineTo(x,58);g.lineTo(x+16,32);g.closePath();g.fill();}}));
+const sc2ConeT=canvasTex(8,64,(g,w,h)=>{const r=g.createLinearGradient(0,0,0,h);r.addColorStop(0,'#fff');r.addColorStop(.35,'#777');r.addColorStop(1,'#000');g.fillStyle=r;g.fillRect(0,0,w,h);});
+function sc2Roadside(G){const o=new THREE.Object3D();
+  {const a=[];for(let i=6;i<N-2;i+=10)a.push(i);
+   const ra=new THREE.InstancedMesh(new THREE.BoxGeometry(.1,.1,.05),new THREE.MeshBasicMaterial({color:0xc86a18}),a.length);
+   a.forEach((i,k)=>{const p=P[i],off=HALF+.38;o.position.set(p.x+p.rx*off,p.y+.98,p.z+p.rz*off);o.rotation.set(0,p.h,0);o.scale.set(1,1,1);o.updateMatrix();ra.setMatrixAt(k,o.matrix);});G.add(ra);}
+  {const L=[[],[]];let last=-99;for(let i=20;i<N-20;i++){if(Math.abs(P[i].k)<1/32||i-last<7)continue;last=i;L[P[i].k>0?1:0].push(i);}
+   L.forEach((list,fl)=>{if(!list.length)return;const m=new THREE.InstancedMesh(new THREE.PlaneGeometry(1.5,.62),new THREE.MeshBasicMaterial({map:sc2ChevT[fl],color:0xb4b4b4}),list.length);
+     list.forEach((i,k)=>{const p=P[i],so=p.k>0?1:-1,off=HALF+(so>0?.8:1.35);o.position.set(p.x+p.rx*so*off,p.y+(so>0?1.35:1.5),p.z+p.rz*so*off);o.rotation.set(0,Math.atan2(-so*p.rx,-so*p.rz),0);o.scale.set(1,1,1);o.updateMatrix();m.setMatrixAt(k,o.matrix);});G.add(m);});}
+  {const step=course.lampStep||72,cnt=Math.floor(N/step),cg=new THREE.ConeGeometry(4.2,7.2,14,1,true).translate(0,-3.6,0),m=new THREE.InstancedMesh(cg,new THREE.MeshBasicMaterial({map:sc2ConeT,color:0xffb870,transparent:true,opacity:.075,blending:THREE.AdditiveBlending,depthWrite:false}),cnt);let n=0;
+   for(let k=0;k<cnt;k++){const p=P[k*step+30];if(!p)break;if(p.T)continue;const off=HALF+1.4,hx=p.x-p.rx*off+p.rx*2.2,hz=p.z-p.rz*off+p.rz*2.2;o.position.set(hx,p.y+7.3,hz);o.rotation.set(0,0,0);o.scale.set(1,1,1);o.updateMatrix();m.setMatrixAt(n++,o.matrix);}
+   m.count=n;m.renderOrder=3;G.add(m);}
+}
 function clearGroup(gr){gr.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material.dispose)o.material.dispose();});while(gr.children.length)gr.remove(gr.children[0]);}
 function buildScenery(){
   clearGroup(trackGroup);clearGroup(railGroup);
-  const G=trackGroup;
+  const G=trackGroup,S2=sc2On(),T2=S2?sc2Prep():null;
   // road
   if(course.env!=='town'){const rows=[];for(let i=0;i<N;i+=STEP){const p=P[i];rows.push([[p.x+p.rx*-HALF,p.y,p.z+p.rz*-HALF,0,p.d/9],[p.x+p.rx*HALF,p.y,p.z+p.rz*HALF,1,p.d/9]]);}
    G.add(new THREE.Mesh(ribbon(rows,{}),new THREE.MeshLambertMaterial({map:course.env==='rail'?ballastTex:course.env==='highway'?roadTexHW:course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'?roadTexCity:roadTex,color:course.snow?0xc8d4e4:0xffffff})));}
@@ -891,7 +1029,8 @@ function buildScenery(){
          let r,g,b; if(s<0){ if(oo<1.3){r=.32;g=.33;b=.34;} else if(oo<7){r=.45;g=.47;b=.44;} else {r=.16;g=.24;b=.15;} }
          else { if(oo<1){r=.2;g=.24;b=.17;} else {r=.13;g=.2;b=.12;} }
          if(course.snow){const w=oo<1.3?.7:.88;r=w;g=w+.03;b=w+.08;}
-         row.push([x,p.y+hh,z,oo/4,p.d/4,r,g,b]);});
+         let yy=p.y+hh;if(S2){const last=j===offs.length-1;if(s<0){if(j>=5)yy=T2.H(x,z)-(last?2:0);}else if(j>=2){const hq=T2.H(x,z);yy=j===2?Math.min(yy,hq)-.5:hq-(last?3.5:1.5);}}
+         row.push([x,yy,z,oo/4,p.d/4,r,g,b]);});
        if(s<0)row.reverse();
        rows.push(row);}
      flush();
@@ -899,6 +1038,7 @@ function buildScenery(){
   if(P.some(p=>p.V))buildViaduct(G);
   if((course.signs==='num'||course.signs==='iroha')&&course.segs)curveSigns(G); // 首都高の signs（案内標識の配列）とは別物
   // valley floor / lake
+  if(S2){sc2Terrain(G,T2);sc2Roadside(G);}else
   {let minY=1e9,cx=0,cz=0;P.forEach(p=>{cx+=p.x;cz+=p.z;minY=Math.min(minY,p.y);});cx/=N;cz/=N;
    const m=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),course.water?new THREE.MeshPhongMaterial({color:0x0c1c33,emissive:0x050b16,specular:0x6f86c8,shininess:60}):new THREE.MeshLambertMaterial({color:course.snow?0xb8c4d6:0x0d1810}));
    m.rotation.x=-Math.PI/2;m.position.set(cx,minY-(course.water?7:45),cz);G.add(m);
@@ -913,7 +1053,7 @@ function buildScenery(){
    G.add(im);}
   // trees
   {const cnt=quality===0?900:1800;
-   const coneG=new THREE.ConeGeometry(1.6,6,6);coneG.translate(0,4,0);
+   const coneG=S2?sc2TreeGeo():new THREE.ConeGeometry(1.6,6,6);if(!S2)coneG.translate(0,4,0);
    const trunkG=new THREE.CylinderGeometry(.18,.25,1.4,5);trunkG.translate(0,.7,0);
    const cone=new THREE.InstancedMesh(coneG,new THREE.MeshLambertMaterial({color:course.snow?0x9fb4b0:0x1d3a24,emissive:course.snow?0x1a2430:0x000000}),cnt);
    const trunk=new THREE.InstancedMesh(trunkG,new THREE.MeshLambertMaterial({color:0x3a2a1c}),cnt);
@@ -924,9 +1064,10 @@ function buildScenery(){
      if(nearRoad(x,z,HALF+3.5,-1,-1)||p.T||P[Math.min(N-1,i+8)].T||P[Math.max(0,i-8)].T)continue;
      if(course.water&&s>0&&oo>9)continue; // 湖側は水際まで
      if(nearV(x,z,52))continue;
-     const sc=.7+Math.random()*.9;o.position.set(x,p.y+sideH(s,oo)-.2,z);o.rotation.y=Math.random()*6;o.scale.set(sc,sc*(.8+Math.random()*.6),sc);o.updateMatrix();
+     const sc=.7+Math.random()*.9;o.position.set(x,S2?Math.min(p.y+sideH(s,oo),T2.H(x,z)-(s>0?1.5:0))-.4:p.y+sideH(s,oo)-.2,z);o.rotation.y=Math.random()*6;o.scale.set(sc,sc*(.8+Math.random()*.6),sc);o.updateMatrix();
      cone.setMatrixAt(n,o.matrix);trunk.setMatrixAt(n,o.matrix);n++;}
    if(course.koyo){const KC=[0xc8321e,0xe0561a,0xe88a1c,0xd8b020,0xa8241a,0x2a4a26];const cc=new THREE.Color();for(let k=0;k<n;k++){cc.setHex(KC[Math.random()*KC.length|0]);cone.setColorAt(k,cc);}cone.material.color.setHex(0xffffff);cone.material.emissive.setHex(0x1a0804);}
+   if(S2&&!course.koyo)sc2TreeTint(cone,n,Math.random);
    cone.count=trunk.count=n;G.add(cone,trunk);}
   // street lamps (cliff side) with fake light pools
   {const step=course.lampStep||72,cnt=Math.floor(N/step);
@@ -2182,6 +2323,7 @@ function buildProfiles(){
 function loadCourse(id){
   course=courseOf(id);HALF=course.half||4.6;course.tollIsl=null;course.spin=null;course.coaster=null;course.gim=null;course.sky=null;course.tower=null;if(course.loop&&course.reroll&&!course.ring){course.reroll=false;course.order=makeLoopOrder();course.segs=loopSegs(course.order);}
   {const urban=course.env==='highway'||course.env==='city'||course.env==='school'||course.env==='arcade'||course.env==='park'||course.env==='airport'||course.env==='town',fc=course.snow?0x3a4660:urban?0x110f24:FOG;scene.fog.color.setHex(fc);scene.background.setHex(fc);scene.fog.near=urban?45:course.snow?20:25;scene.fog.far=urban?560:course.snow?200:240;}
+  sc2Apply();
   snowFx.visible=!!course.snow;
   const T=buildTrack(course);P=T.pts;N=P.length;TOTAL=P[N-1].d;HAIRPINS=T.hairpins;GOAL_I=N-40;
   if(course.ring){const w0=200;let best=1e18,j0=0;for(let j=Math.floor(N*.6);j<N-300;j++){const d=(P[j].x-P[w0].x)**2+(P[j].z-P[w0].z)**2;if(d<best){best=d;j0=j;}} // 1周ぶん先の同じ地点へワープ
@@ -2285,6 +2427,8 @@ const VIEW_NAMES=['後方','ハンドル','フロント','サイド'];
 function toggleView(){game.view=(game.view+1)%4;wheelRig.visible=game.view===1;$('btnView').textContent='視点：'+VIEW_NAMES[game.view];}
 $('btnView').addEventListener('click',toggleView);
 document.querySelectorAll('#qSeg button').forEach(b=>b.addEventListener('click',()=>{quality=+b.dataset.q;store.set('touge_q',quality);applyQuality();}));
+function sc2Seg(){document.querySelectorAll('#scSeg button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.s==='1')===sc2Pref));}sc2Seg();
+document.querySelectorAll('#scSeg button').forEach(b=>b.addEventListener('click',()=>{sc2Pref=b.dataset.s==='1';store.set('touge_sc2',sc2Pref?'1':'0');sc2Seg();if(course&&course.sc2){if(!sc2Pref){scene.fog.color.setHex(FOG);scene.background.setHex(FOG);scene.fog.near=25;scene.fog.far=240;}sc2Apply();buildScenery();}}));
 {const sr=()=>document.querySelectorAll('#rotSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r===rotMode));document.querySelectorAll('#rotSeg button').forEach(b=>b.addEventListener('click',()=>{rotMode=+b.dataset.r;store.set('touge_rot',rotMode);sr();resize();}));sr();}
 // iPhoneのダブルタップ・ピンチでのズームを止める
 try{['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
@@ -3397,7 +3541,7 @@ function frame(now){
   if(course&&course.spin)course.spin.forEach(([o,ax,v])=>o.rotation[ax]+=dt*v);
   if(course&&course.coaster&&course.coaster.path.length>1&&dt>0){const C=course.coaster,L=C.path.length;C.t=((C.t||0)+dt*14)%L;const k=Math.min(L-1,Math.max(0,Math.floor(C.t))),q=C.path[k],n=C.path[(k+1)%L];C.train.position.set(q.x,q.y+.8,q.z);C.train.rotation.set(0,Math.atan2(n.x-q.x,n.z-q.z),0);}
   const moon=scene.userData.moon;moon.position.copy(camera.position).add(moon.userData.off);
-  scene.userData.stars.position.copy(camera.position);
+  scene.userData.stars.position.copy(camera.position);sc2Frame(now);
 
   // HUD
   if(game.state!=='title'){
